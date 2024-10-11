@@ -2,10 +2,6 @@ require:
   - rubocop-performance
   - rubocop-rails
   - rubocop-rspec
-  - ./spec/linters/gl_cops/interactor_inherits_from_interactor_base.rb
-  - ./spec/linters/gl_cops/prevent_erb_files.rb
-  - ./spec/linters/gl_cops/sidekiq_inherits_from_sidekiq_job.rb
-  - ./spec/linters/gl_cops/callback_method_names.rb
 
 AllCops:
   SuggestExtensions: false
@@ -20,21 +16,6 @@ AllCops:
     - 'swagger/**/*'
     - 'tmp/**/*'
     - 'vendor/**/*'
-
-GLCops/CallbackMethodNames:
-  Enabled: true
-
-GLCops/InteractorInheritsFromInteractorBase:
-  Include:
-    - 'app/interactors/**/*'
-
-GLCops/PreventErbFiles:
-  Enabled: true
-
-GLCops/SidekiqInheritsFromSidekiqJob:
-  Include:
-    - '**/*_worker.rb'
-    - '**/*_job.rb'
 
 Layout/LineLength:
   Max: 100
