@@ -3,6 +3,10 @@ require:
   - rubocop-rails
   - rubocop-rspec
   - rubocop-magic_numbers
+  - ./lib/gl_rubocop/custom/interactor_inherits_from_interactor_base.rb
+  - ./lib/gl_rubocop/custom/callback_method_names.rb
+  - ./lib/gl_rubocop/custom/prevent_erb_files.rb
+  - ./lib/gl_rubocop/custom/sidekiq_inherits_from_sidekiq_job.rb
 
 AllCops:
   SuggestExtensions: false
@@ -17,6 +21,23 @@ AllCops:
     - 'swagger/**/*'
     - 'tmp/**/*'
     - 'vendor/**/*'
+    - 'bin/**/*'
+
+Custom/InteractorInheritsFromInteractorBase:
+  Enabled: true
+  Include:
+    - '**/interactors/**/*'
+
+Custom/CallbackMethodNames:
+  Enabled: true
+
+Custom/PreventErbFiles:
+  Enabled: true
+
+Custom/SidekiqInheritsFromSidekiqJob:
+  Include:
+    - '**/*_worker.rb'
+    - '**/*_job.rb'
 
 Layout/LineLength:
   Max: 100
@@ -32,12 +53,21 @@ MagicNumbers/NoAssignment:
 
 MagicNumbers/NoArgument: 
   Enabled: true
+  PermittedValues:
+    - 0
+    - 1
 
 MagicNumbers/NoDefault:
   Enabled: true
+  PermittedValues:
+  - 0
+  - 1
 
 MagicNumbers/NoReturn:
   Enabled: true
+  PermittedValues:
+  - 0
+  - 1
 
 Metrics/AbcSize:
   Max: 17
