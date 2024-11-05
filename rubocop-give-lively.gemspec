@@ -31,6 +31,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency 'rubocop-performance'
   spec.add_dependency 'rubocop-rake'
   spec.add_dependency 'rubocop-rspec'
+  spec.add_dependency 'rubocop-magic_numbers'
 
   spec.metadata['rubygems_mfa_required'] = 'true'
 end

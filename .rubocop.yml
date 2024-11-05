@@ -2,6 +2,7 @@ require:
   - rubocop-performance
   - rubocop-rails
   - rubocop-rspec
+  - rubocop-magic_numbers
 
 AllCops:
   SuggestExtensions: false
@@ -25,6 +26,18 @@ Layout/LineLength:
 Lint/MissingSuper:
   Exclude:
     - 'app/components/**/*'
+
+MagicNumbers/NoAssignment:
+  Enabled: false
+
+MagicNumbers/NoArgument: 
+  Enabled: true
+
+MagicNumbers/NoDefault:
+  Enabled: true
+
+MagicNumbers/NoReturn:
+  Enabled: true
 
 Metrics/AbcSize:
   Max: 17
