@@ -2,9 +2,9 @@
 
 require 'rubocop'
 require 'rubocop/rspec/support'
-require 'linters/gl_cops/prevent_erb_files'
+require 'gl_rubocop/gl_cops/prevent_erb_files'
 
-RSpec.describe Custom::PreventErbFiles do
+RSpec.describe GLRubocop::GLCops::PreventErbFiles do
   include RuboCop::RSpec::ExpectOffense
   let(:config) { RuboCop::Config.new }
   let(:cop) { described_class.new(config) }
@@ -26,4 +26,4 @@ RSpec.describe Custom::PreventErbFiles do
     end
   end
 end
- d
+

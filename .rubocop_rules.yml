@@ -65,6 +65,15 @@ FactoryBot/CreateList:
 FactoryBot/FactoryClassName:
   VersionAdded: '1.37'
   VersionChanged: '2.24'
+GLCops/CallbackMethodNames: {}
+GLCops/InteractorInheritsFromInteractorBase:
+  Include:
+  - "**/interactors/**/*"
+GLCops/PreventErbFiles: {}
+GLCops/SidekiqInheritsFromSidekiqJob:
+  Include:
+  - "**/*_worker.rb"
+  - "**/*_job.rb"
 Gemspec/DuplicatedAssignment:
   Severity: warning
   VersionAdded: '0.52'
@@ -779,9 +788,18 @@ Lint/Void:
   VersionChanged: '1.61'
   CheckForMethodsWithNoSideEffects: false
 MagicNumbers/Base: {}
-MagicNumbers/NoArgument: {}
-MagicNumbers/NoDefault: {}
-MagicNumbers/NoReturn: {}
+MagicNumbers/NoArgument:
+  PermittedValues:
+  - 0
+  - 1
+MagicNumbers/NoDefault:
+  PermittedValues:
+  - 0
+  - 1
+MagicNumbers/NoReturn:
+  PermittedValues:
+  - 0
+  - 1
 Metrics/AbcSize:
   VersionAdded: '0.27'
   VersionChanged: '1.5'

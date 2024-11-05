@@ -2,9 +2,9 @@
 
 require 'rubocop'
 require 'rubocop/rspec/support'
-require 'linters/gl_cops/callback_method_names'
+require 'gl_rubocop/gl_cops/callback_method_names'
 
-RSpec.describe Custom::CallbackMethodNames do
+RSpec.describe GLRubocop::GLCops::CallbackMethodNames do
   subject(:cop) { described_class.new(config) }
 
   let(:config) { RuboCop::Config.new }

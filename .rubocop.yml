@@ -3,10 +3,10 @@ require:
   - rubocop-rails
   - rubocop-rspec
   - rubocop-magic_numbers
-  - ./lib/gl_rubocop/custom/interactor_inherits_from_interactor_base.rb
-  - ./lib/gl_rubocop/custom/callback_method_names.rb
-  - ./lib/gl_rubocop/custom/prevent_erb_files.rb
-  - ./lib/gl_rubocop/custom/sidekiq_inherits_from_sidekiq_job.rb
+  - ./lib/gl_rubocop/gl_cops/interactor_inherits_from_interactor_base.rb
+  - ./lib/gl_rubocop/gl_cops/callback_method_names.rb
+  - ./lib/gl_rubocop/gl_cops/prevent_erb_files.rb
+  - ./lib/gl_rubocop/gl_cops/sidekiq_inherits_from_sidekiq_job.rb
 
 AllCops:
   SuggestExtensions: false
@@ -23,18 +23,18 @@ AllCops:
     - 'vendor/**/*'
     - 'bin/**/*'
 
-Custom/InteractorInheritsFromInteractorBase:
+GLCops/InteractorInheritsFromInteractorBase:
   Enabled: true
   Include:
     - '**/interactors/**/*'
 
-Custom/CallbackMethodNames:
+GLCops/CallbackMethodNames:
   Enabled: true
 
-Custom/PreventErbFiles:
+GLCops/PreventErbFiles:
   Enabled: true
 
-Custom/SidekiqInheritsFromSidekiqJob:
+GLCops/SidekiqInheritsFromSidekiqJob:
   Include:
     - '**/*_worker.rb'
     - '**/*_job.rb'

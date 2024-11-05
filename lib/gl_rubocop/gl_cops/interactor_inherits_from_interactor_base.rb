@@ -1,5 +1,5 @@
 module GLRubocop
-  module Custom
+  module GLCops
     class InteractorInheritsFromInteractorBase < RuboCop::Cop::Cop
       def on_class(klass)
         return unless klass.instance_of?(RuboCop::AST::ClassNode)
