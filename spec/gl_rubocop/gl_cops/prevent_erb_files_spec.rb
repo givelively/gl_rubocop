@@ -26,4 +26,3 @@ RSpec.describe GLRubocop::GLCops::PreventErbFiles do
     end
   end
 end
-
