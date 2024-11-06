@@ -29,13 +29,11 @@ Gem::Specification.new do |spec|
   spec.require_paths = ['lib']
 
   spec.add_dependency 'rubocop'
-  spec.add_dependency 'rubocop-capybara'
   spec.add_dependency 'rubocop-magic_numbers'
   spec.add_dependency 'rubocop-performance'
   spec.add_dependency 'rubocop-rails'
   spec.add_dependency 'rubocop-rake'
   spec.add_dependency 'rubocop-rspec'
-  spec.add_dependency 'rubocop-rspec_rails'
 
   spec.metadata['rubygems_mfa_required'] = 'true'
 end
