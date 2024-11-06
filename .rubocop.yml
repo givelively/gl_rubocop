@@ -3,6 +3,8 @@ require:
   - rubocop-rails
   - rubocop-rspec
   - rubocop-magic_numbers
+  - rubocop-rspec_rails
+  - rubocop-capybara
   - ./lib/gl_rubocop/gl_cops/interactor_inherits_from_interactor_base.rb
   - ./lib/gl_rubocop/gl_cops/callback_method_names.rb
   - ./lib/gl_rubocop/gl_cops/prevent_erb_files.rb
