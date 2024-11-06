@@ -1,5 +1,5 @@
 ---
-RuboCop-version: 1.62.1 (using Parser 3.3.5.0, rubocop-ast 1.32.3, running on ruby
+RuboCop-version: 1.62.1 (using Parser 3.3.6.0, rubocop-ast 1.34.0, running on ruby
   3.1.6)
 Bundler/DuplicatedGem:
   Severity: warning
@@ -651,6 +651,8 @@ Lint/RedundantSafeNavigation:
   - eql?
   - respond_to?
   - equal?
+  - presence
+  - present?
 Lint/RedundantSplatExpansion:
   VersionAdded: '0.76'
   VersionChanged: '1.7'
@@ -681,6 +683,7 @@ Lint/SafeNavigationChain:
   - present?
   - blank?
   - presence
+  - presence_in
   - try
   - try!
   - in?
@@ -1417,12 +1420,6 @@ RSpecRails/HttpStatus:
   EnforcedStyle: symbolic
   VersionAdded: '1.23'
   VersionChanged: '2.20'
-Rails/ActionFilter:
-  VersionAdded: '0.19'
-  EnforcedStyle: action
-  Include:
-  - app/controllers/**/*.rb
-  - app/mailers/**/*.rb
 Rails/ActiveRecordAliases:
   VersionAdded: '0.53'
 Rails/ActiveRecordOverride:
@@ -1444,7 +1441,7 @@ Rails/ApplicationMailer:
   VersionChanged: '2.5'
 Rails/ApplicationRecord:
   VersionAdded: '0.49'
-  VersionChanged: '2.5'
+  VersionChanged: '2.26'
   Exclude:
   - "/db/migrate/*"
 Rails/ArelStar:
@@ -1514,10 +1511,8 @@ Rails/FilePath:
   EnforcedStyle: slashes
 Rails/FindBy:
   VersionAdded: '0.30'
-  VersionChanged: '2.11'
+  VersionChanged: '2.21'
   IgnoreWhereFirst: true
-  Include:
-  - app/models/**/*.rb
 Rails/HasAndBelongsToMany:
   VersionAdded: '0.12'
   Include:
@@ -1564,8 +1559,12 @@ Rails/LinkToBlank:
   VersionAdded: '0.62'
 Rails/NotNullColumn:
   VersionAdded: '0.43'
+  VersionChanged: '2.20'
+  Database:
+  SupportedDatabases:
+  - mysql
   Include:
-  - db/migrate/*.rb
+  - db/**/*.rb
 Rails/Output:
   VersionAdded: '0.15'
   VersionChanged: '0.19'
@@ -1642,7 +1641,7 @@ Rails/ScopeArgs:
   - app/models/**/*.rb
 Rails/SkipsModelValidations:
   VersionAdded: '0.47'
-  VersionChanged: '2.7'
+  VersionChanged: '2.25'
   ForbiddenMethods:
   - decrement!
   - decrement_counter

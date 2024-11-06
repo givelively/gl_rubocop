@@ -28,12 +28,12 @@ Gem::Specification.new do |spec|
   spec.executables = spec.files.grep(%r{\Aexe/}) { |f| File.basename(f) }
   spec.require_paths = ['lib']
 
-  spec.add_dependency 'rubocop'
+  spec.add_dependency 'rubocop', '~> 1.62.0'
   spec.add_dependency 'rubocop-magic_numbers'
   spec.add_dependency 'rubocop-performance'
   spec.add_dependency 'rubocop-rails'
   spec.add_dependency 'rubocop-rake'
-  spec.add_dependency 'rubocop-rspec'
+  spec.add_dependency 'rubocop-rspec', '~> 2.25'
 
   spec.metadata['rubygems_mfa_required'] = 'true'
 end
