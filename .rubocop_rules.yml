@@ -791,16 +791,13 @@ Lint/Void:
   VersionChanged: '1.61'
   CheckForMethodsWithNoSideEffects: false
 MagicNumbers/Base: {}
-MagicNumbers/NoArgument:
-  PermittedValues:
-  - 0
-  - 1
+MagicNumbers/NoArgument: {}
 MagicNumbers/NoDefault:
   PermittedValues:
   - 0
   - 1
 MagicNumbers/NoReturn:
-  PermittedValues:
+  PermittedReturnValues:
   - 0
   - 1
 Metrics/AbcSize:
