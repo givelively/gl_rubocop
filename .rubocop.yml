@@ -50,12 +50,13 @@ Lint/MissingSuper:
 
 MagicNumbers/NoAssignment:
   Enabled: false
+  AllowedAssignments:
+    - instance_variables
+    - class_variables
+    - global_variables
 
 MagicNumbers/NoArgument: 
   Enabled: true
-  PermittedValues:
-    - 0
-    - 1
 
 MagicNumbers/NoDefault:
   Enabled: true
@@ -65,7 +66,7 @@ MagicNumbers/NoDefault:
 
 MagicNumbers/NoReturn:
   Enabled: true
-  PermittedValues:
+  PermittedReturnValues:
   - 0
   - 1
 
