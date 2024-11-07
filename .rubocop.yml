@@ -57,6 +57,9 @@ MagicNumbers/NoAssignment:
 
 MagicNumbers/NoArgument: 
   Enabled: true
+  PermittedValues:
+  - 0
+  - 1
 
 MagicNumbers/NoDefault:
   Enabled: true
