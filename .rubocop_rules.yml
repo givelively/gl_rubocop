@@ -791,7 +791,10 @@ Lint/Void:
   VersionChanged: '1.61'
   CheckForMethodsWithNoSideEffects: false
 MagicNumbers/Base: {}
-MagicNumbers/NoArgument: {}
+MagicNumbers/NoArgument:
+  PermittedValues:
+  - 0
+  - 1
 MagicNumbers/NoDefault:
   PermittedValues:
   - 0
