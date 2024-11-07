@@ -2,7 +2,7 @@
 
 source 'https://rubygems.org'
 
-# Specify your gem's dependencies in rubocop-give-lively.gemspec
+# gem's dependencies specified in gemspec
 gemspec
 
 group :development, :test do
