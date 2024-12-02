@@ -11,22 +11,9 @@ require:
 AllCops:
   SuggestExtensions: false
   NewCops: enable
-  Exclude:
-    - 'config/**/*'
-    - 'db/**/*'
-    - 'log/**/*'
-    - 'public/**/*'
-    - 'spec/factories/**/*'
-    - 'spec/support/**/*'
-    - 'swagger/**/*'
-    - 'tmp/**/*'
-    - 'vendor/**/*'
-    - 'bin/**/*'
 
 GLCops/InteractorInheritsFromInteractorBase:
-  Enabled: true
-  Include:
-    - '**/interactors/**/*'
+  Enabled: false
 
 GLCops/CallbackMethodNames:
   Enabled: true
@@ -34,19 +21,10 @@ GLCops/CallbackMethodNames:
 GLCops/PreventErbFiles:
   Enabled: true
 
-GLCops/SidekiqInheritsFromSidekiqJob:
-  Include:
-    - '**/*_worker.rb'
-    - '**/*_job.rb'
-
 Layout/LineLength:
   Max: 100
   AllowedPatterns:
     - '^ *#'        # Ignores full lines starting with any indentation and a comment (#)
-
-Lint/MissingSuper:
-  Exclude:
-    - 'app/components/**/*'
 
 MagicNumbers/NoAssignment:
   Enabled: false
@@ -75,44 +53,12 @@ MagicNumbers/NoReturn:
 
 Metrics/AbcSize:
   Max: 17
-  Exclude:
-    - 'db/**/*'
-    - 'spec/**/*'
-    - 'config/routes.rb'
-    - 'config/routes/*'
 
 Metrics/MethodLength:
   Max: 15
-  Exclude:
-    - 'app/mailers/**/*'
-    - 'config/routes/**/*'
-    - 'db/**/*'
-    - 'lib/tasks/**/*'
-
-Metrics/BlockLength:
-  Exclude:
-    - 'app/admin/**/*'
-    - 'db/**/*'
-    - 'config/routes/*'
-    - 'config/coverband.rb'
-    - 'spec/**/*'
 
 Metrics/ClassLength:
   Max: 150
-  Exclude:
-    - 'db/seeds/**/*'
-
-Metrics/CyclomaticComplexity:
-  Exclude:
-    - 'db/seeds/**/*'
-
-Metrics/PerceivedComplexity:
-  Exclude:
-    - 'db/seeds/**/*'
-
-Metrics/ParameterLists:
-  Exclude:
-    - 'db/seeds/**/*'
 
 Performance/MapCompact:
   Enabled: false
@@ -125,10 +71,6 @@ Style/AsciiComments:
 
 Naming/MethodParameterName:
   MinNameLength: 1
-
-Style/ClassAndModuleChildren:
-  Exclude:
-    - 'app/controllers/smart_donations_legacy/**/*'
 
 Style/Documentation:
   Enabled: false
@@ -145,27 +87,14 @@ Rails/FindEach:
 Rails/I18nLocaleTexts:
   Enabled: false
 
-Style/GlobalVars:
-  Exclude:
-    - 'spec/**/*'
-
 RSpec/NestedGroups:
   Max: 6
-  Exclude:
-    - 'spec/controllers/**/*'
-    - 'spec/requests/**/*'
 
 RSpec/MultipleExpectations:
   Max: 5
-  Exclude:
-    - 'spec/system/**/*'
 
 RSpec/ExampleLength:
   Max: 30
-  Exclude:
-    - 'spec/lib/props_module_spec.rb'
-    - 'spec/system/**/*'
-    - 'spec/serializers/**/*'
 
 RSpec/AnyInstance:
   Enabled: false
@@ -176,46 +105,11 @@ RSpec/ReceiveMessages:
 RSpec/VerifiedDoubles:
   IgnoreSymbolicNames: true
 
-Rails/SkipsModelValidations:
-  Exclude:
-    - 'spec/**/*'
-    - 'db/**/*'
-
 RSpec/MessageSpies:
   Enabled: false
 
 RSpec/LetSetup:
   Enabled: false
-
-Rails/Output:
-  Exclude:
-    - 'db/seeds/**/*'
-
-RSpec/EmptyExampleGroup:
-  Exclude:
-    - 'spec/api/**/*'
-
-RSpec/DescribeClass:
-  Exclude:
-    - 'spec/api/**/*'
-    - 'spec/views/**/*'
-    - 'spec/lib/tasks/**/*'
-
-Rails/ApplicationRecord:
-  Exclude:
-    - 'db/migrate/*'
-
-RSpec/HookArgument:
-  Exclude:
-    - 'spec/support/**/*'
-
-RSpec/InstanceVariable:
-  Exclude:
-    - 'spec/workers/salesforce/**/*'
-    - 'spec/views/**/*'
-    - 'spec/services/salesforce/**/*'
-    - 'spec/controllers/salesforce_controller_spec.rb'
-    - 'spec/controllers/v1/**/*'
 
 Rails/BulkChangeTable:
   Enabled: false
@@ -239,17 +133,6 @@ Style/MultilineBlockChain:
 
 Naming/VariableNumber:
   EnforcedStyle: 'snake_case'
-  AllowedIdentifiers:
-    - is_501c3
-    - last4
-    - line1
-    - line2
-    - address_line1
-    - address_line2
-    - google_oauth2
-    - s3
-    - shift4
-    - Shift4
 
 RSpec/MultipleMemoizedHelpers:
   Enabled: false
@@ -265,13 +148,9 @@ RSpec/IndexedLet:
 
 RSpec/FilePath:
   Enabled: true
-  Exclude:
-    - 'packs/*/spec/**/*' # Because of automatic namespacing
 
 RSpec/SpecFilePathFormat:
   Enabled: true
-  Exclude:
-    - 'packs/*/spec/**/*' # Because of automatic namespacing
 
 RSpec/VariableName:
   AllowedPatterns:
