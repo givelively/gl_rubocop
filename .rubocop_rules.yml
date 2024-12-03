@@ -66,8 +66,14 @@ FactoryBot/FactoryClassName:
   VersionAdded: '1.37'
   VersionChanged: '2.24'
 GLCops/CallbackMethodNames: {}
+GLCops/InteractorInheritsFromInteractorBase:
+  Include:
+  - app/interactors/**/*
 GLCops/PreventErbFiles: {}
-GLCops/SidekiqInheritsFromSidekiqJob: {}
+GLCops/SidekiqInheritsFromSidekiqJob:
+  Include:
+  - app/**/*_worker.rb
+  - app/**/*_job.rb
 Gemspec/DuplicatedAssignment:
   Severity: warning
   VersionAdded: '0.52'
@@ -591,6 +597,8 @@ Lint/MissingSuper:
   AllowedParentClasses: []
   VersionAdded: '0.89'
   VersionChanged: '1.4'
+  Exclude:
+  - "/app/components/**/*"
 Lint/MixedRegexpCaptureTypes:
   VersionAdded: '0.85'
 Lint/MultipleComparison:
@@ -802,6 +810,11 @@ Metrics/AbcSize:
   AllowedPatterns: []
   CountRepeatedAttributes: true
   Max: 17
+  Exclude:
+  - "/db/**/*"
+  - "/spec/**/*"
+  - "/config/routes.rb"
+  - "/config/routes/*"
 Metrics/BlockLength:
   VersionAdded: '0.44'
   VersionChanged: '1.5'
@@ -815,6 +828,11 @@ Metrics/BlockLength:
   - "/**/*.gemspec"
   - "**/*_spec.rb"
   - "**/spec/**/*"
+  - "/app/admin/**/*"
+  - "/db/**/*"
+  - "/config/routes/*"
+  - "/config/coverband.rb"
+  - "/spec/**/*"
   inherit_mode:
     merge:
     - Exclude
@@ -829,12 +847,16 @@ Metrics/ClassLength:
   CountComments: false
   Max: 150
   CountAsOne: []
+  Exclude:
+  - "/db/seeds/**/*"
 Metrics/CyclomaticComplexity:
   VersionAdded: '0.25'
   VersionChanged: '0.81'
   AllowedMethods: []
   AllowedPatterns: []
   Max: 7
+  Exclude:
+  - "/db/seeds/**/*"
 Metrics/MethodLength:
   VersionAdded: '0.25'
   VersionChanged: '1.5'
@@ -843,6 +865,11 @@ Metrics/MethodLength:
   CountAsOne: []
   AllowedMethods: []
   AllowedPatterns: []
+  Exclude:
+  - "/app/mailers/**/*"
+  - "/config/routes/**/*"
+  - "/db/**/*"
+  - "/lib/tasks/**/*"
 Metrics/ModuleLength:
   VersionAdded: '0.31'
   VersionChanged: '0.87'
@@ -855,12 +882,16 @@ Metrics/ParameterLists:
   Max: 5
   CountKeywordArgs: true
   MaxOptionalParameters: 3
+  Exclude:
+  - "/db/seeds/**/*"
 Metrics/PerceivedComplexity:
   VersionAdded: '0.25'
   VersionChanged: '0.81'
   AllowedMethods: []
   AllowedPatterns: []
   Max: 8
+  Exclude:
+  - "/db/seeds/**/*"
 Migration/DepartmentName:
   VersionAdded: '0.75'
 Naming/AccessorMethodName:
@@ -1017,13 +1048,16 @@ Naming/VariableNumber:
   CheckMethodNames: true
   CheckSymbols: true
   AllowedIdentifiers:
-  - capture3
-  - iso8601
-  - rfc1123_date
-  - rfc822
-  - rfc2822
-  - rfc3339
-  - x86_64
+  - is_501c3
+  - last4
+  - line1
+  - line2
+  - address_line1
+  - address_line2
+  - google_oauth2
+  - s3
+  - shift4
+  - Shift4
   AllowedPatterns: []
 Performance/BindCall:
   VersionAdded: '1.6'
@@ -1118,11 +1152,9 @@ RSpec/ContextWording:
   VersionChanged: '2.13'
 RSpec/DescribeClass:
   Exclude:
-  - "**/spec/features/**/*"
-  - "**/spec/requests/**/*"
-  - "**/spec/routing/**/*"
-  - "**/spec/system/**/*"
-  - "**/spec/views/**/*"
+  - "/spec/api/**/*"
+  - "/spec/views/**/*"
+  - "/spec/lib/tasks/**/*"
   IgnoredMetadata:
     type:
     - channel
@@ -1155,6 +1187,8 @@ RSpec/EmptyExampleGroup:
   AutoCorrect: contextual
   VersionAdded: '1.7'
   VersionChanged: '2.31'
+  Exclude:
+  - "/spec/api/**/*"
 RSpec/EmptyHook:
   AutoCorrect: contextual
   VersionAdded: '1.39'
@@ -1177,6 +1211,10 @@ RSpec/ExampleLength:
   CountAsOne: []
   VersionAdded: '1.5'
   VersionChanged: '2.3'
+  Exclude:
+  - "/spec/lib/props_module_spec.rb"
+  - "/spec/system/**/*"
+  - "/spec/serializers/**/*"
 RSpec/ExampleWithoutDescription:
   EnforcedStyle: always_allow
   VersionAdded: '1.22'
@@ -1215,6 +1253,8 @@ RSpec/FilePath:
   SpecSuffixOnly: false
   VersionAdded: '1.2'
   VersionChanged: '2.24'
+  Exclude:
+  - "/packs/*/spec/**/*"
 RSpec/Focus:
   AutoCorrect: contextual
   VersionAdded: '1.5'
@@ -1222,6 +1262,8 @@ RSpec/Focus:
 RSpec/HookArgument:
   EnforcedStyle: implicit
   VersionAdded: '1.7'
+  Exclude:
+  - "/spec/support/**/*"
 RSpec/HooksBeforeExamples:
   AutoCorrect: contextual
   VersionAdded: '1.29'
@@ -1241,6 +1283,12 @@ RSpec/InstanceVariable:
   AssignmentOnly: false
   VersionAdded: '1.0'
   VersionChanged: '1.7'
+  Exclude:
+  - "/spec/workers/salesforce/**/*"
+  - "/spec/views/**/*"
+  - "/spec/services/salesforce/**/*"
+  - "/spec/controllers/salesforce_controller_spec.rb"
+  - "/spec/controllers/v1/**/*"
 RSpec/ItBehavesLike:
   EnforcedStyle: it_behaves_like
   VersionAdded: '1.13'
@@ -1265,6 +1313,8 @@ RSpec/MultipleExpectations:
   Max: 5
   VersionAdded: '1.7'
   VersionChanged: '1.21'
+  Exclude:
+  - "/spec/system/**/*"
 RSpec/MultipleSubjects:
   VersionAdded: '1.16'
 RSpec/NamedSubject:
@@ -1277,6 +1327,9 @@ RSpec/NestedGroups:
   AllowedGroups: []
   VersionAdded: '1.7'
   VersionChanged: '2.13'
+  Exclude:
+  - "/spec/controllers/**/*"
+  - "/spec/requests/**/*"
 RSpec/NotToNot:
   EnforcedStyle: not_to
   VersionAdded: '1.4'
@@ -1326,7 +1379,7 @@ RSpec/SpecFilePathFormat:
   Include:
   - "**/*_spec.rb"
   Exclude:
-  - "**/spec/routing/**/*"
+  - "/packs/*/spec/**/*"
   CustomTransform:
     RuboCop: rubocop
     RSpec: rspec
@@ -1390,7 +1443,7 @@ Rails/ApplicationRecord:
   VersionAdded: '0.49'
   VersionChanged: '2.26'
   Exclude:
-  - "/db/**/*.rb"
+  - "/db/migrate/*"
 Rails/ArelStar:
   VersionAdded: '2.9'
 Rails/AssertNot:
@@ -1520,6 +1573,8 @@ Rails/Output:
   - config/**/*.rb
   - db/**/*.rb
   - lib/**/*.rb
+  Exclude:
+  - "/db/seeds/**/*"
 Rails/OutputSafety:
   VersionAdded: '0.41'
 Rails/Pick:
@@ -1607,6 +1662,9 @@ Rails/SkipsModelValidations:
   - upsert
   - upsert_all
   AllowedMethods: []
+  Exclude:
+  - "/spec/**/*"
+  - "/db/**/*"
 Rails/UniqBeforePluck:
   VersionAdded: '0.40'
   VersionChanged: '2.13'
@@ -1715,6 +1773,8 @@ Style/CharacterLiteral:
 Style/ClassAndModuleChildren:
   VersionAdded: '0.19'
   EnforcedStyle: nested
+  Exclude:
+  - "/app/controllers/smart_donations_legacy/**/*"
 Style/ClassCheck:
   VersionAdded: '0.24'
   EnforcedStyle: is_a?
@@ -1841,6 +1901,8 @@ Style/GlobalStdStream:
 Style/GlobalVars:
   VersionAdded: '0.13'
   AllowedVariables: []
+  Exclude:
+  - "/spec/**/*"
 Style/GuardClause:
   VersionAdded: '0.20'
   VersionChanged: '1.31'
