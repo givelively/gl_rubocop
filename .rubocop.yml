@@ -1,2 +1,5 @@
+# default.yml is the exportable rubocop configuration imported by projects using this gem.
+# This file ".rubocop.yml" is used strictly for linting the code in this gem.
+
 inherit_from:
-  - rubocop.yml
+  - default.yml
