@@ -2,7 +2,7 @@ require 'rubocop'
 
 module GLRubocop
   PROJECT_ROOT = File.expand_path('../', __dir__)
-  CONFIG_DEFAULT = File.join(PROJECT_ROOT, '.rubocop.yml')
+  CONFIG_DEFAULT = File.join(PROJECT_ROOT, 'default.yml')
 
   # Register your custom RuboCop config
   RuboCop::ConfigLoader.default_configuration = RuboCop::ConfigLoader.merge_with_default(
