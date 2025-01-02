@@ -226,6 +226,7 @@ Rails/CreateTableWithTimestamps:
 Rails/UnknownEnv:
   Environments:
     - development
+    - loadtesting
     - staging
     - sandbox
     - production

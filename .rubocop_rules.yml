@@ -1679,6 +1679,7 @@ Rails/UnknownEnv:
   VersionChanged: '2.18'
   Environments:
   - development
+  - loadtesting
   - staging
   - sandbox
   - production
