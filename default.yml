@@ -46,7 +46,7 @@ Layout/LineLength:
 
 Lint/MissingSuper:
   Exclude:
-    - /app/components/**/*
+    - 'app/components/**/*'
 
 MagicNumbers/NoAssignment:
   Enabled: false
