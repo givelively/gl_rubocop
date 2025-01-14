@@ -8,7 +8,7 @@ require:
   - ./lib/gl_rubocop/gl_cops/callback_method_names.rb
   - ./lib/gl_rubocop/gl_cops/prevent_erb_files.rb
   - ./lib/gl_rubocop/gl_cops/sidekiq_inherits_from_sidekiq_job.rb
-  - ./lib/gl_rubocop/gl_cops/view_component_data_test_ids.rb
+  - ./lib/gl_rubocop/gl_cops/unique_identifier.rb
 
 
 AllCops:
@@ -42,7 +42,7 @@ GLCops/SidekiqInheritsFromSidekiqJob:
     - 'app/**/*_worker.rb'
     - 'app/**/*_job.rb'
 
-GLCops/ViewComponentDataTestIds:
+GLCops/UniqueIdentifier:
   Enabled: true
   Include:
     - 'app/components/**/*.haml'
