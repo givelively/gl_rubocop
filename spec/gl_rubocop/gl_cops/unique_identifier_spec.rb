@@ -8,6 +8,7 @@ RSpec.describe GLRubocop::GLCops::UniqueIdentifier do
   include RuboCop::RSpec::ExpectOffense
 
   subject(:cop) { described_class.new(config) }
+
   let(:config) { RuboCop::Config.new }
 
   let!(:processed_source) { parse_source(source) }
@@ -15,7 +16,8 @@ RSpec.describe GLRubocop::GLCops::UniqueIdentifier do
   let(:file_path) { '/path/to/component.html.haml' }
 
   before do
-    allow_any_instance_of(described_class).to receive(:processed_source).and_return(processed_source)
+    allow_any_instance_of(described_class).to receive(:processed_source)
+      .and_return(processed_source)
     allow(processed_source).to receive(:file_path).and_return(file_path)
     allow(File).to receive(:exist?).with(file_path).and_return(true)
     allow(File).to receive(:read).with(file_path).and_return(template_content)
