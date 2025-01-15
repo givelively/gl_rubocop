@@ -5,6 +5,9 @@ module GLRubocop
       #
       # Good:
       #   {data-test-id: "unique-id"}
+      #   {data-test-id: @unique_id }
+      #   {'data-test-id': "unique-id"}
+      #   {"data-test-id": "unique-id"}
       #
       # Bad:
       #   {data: {testId: "unique-id"}}
@@ -38,7 +41,8 @@ module GLRubocop
       end
 
       def regex_for_indentifier_and_value
-        /#{Regexp.quote(UNIQUE_IDENTIFIER)}:\s*(["']([^"']*)["']|@\w+)/
+        key = Regexp.quote(UNIQUE_IDENTIFIER)
+        /(?:#{key}|["']#{key}["']):\s*(["']([^"']*)["']|@\w+)/
       end
 
       def test_id_value
