@@ -46,7 +46,6 @@ GLCops/UniqueIdentifier:
   Enabled: true
   Include:
     - 'app/components/**/*.haml'
-    - 'app/components/**/*.html.haml'
 
 Layout/LineLength:
   Max: 100

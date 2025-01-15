@@ -77,7 +77,6 @@ GLCops/SidekiqInheritsFromSidekiqJob:
 GLCops/UniqueIdentifier:
   Include:
   - app/components/**/*.haml
-  - app/components/**/*.html.haml
 Gemspec/DuplicatedAssignment:
   Severity: warning
   VersionAdded: '0.52'
