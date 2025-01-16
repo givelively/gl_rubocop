@@ -4,10 +4,12 @@ module GLRubocop
       # This cop ensures that view components include a data-test-id attribute.
       #
       # Good:
-      #   {data-test-id: "unique-id"}
+      #   {data-test-id: 'unique-id'}
       #   {data-test-id: @unique_id }
-      #   {'data-test-id': "unique-id"}
+      #   {'data-test-id': 'unique-id'}
       #   {"data-test-id": "unique-id"}
+      #   {data: {test-id: 'unique-id'}}
+      #   {data: {'test-id': 'unique-id'}}
       #
       # Bad:
       #   {data: {testId: "unique-id"}}
@@ -15,7 +17,7 @@ module GLRubocop
 
       MSG = 'View components must include a data-test-id attribute'.freeze
       EMPTY_MSG = 'data-test-id attribute must not be empty'.freeze
-      UNIQUE_IDENTIFIER = 'data-test-id'.freeze
+      UNIQUE_IDENTIFIER = 'test-id'.freeze
 
       def on_send(node)
         return unless file_exists? && valid_method_name?(node)
@@ -42,7 +44,7 @@ module GLRubocop
 
       def regex_for_indentifier_and_value
         key = Regexp.quote(UNIQUE_IDENTIFIER)
-        /(?:#{key}|["']#{key}["']):\s*(["']([^"']*)["']|@\w+)/
+        /(?:["']?data-#{key}["']?|data:.?\{["']?#{key}["']?):\s*(["']([^"']*)["']|@\w+)/
       end
 
       def test_id_value
