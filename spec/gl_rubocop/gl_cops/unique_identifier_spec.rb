@@ -69,4 +69,51 @@ RSpec.describe GLRubocop::GLCops::UniqueIdentifier do
       RUBY
     end
   end
+
+  context 'when render method is used with valid data-test-id formats' do
+    let(:source) { 'render "component"' }
+
+    valid_templates = [
+      '%div{data-test-id: "unique-id"} Some content',
+      '%div{data-test-id: @unique_id} Some content',
+      '%div{"data-test-id": "unique-id"} Some content',
+      '%div{\'data-test-id\': \'unique-id\'} Some content',
+      '%div{data: {\'test-id\': \'unique-id\'}} Some content',
+      '%div{data: {test-id: "unique-id"}} Some content'
+    ]
+
+    valid_templates.each do |template|
+      context "when template content is #{template}" do
+        let(:template_content) { template }
+
+        it 'does not register an offense' do
+          expect_no_offenses(<<~RUBY)
+            render "component"
+          RUBY
+        end
+      end
+    end
+  end
+
+  context 'when render method is used with invalid data-test-id formats' do
+    let(:source) { 'render "component"' }
+
+    invalid_templates = [
+      '%div{data: {testId: "unique-id"}} Some content',
+      '%div{data: {test: {id: "unique-id"}}} Some content'
+    ]
+
+    invalid_templates.each do |template|
+      context "when template content is #{template}" do
+        let(:template_content) { template }
+
+        it 'registers an offense' do
+          expect_offense(<<~RUBY)
+            render "component"
+            ^^^^^^^^^^^^^^^^^^ GLCops/UniqueIdentifier: View components must include a data-test-id attribute
+          RUBY
+        end
+      end
+    end
+  end
 end
