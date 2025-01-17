@@ -70,6 +70,7 @@ GLCops/InteractorInheritsFromInteractorBase:
   Include:
   - app/interactors/**/*
 GLCops/PreventErbFiles: {}
+GLCops/RailsCache: {}
 GLCops/SidekiqInheritsFromSidekiqJob:
   Include:
   - app/**/*_worker.rb

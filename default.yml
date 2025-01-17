@@ -7,6 +7,7 @@ require:
   - ./lib/gl_rubocop/gl_cops/interactor_inherits_from_interactor_base.rb
   - ./lib/gl_rubocop/gl_cops/callback_method_names.rb
   - ./lib/gl_rubocop/gl_cops/prevent_erb_files.rb
+  - ./lib/gl_rubocop/gl_cops/rails_cache.rb
   - ./lib/gl_rubocop/gl_cops/sidekiq_inherits_from_sidekiq_job.rb
   - ./lib/gl_rubocop/gl_cops/unique_identifier.rb
 
@@ -35,6 +36,9 @@ GLCops/CallbackMethodNames:
   Enabled: true
 
 GLCops/PreventErbFiles:
+  Enabled: true
+
+GLCops/RailsCache:
   Enabled: true
 
 GLCops/SidekiqInheritsFromSidekiqJob:
