@@ -157,6 +157,11 @@ Rails/FindEach:
 Rails/I18nLocaleTexts:
   Enabled: false
 
+Rails/UnusedIgnoredColumns:
+  # This rule is incompatible with our split schema for datawarehouse models
+  # It is disabled by default in rubocop-rails
+  Enabled: false
+
 Style/GlobalVars:
   Exclude:
     - 'spec/**/*'

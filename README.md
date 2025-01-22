@@ -18,12 +18,11 @@ Or install it yourself as:
 $ gem install gl_lint
 ```
 
-And finally add to the top of your project's RuboCop configuration file:
+And finally add this to the top of your project's RuboCop configuration file:
 
 ```yml
  inherit_gem:
     rubocop-shopify: rubocop.yml
-
 ```
 Any `Include` or `Exclude` configuration provided will be merged with RuboCop's defaults.
 
