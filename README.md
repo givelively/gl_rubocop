@@ -26,7 +26,7 @@ And finally add this to the top of your project's RuboCop configuration file:
 
 ```yml
  inherit_gem:
-    rubocop-shopify: rubocop.yml
+    gl_rubocop: default.yml
 ```
 
 Any `Include` or `Exclude` configuration provided will be merged with RuboCop's defaults.
