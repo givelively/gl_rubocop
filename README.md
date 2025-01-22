@@ -1,7 +1,9 @@
 # gl_rubocop
+
 A shareable configuration of rules we use at Give Lively to lint our Ruby code.
 
 ## Installation
+
 Add this line to your application's Gemfile:
 
 ```ruby
@@ -9,13 +11,15 @@ gem 'gl_rubocop', require: false
 ```
 
 And then execute:
-```
-$ bundle install
+
+```bash
+ bundle install
 ```
 
 Or install it yourself as:
-```
-$ gem install gl_lint
+
+```bash
+ gem install gl_lint
 ```
 
 And finally add this to the top of your project's RuboCop configuration file:
@@ -24,6 +28,7 @@ And finally add this to the top of your project's RuboCop configuration file:
  inherit_gem:
     rubocop-shopify: rubocop.yml
 ```
+
 Any `Include` or `Exclude` configuration provided will be merged with RuboCop's defaults.
 
 For more information about inheriting configuration from a gem please check
@@ -48,4 +53,4 @@ documentation](https://docs.rubocop.org/rubocop/configuration.html#inheriting-co
 
 8. Following the authorization prompts listed by the gem command.
 
-9. Your changes have now been published to the rubygems registry
+9. Your changes have now been published to the rubygems registry.
