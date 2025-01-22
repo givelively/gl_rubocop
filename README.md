@@ -35,7 +35,7 @@ For more information about inheriting configuration from a gem please check
 [RuboCop's
 documentation](https://docs.rubocop.org/rubocop/configuration.html#inheriting-configuration-from-a-dependency-gem).
 
-## Making changes and Publishing
+## Making changes and publishing
 
 1. As per our code agreements, all code changes to this gem are required to be made via pull request with final approval from at least one Give Lively engineer.
 
