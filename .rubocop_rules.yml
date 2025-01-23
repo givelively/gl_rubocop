@@ -1,6 +1,4 @@
 ---
-RuboCop-version: 1.62.1 (using Parser 3.3.7.0, rubocop-ast 1.37.0, running on ruby
-  3.1.6)
 Bundler/DuplicatedGem:
   Severity: warning
   VersionAdded: '0.46'
@@ -1751,6 +1749,16 @@ Rails/Validation:
   VersionChanged: '0.41'
   Include:
   - app/models/**/*.rb
+Rake/ClassDefinitionInTask:
+  VersionAdded: 0.3.0
+Rake/Desc:
+  VersionAdded: 0.1.0
+Rake/DuplicateNamespace:
+  VersionAdded: 0.5.0
+Rake/DuplicateTask:
+  VersionAdded: 0.4.0
+Rake/MethodDefinitionInTask:
+  VersionAdded: 0.2.0
 Security/Eval:
   VersionAdded: '0.47'
 Security/JSONLoad:
