@@ -847,8 +847,6 @@ Lint/Void:
   Exclude:
   - "/**/*.haml"
 MagicNumbers/Base: {}
-  Exclude:
-  - "/spec/**/*"
 MagicNumbers/NoArgument:
   Exclude:
   - "/spec/**/*"
