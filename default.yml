@@ -63,6 +63,7 @@ Lint/MissingSuper:
 MagicNumbers/NoAssignment:
   Exclude:
     - "spec/**/*"
+    - "**/spec/**/*"
   Enabled: false
   AllowedAssignments:
     - instance_variables
@@ -72,6 +73,7 @@ MagicNumbers/NoAssignment:
 MagicNumbers/NoArgument:
   Exclude:
     - "spec/**/*"
+    - "**/spec/**/*"
   Enabled: true
   PermittedValues:
     - 0
@@ -80,6 +82,7 @@ MagicNumbers/NoArgument:
 MagicNumbers/NoDefault:
   Exclude:
     - "spec/**/*"
+    - "**/spec/**/*"
   Enabled: true
   PermittedValues:
     - 0
@@ -88,6 +91,7 @@ MagicNumbers/NoDefault:
 MagicNumbers/NoReturn:
   Exclude:
     - "spec/**/*"
+    - "**/spec/**/*"
   Enabled: true
   PermittedReturnValues:
     - 0

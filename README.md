@@ -54,3 +54,31 @@ documentation](https://docs.rubocop.org/rubocop/configuration.html#inheriting-co
 8. Following the authorization prompts listed by the gem command.
 
 9. Your changes have now been published to the rubygems registry.
+
+## Testing Locally
+It's likely the case you'll want to test your changes locally before opening a PR, getting approval, and publishing the gem.
+
+To do so, complete the following steps:
+
+1. Save the changes to whichever files you have modified.
+
+2. Run the command `gem build` to create the bundle (this may require you to have bumped the version number)
+
+3. Go to the Gemfile in whichever ruby-based repo you want to test your rubocop changes against
+
+4. Create an entry for gl_rubocop specifiying the *relative* path to your local `gl_rubocop` repo (ex. `../code/gl_rubocop`):
+
+```ruby
+gem 'gl_rubocop', '~> 0.2.9', path: '../path/to/your/local/gl_rubocop'
+```
+
+5. Within the same repo as the Gemfile you just updated run `bundle install`
+
+6. Finally add the following lines to your rubocop configuration file
+
+```yml
+ inherit_gem:
+    gl_rubocop: default.yml
+```
+
+7. Now you can test your rubocop changes local with the target repo.
