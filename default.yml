@@ -7,8 +7,8 @@ require:
   - rubocop-rake
   - ./lib/gl_rubocop/gl_cops/callback_method_names.rb
   - ./lib/gl_rubocop/gl_cops/interactor_inherits_from_interactor_base.rb
-  - ./lib/gl_rubocop/gl_cops/prevent_erb_files.rb
   - ./lib/gl_rubocop/gl_cops/no_stubbing_perform_async.rb
+  - ./lib/gl_rubocop/gl_cops/prevent_erb_files.rb
   - ./lib/gl_rubocop/gl_cops/rails_cache.rb
   - ./lib/gl_rubocop/gl_cops/sidekiq_inherits_from_sidekiq_job.rb
   - ./lib/gl_rubocop/gl_cops/unique_identifier.rb
