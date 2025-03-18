@@ -51,6 +51,9 @@ GLCops/UniqueIdentifier:
   Include:
     - "app/components/**/*.haml"
 
+Layout/ClassStructure:
+  Enabled: true
+  
 Layout/LineLength:
   Max: 100
   AllowedPatterns:

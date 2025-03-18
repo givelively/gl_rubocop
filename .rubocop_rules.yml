@@ -1,4 +1,6 @@
 ---
+RuboCop-version: 1.62.1 (using Parser 3.3.6.0, rubocop-ast 1.36.2, running on ruby
+  3.1.6)
 Bundler/DuplicatedGem:
   Severity: warning
   VersionAdded: '0.46'
@@ -146,6 +148,22 @@ Layout/CaseIndentation:
   EnforcedStyle: case
   IndentOneStep: false
   IndentationWidth:
+Layout/ClassStructure:
+  VersionAdded: '0.52'
+  VersionChanged: '1.53'
+  Categories:
+    module_inclusion:
+    - include
+    - prepend
+    - extend
+  ExpectedOrder:
+  - module_inclusion
+  - constants
+  - public_class_methods
+  - initializer
+  - public_methods
+  - protected_methods
+  - private_methods
 Layout/ClosingHeredocIndentation:
   VersionAdded: '0.57'
 Layout/ClosingParenthesisIndentation:
