@@ -27,13 +27,19 @@ AllCops:
     - "vendor/**/*"
     - "bin/**/*"
 
+Capybara/ClickLinkOrButtonStyle:
+  EnforcedStyle: link_or_button
+
+Capybara/NegationMatcher:
+  EnforcedStyle: not_to
+
+GLCops/CallbackMethodNames:
+  Enabled: true
+
 GLCops/InteractorInheritsFromInteractorBase:
   Enabled: true
   Include:
     - "app/interactors/**/*"
-
-GLCops/CallbackMethodNames:
-  Enabled: true
 
 GLCops/PreventErbFiles:
   Enabled: true
@@ -53,68 +59,60 @@ GLCops/UniqueIdentifier:
 
 Layout/ClassStructure:
   Enabled: true
-  
+
 Layout/LineLength:
-  Max: 100
   AllowedPatterns:
     - "^ *#" # Ignores full lines starting with any indentation and a comment (#)
+  Max: 100
 
 Lint/MissingSuper:
   Exclude:
     - "app/components/**/*"
 
-MagicNumbers/NoAssignment:
-  Exclude:
-    - "spec/**/*"
-    - "**/spec/**/*"
-  Enabled: false
-  AllowedAssignments:
-    - instance_variables
-    - class_variables
-    - global_variables
-
 MagicNumbers/NoArgument:
+  Enabled: true
   Exclude:
     - "spec/**/*"
     - "**/spec/**/*"
-  Enabled: true
   PermittedValues:
     - 0
     - 1
 
-MagicNumbers/NoDefault:
+MagicNumbers/NoAssignment:
+  AllowedAssignments:
+    - instance_variables
+    - class_variables
+    - global_variables
+  Enabled: false
   Exclude:
     - "spec/**/*"
     - "**/spec/**/*"
+
+MagicNumbers/NoDefault:
   Enabled: true
+  Exclude:
+    - "spec/**/*"
+    - "**/spec/**/*"
   PermittedValues:
     - 0
     - 1
 
 MagicNumbers/NoReturn:
+  Enabled: true
   Exclude:
     - "spec/**/*"
     - "**/spec/**/*"
-  Enabled: true
   PermittedReturnValues:
     - 0
     - 1
 
 Metrics/AbcSize:
-  Max: 17
   Exclude:
     - "db/**/*"
     - "spec/**/*"
     - "config/routes.rb"
     - "config/routes/*"
-
-Metrics/MethodLength:
-  Max: 15
-  Exclude:
-    - "app/mailers/**/*"
-    - "config/routes/**/*"
-    - "db/**/*"
-    - "lib/tasks/**/*"
+  Max: 17
 
 Metrics/BlockLength:
   Exclude:
@@ -125,11 +123,23 @@ Metrics/BlockLength:
     - "spec/**/*"
 
 Metrics/ClassLength:
+  Exclude:
+    - "db/seeds/**/*"
   Max: 150
+
+Metrics/CyclomaticComplexity:
   Exclude:
     - "db/seeds/**/*"
 
-Metrics/CyclomaticComplexity:
+Metrics/MethodLength:
+  Exclude:
+    - "app/mailers/**/*"
+    - "config/routes/**/*"
+    - "db/**/*"
+    - "lib/tasks/**/*"
+  Max: 15
+
+Metrics/ParameterLists:
   Exclude:
     - "db/seeds/**/*"
 
@@ -137,141 +147,10 @@ Metrics/PerceivedComplexity:
   Exclude:
     - "db/seeds/**/*"
 
-Metrics/ParameterLists:
-  Exclude:
-    - "db/seeds/**/*"
-
-Performance/MapCompact:
-  Enabled: false
-
-Style/Alias:
-  EnforcedStyle: prefer_alias_method
-
-Style/AsciiComments:
-  Enabled: false
-
 Naming/MethodParameterName:
   MinNameLength: 1
 
-Style/ClassAndModuleChildren:
-  Exclude:
-    - "app/controllers/smart_donations_legacy/**/*"
-
-Style/Documentation:
-  Enabled: false
-
-Style/FrozenStringLiteralComment:
-  Enabled: false
-
-Rails/TimeZone:
-  Enabled: false
-
-Rails/FindEach:
-  Enabled: false
-
-Rails/I18nLocaleTexts:
-  Enabled: false
-
-Rails/UnusedIgnoredColumns:
-  # This rule is incompatible with our split schema for datawarehouse models
-  # It is disabled by default in rubocop-rails
-  Enabled: false
-
-Style/GlobalVars:
-  Exclude:
-    - "spec/**/*"
-
-RSpec/NestedGroups:
-  Max: 6
-  Exclude:
-    - "spec/controllers/**/*"
-    - "spec/requests/**/*"
-
-RSpec/MultipleExpectations:
-  Max: 5
-  Exclude:
-    - "spec/system/**/*"
-
-RSpec/ExampleLength:
-  Max: 30
-  Exclude:
-    - "spec/lib/props_module_spec.rb"
-    - "spec/system/**/*"
-    - "spec/serializers/**/*"
-
-RSpec/AnyInstance:
-  Enabled: false
-
-RSpec/ReceiveMessages:
-  Enabled: false
-
-RSpec/VerifiedDoubles:
-  IgnoreSymbolicNames: true
-
-Rails/SkipsModelValidations:
-  Exclude:
-    - "spec/**/*"
-    - "db/**/*"
-
-RSpec/MessageSpies:
-  Enabled: false
-
-RSpec/LetSetup:
-  Enabled: false
-
-Rails/Output:
-  Exclude:
-    - "db/seeds/**/*"
-
-RSpec/EmptyExampleGroup:
-  Exclude:
-    - "spec/api/**/*"
-
-RSpec/DescribeClass:
-  Exclude:
-    - "spec/api/**/*"
-    - "spec/views/**/*"
-    - "spec/lib/tasks/**/*"
-
-Rails/ApplicationRecord:
-  Exclude:
-    - "db/migrate/*"
-
-RSpec/HookArgument:
-  Exclude:
-    - "spec/support/**/*"
-
-RSpec/InstanceVariable:
-  Exclude:
-    - "spec/workers/salesforce/**/*"
-    - "spec/views/**/*"
-    - "spec/services/salesforce/**/*"
-    - "spec/controllers/salesforce_controller_spec.rb"
-    - "spec/controllers/v1/**/*"
-
-Rails/BulkChangeTable:
-  Enabled: false
-
-Rails/CreateTableWithTimestamps:
-  Enabled: false
-
-Rails/UnknownEnv:
-  Environments:
-    - development
-    - loadtesting
-    - staging
-    - sandbox
-    - production
-    - test
-
-Style/HashAsLastArrayItem:
-  Enabled: false
-
-Style/MultilineBlockChain:
-  Enabled: false
-
 Naming/VariableNumber:
-  EnforcedStyle: "snake_case"
   AllowedIdentifiers:
     - is_501c3
     - last4
@@ -283,23 +162,76 @@ Naming/VariableNumber:
     - s3
     - shift4
     - Shift4
+  EnforcedStyle: "snake_case"
 
-RSpec/MultipleMemoizedHelpers:
+Performance/MapCompact:
   Enabled: false
 
-RSpecRails/InferredSpecType:
+RSpec/AnyInstance:
   Enabled: false
 
-RSpec/SortMetadata:
-  Enabled: false
+RSpec/DescribeClass:
+  Exclude:
+    - "spec/api/**/*"
+    - "spec/views/**/*"
+    - "spec/lib/tasks/**/*"
 
-RSpec/IndexedLet:
-  Enabled: false
+RSpec/EmptyExampleGroup:
+  Exclude:
+    - "spec/api/**/*"
+
+RSpec/ExampleLength:
+  Exclude:
+    - "spec/lib/props_module_spec.rb"
+    - "spec/system/**/*"
+    - "spec/serializers/**/*"
+  Max: 30
 
 RSpec/FilePath:
   Enabled: true
   Exclude:
     - "packs/*/spec/**/*" # Because of automatic namespacing
+
+RSpec/HookArgument:
+  Exclude:
+    - "spec/support/**/*"
+
+RSpec/IndexedLet:
+  Enabled: false
+
+RSpec/InstanceVariable:
+  Exclude:
+    - "spec/workers/salesforce/**/*"
+    - "spec/views/**/*"
+    - "spec/services/salesforce/**/*"
+    - "spec/controllers/salesforce_controller_spec.rb"
+    - "spec/controllers/v1/**/*"
+
+RSpec/LetSetup:
+  Enabled: false
+
+RSpec/MessageSpies:
+  Enabled: false
+
+RSpec/MultipleExpectations:
+  Exclude:
+    - "spec/system/**/*"
+  Max: 5
+
+RSpec/MultipleMemoizedHelpers:
+  Enabled: false
+
+RSpec/NestedGroups:
+  Exclude:
+    - "spec/controllers/**/*"
+    - "spec/requests/**/*"
+  Max: 6
+
+RSpec/ReceiveMessages:
+  Enabled: false
+
+RSpec/SortMetadata:
+  Enabled: false
 
 RSpec/SpecFilePathFormat:
   Enabled: true
@@ -310,8 +242,76 @@ RSpec/VariableName:
   AllowedPatterns:
     - "Authorization" # used in RSwag specs
 
-Capybara/ClickLinkOrButtonStyle:
-  EnforcedStyle: link_or_button
+RSpec/VerifiedDoubles:
+  IgnoreSymbolicNames: true
 
-Capybara/NegationMatcher:
-  EnforcedStyle: not_to
+RSpecRails/InferredSpecType:
+  Enabled: false
+
+Rails/ApplicationRecord:
+  Exclude:
+    - "db/migrate/*"
+
+Rails/BulkChangeTable:
+  Enabled: false
+
+Rails/CreateTableWithTimestamps:
+  Enabled: false
+
+Rails/FindEach:
+  Enabled: false
+
+Rails/I18nLocaleTexts:
+  Enabled: false
+
+Rails/Output:
+  Exclude:
+    - "db/seeds/**/*"
+
+Rails/SkipsModelValidations:
+  Exclude:
+    - "spec/**/*"
+    - "db/**/*"
+
+Rails/TimeZone:
+  Enabled: false
+
+Rails/UnknownEnv:
+  Environments:
+    - development
+    - loadtesting
+    - staging
+    - sandbox
+    - production
+    - test
+
+Rails/UnusedIgnoredColumns:
+  # This rule is incompatible with our split schema for datawarehouse models
+  # It is disabled by default in rubocop-rails
+  Enabled: false
+
+Style/Alias:
+  EnforcedStyle: prefer_alias_method
+
+Style/AsciiComments:
+  Enabled: false
+
+Style/ClassAndModuleChildren:
+  Exclude:
+    - "app/controllers/smart_donations_legacy/**/*"
+
+Style/Documentation:
+  Enabled: false
+
+Style/FrozenStringLiteralComment:
+  Enabled: false
+
+Style/GlobalVars:
+  Exclude:
+    - "spec/**/*"
+
+Style/HashAsLastArrayItem:
+  Enabled: false
+
+Style/MultilineBlockChain:
+  Enabled: false
