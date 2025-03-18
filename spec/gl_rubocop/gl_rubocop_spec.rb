@@ -10,9 +10,10 @@ RSpec.describe GLRubocop do
   describe "default.yml file" do
     it "keys are ordered alphabetically" do
       default_rules = YAML.safe_load(File.read("default.yml"))
-      checked_rule_keys = default_rules.keys - %w[require]
+      target_rule_keys = (default_rules.keys - %w[require]).sort
 
-      expect(checked_rule_keys).to eq checked_rule_keys.sort
+      # The rules should be ordered alphabetically, except for require (which comes first)
+      expect(default_rules.keys).to eq(%w[require] + target_rule_keys)
     end
   end
 end
