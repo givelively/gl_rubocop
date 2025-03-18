@@ -67,6 +67,7 @@ GLCops/CallbackMethodNames: {}
 GLCops/InteractorInheritsFromInteractorBase:
   Include:
   - app/interactors/**/*
+GLCops/NoStubbingPerformAsync: {}
 GLCops/PreventErbFiles: {}
 GLCops/RailsCache: {}
 GLCops/SidekiqInheritsFromSidekiqJob:
