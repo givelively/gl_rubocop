@@ -81,6 +81,7 @@ MagicNumbers/NoArgument:
   PermittedValues:
     - 0
     - 1
+    - 100
 
 MagicNumbers/NoAssignment:
   AllowedAssignments:
@@ -100,6 +101,7 @@ MagicNumbers/NoDefault:
   PermittedValues:
     - 0
     - 1
+    - 100
 
 MagicNumbers/NoReturn:
   Enabled: true
@@ -109,6 +111,7 @@ MagicNumbers/NoReturn:
   PermittedReturnValues:
     - 0
     - 1
+    - 100
 
 Metrics/AbcSize:
   Exclude:
