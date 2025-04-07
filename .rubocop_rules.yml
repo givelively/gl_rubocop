@@ -871,6 +871,7 @@ MagicNumbers/NoArgument:
   PermittedValues:
   - 0
   - 1
+  - 100
 MagicNumbers/NoDefault:
   Exclude:
   - "/spec/**/*"
@@ -878,6 +879,7 @@ MagicNumbers/NoDefault:
   PermittedValues:
   - 0
   - 1
+  - 100
 MagicNumbers/NoReturn:
   Exclude:
   - "/spec/**/*"
@@ -885,6 +887,7 @@ MagicNumbers/NoReturn:
   PermittedReturnValues:
   - 0
   - 1
+  - 100
 Metrics/AbcSize:
   VersionAdded: '0.27'
   VersionChanged: '1.5'
