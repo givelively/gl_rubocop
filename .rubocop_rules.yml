@@ -1396,7 +1396,7 @@ RSpec/MissingExampleGroupArgument:
 RSpec/MultipleDescribes:
   VersionAdded: '1.0'
 RSpec/MultipleExpectations:
-  Max: 5
+  Max: 8
   VersionAdded: '1.7'
   VersionChanged: '1.21'
   Exclude:
@@ -1797,6 +1797,8 @@ Security/Open:
   VersionChanged: '1.0'
 Security/YAMLLoad:
   VersionAdded: '0.47'
+Sorbet/ConstantsFromStrings:
+  VersionAdded: 0.2.0
 Style/AccessModifierDeclarations:
   VersionAdded: '0.57'
   VersionChanged: '0.81'

@@ -5,6 +5,7 @@ require:
   - rubocop-magic_numbers
   - rubocop-haml
   - rubocop-rake
+  - rubocop-sorbet
   - ./lib/gl_rubocop/gl_cops/callback_method_names.rb
   - ./lib/gl_rubocop/gl_cops/interactor_inherits_from_interactor_base.rb
   - ./lib/gl_rubocop/gl_cops/no_stubbing_perform_async.rb
@@ -220,7 +221,7 @@ RSpec/MessageSpies:
 RSpec/MultipleExpectations:
   Exclude:
     - "spec/system/**/*"
-  Max: 5
+  Max: 8
 
 RSpec/MultipleMemoizedHelpers:
   Enabled: false
@@ -292,6 +293,72 @@ Rails/UnknownEnv:
 Rails/UnusedIgnoredColumns:
   # This rule is incompatible with our split schema for datawarehouse models
   # It is disabled by default in rubocop-rails
+  Enabled: false
+
+Sorbet/AllowIncompatibleOverride:
+  Enabled: false
+
+Sorbet/BindingConstantWithoutTypeAlias:
+  Enabled: false
+
+Sorbet/BuggyObsoleteStrictMemoization:
+  Enabled: false
+
+Sorbet/CheckedTrueInSignature:
+  Enabled: false
+
+Sorbet/ConstantsFromStrings:
+  Enabled: true
+
+Sorbet/EmptyLineAfterSig:
+  Enabled: false
+
+Sorbet/EnforceSigilOrder:
+  Enabled: false
+
+Sorbet/EnforceSingleSigil:
+  Enabled: false
+
+Sorbet/FalseSigil:
+  Enabled: false
+
+Sorbet/ForbidComparableTEnum:
+  Enabled: false
+
+Sorbet/ForbidExtendTSigHelpersInShims:
+  Enabled: false
+
+Sorbet/ForbidRBIOutsideOfAllowedPaths:
+  Enabled: false
+
+Sorbet/ForbidUntypedStructProps:
+  Enabled: false
+
+Sorbet/KeywordArgumentOrdering:
+  Enabled: false
+
+Sorbet/MultipleTEnumValues:
+  Enabled: false
+
+Sorbet/ObsoleteStrictMemoization:
+  Enabled: false
+
+Sorbet/SelectByIsA:
+  Enabled: false
+
+Sorbet/SignatureBuildOrder:
+  Enabled: false
+
+Sorbet/TypeAliasName:
+  Enabled: false
+  
+Sorbet/ValidGemVersionAnnotations:
+  Enabled: false
+
+Sorbet/ValidSigil:
+  Enabled: false
+
+Sorbet/VoidCheckedTests:
   Enabled: false
 
 Style/Alias:
