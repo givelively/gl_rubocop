@@ -68,6 +68,7 @@ Layout/ClassStructure:
 Layout/LineLength:
   AllowedPatterns:
     - "^ *#" # Ignores full lines starting with any indentation and a comment (#)
+    - !ruby/regexp /^\s*['"].*['"]\s*$/ # ignores lies that are string literals
   Max: 100
 
 Lint/MissingSuper:

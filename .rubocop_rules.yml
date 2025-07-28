@@ -350,6 +350,7 @@ Layout/LineLength:
   - https
   IgnoreCopDirectives: true
   AllowedPatterns:
+  - !ruby/regexp /^\s*['"].*['"]\s*$/
   - "^ *#"
   Exclude:
   - "/**/*.haml"
