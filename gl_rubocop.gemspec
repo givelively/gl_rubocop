@@ -34,7 +34,5 @@ Gem::Specification.new do |spec|
   spec.add_dependency 'rubocop-rspec', '~> 2.25'
   spec.add_dependency 'rubocop-sorbet'
 
-  spec.add_dependency 'pry', '~> 0.14.1'
-
   spec.metadata['rubygems_mfa_required'] = 'true'
 end
