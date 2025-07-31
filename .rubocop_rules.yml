@@ -101,6 +101,7 @@ Gemspec/RubyVersionGlobalsUsage:
   VersionChanged: '1.40'
   Include:
   - "**/*.gemspec"
+GlCops/LimitFlashOptions: {}
 Layout/AccessModifierIndentation:
   VersionAdded: '0.49'
   EnforcedStyle: indent
