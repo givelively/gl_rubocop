@@ -8,7 +8,7 @@ RSpec.describe RuboCop::Cop::Layout::LineLength, :rubocop do
   include RuboCop::RSpec::ExpectOffense
 
   describe 'AllowedPatterns' do
-    subject(:cop) { RuboCop::Cop::Layout::LineLength.new(config) }
+    subject(:cop) { described_class.new(config) }
 
     let(:config) do
       RuboCop::Config.new(
@@ -28,7 +28,7 @@ RSpec.describe RuboCop::Cop::Layout::LineLength, :rubocop do
       RUBY
 
       expect_no_offenses(<<~RUBY)
-        #{'#'  +'a' * 120}
+        ##{'a' * 120}
       RUBY
     end
 
