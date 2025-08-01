@@ -3,10 +3,25 @@
 module GlRubocop
   module GlCops
     class LimitFlashOptions < RuboCop::Cop::Base
-      MSG = 'This cop checks for the use of flash options not in the whitelist.' \
+      # This cop ensures that the use of any of our notification methods only accept the allowed keys for type
+      # and variant.
+      # Good:
+      #   flash[:success] = "Operation successful"
+      #   flash.now[:info] = "This is an info message"
+      #   Alert::Component.new(type: :success, message: "Success")
+      #   Notifications::Dismissible::Component.new(variant: :info, message: "Info")
+
+      # Bad:
+      #   flash[:error] = "Not allowed"
+      #   flash.now[:anything_else] = "Not allowed"
+      #   Alert::Component.new(type: :notice, message: "Error")
+      #   Notifications::Dismissible::Component.new(variant: :blue_box, message: "Error")
+
+      MSG = 'This cop checks for the use of flash options not in the allowlist. ' \
             'Please limit flash options to those defined in the application configuration.'
 
       ALLOWED_FLASH_KEYS = %i[success info warning danger].freeze
+
 
       # Matches the Rails flash hash assignment
       def_node_matcher :rails_flash?, <<~PATTERN
@@ -49,37 +64,18 @@ module GlRubocop
         )
       PATTERN
 
-      # Checks for usage of flash or flash.now with keys not in the whitelist
+      # Checks for usage of flash or flash.now with keys not in the allowlist
       def on_send(node)
-        check_rails_flash?(node)
-        check_alert_component_new?(node)
-        check_notifications_dismissable_component_new?(node)
+        check_key(node, rails_flash?(node))
+        check_key(node, alert_component_new?(node))
+        check_key(node, notifications_dismissible_component_new?(node))
       end
 
-      def check_rails_flash?(node)
-        key, _value = rails_flash?(node)
+      def check_key(node, key)
         return false unless key
         return false if ALLOWED_FLASH_KEYS.include?(key)
 
-        add_offense(node, message: MSG)
-      end
-
-      def check_alert_component_new?(node)
-        key = alert_component_new?(node)
-        return false unless key
-
-        return false if ALLOWED_FLASH_KEYS.include?(key)
-
-        add_offense(node, message: MSG)
-      end
-
-      def check_notifications_dismissable_component_new?(node)
-        key = notifications_dismissible_component_new?(node)
-        return false unless key
-
-        return false if ALLOWED_FLASH_KEYS.include?(key)
-
-        add_offense(node, message: MSG)
+        add_offense(node, message: MSG) 
       end
     end
   end
