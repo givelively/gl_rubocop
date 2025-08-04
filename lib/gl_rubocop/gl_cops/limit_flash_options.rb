@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
-module GlRubocop
-  module GlCops
+module GLRubocop
+  module GLCops
     class LimitFlashOptions < RuboCop::Cop::Base
       # This cop ensures that the use of any of our notification methods only accept the allowed keys for type
       # and variant.
@@ -21,7 +21,6 @@ module GlRubocop
             'Please limit flash options to those defined in the application configuration.'
 
       ALLOWED_FLASH_KEYS = %i[success info warning danger].freeze
-
 
       # Matches the Rails flash hash assignment
       def_node_matcher :rails_flash?, <<~PATTERN
@@ -75,7 +74,7 @@ module GlRubocop
         return false unless key
         return false if ALLOWED_FLASH_KEYS.include?(key)
 
-        add_offense(node, message: MSG) 
+        add_offense(node, message: MSG)
       end
     end
   end
