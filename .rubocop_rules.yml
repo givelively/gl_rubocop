@@ -351,6 +351,7 @@ Layout/LineLength:
   IgnoreCopDirectives: true
   AllowedPatterns:
   - "^ *#"
+  - ^\s*['"].*['"]\s*$
   Exclude:
   - "/**/*.haml"
 Layout/MultilineArrayBraceLayout:
