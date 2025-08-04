@@ -67,6 +67,7 @@ GLCops/CallbackMethodNames: {}
 GLCops/InteractorInheritsFromInteractorBase:
   Include:
   - app/interactors/**/*
+GLCops/LimitFlashOptions: {}
 GLCops/NoStubbingPerformAsync: {}
 GLCops/PreventErbFiles: {}
 GLCops/RailsCache: {}
@@ -101,7 +102,6 @@ Gemspec/RubyVersionGlobalsUsage:
   VersionChanged: '1.40'
   Include:
   - "**/*.gemspec"
-GLCops/LimitFlashOptions: {}
 Layout/AccessModifierIndentation:
   VersionAdded: '0.49'
   EnforcedStyle: indent
