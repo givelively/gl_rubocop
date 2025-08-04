@@ -4,7 +4,7 @@ require 'rubocop'
 require 'rubocop/rspec/support'
 require 'gl_rubocop/gl_cops/rails_cache'
 
-RSpec.describe GlRubocop::GlCops::LimitFlashOptions, :rubocop do
+RSpec.describe GLRubocop::GLCops::LimitFlashOptions, :rubocop do
   include RuboCop::RSpec::ExpectOffense
 
   subject(:cop) { described_class.new }
