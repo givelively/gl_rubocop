@@ -27,6 +27,7 @@ Gem::Specification.new do |spec|
 
   spec.add_dependency 'rubocop', '~> 1.62.1'
   spec.add_dependency 'rubocop-haml', '~> 0.2.4'
+  spec.add_dependency 'rubocop-i18n'
   spec.add_dependency 'rubocop-magic_numbers'
   spec.add_dependency 'rubocop-performance'
   spec.add_dependency 'rubocop-rails'
