@@ -539,7 +539,7 @@ Lint/ConstantDefinitionInBlock:
   - enums
 Lint/Debugger:
   VersionAdded: '0.14'
-  VersionChanged: '1.63'
+  VersionChanged: '1.46'
   DebuggerMethods:
     Kernel:
     - binding.irb
@@ -550,14 +550,8 @@ Lint/Debugger:
     - Kernel.byebug
     - Kernel.remote_byebug
     Capybara:
-    - page.save_and_open_page
-    - page.save_and_open_screenshot
-    - page.save_page
-    - page.save_screenshot
     - save_and_open_page
     - save_and_open_screenshot
-    - save_page
-    - save_screenshot
     debug.rb:
     - binding.b
     - binding.break
@@ -579,10 +573,6 @@ Lint/Debugger:
     - jard
     WebConsole:
     - binding.console
-  DebuggerRequires:
-    debug.rb:
-    - debug/open
-    - debug/start
 Lint/DeprecatedClassMethods:
   VersionAdded: '0.19'
 Lint/DeprecatedOpenSSLConstant:
@@ -1018,7 +1008,6 @@ Naming/FileName:
   VersionAdded: '0.50'
   VersionChanged: '1.23'
   Exclude:
-  - "/Rakefile.rb"
   - "/**/*.haml"
   ExpectMatchingDefinition: false
   CheckDefinitionPathHierarchy: true
