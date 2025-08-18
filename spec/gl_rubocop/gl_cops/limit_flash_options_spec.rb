@@ -13,7 +13,7 @@ RSpec.describe GLRubocop::GLCops::LimitFlashOptions, :rubocop do
     it 'registers an offense for disallowed flash key' do
       expect_offense(<<~RUBY)
         flash[:error] = "Not allowed"
-        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ GLCops/LimitFlashOptions: This cop checks for the use of flash options not in the allowlist. Please limit flash options to those defined in the application configuration.
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ GLCops/LimitFlashOptions: 'error' is not one of the permitted flash keys: [:success, :info, :warning, :danger]
       RUBY
     end
 
@@ -28,7 +28,7 @@ RSpec.describe GLRubocop::GLCops::LimitFlashOptions, :rubocop do
     it 'registers an offense for disallowed flash.now key' do
       expect_offense(<<~RUBY)
         flash.now[:error] = "Not allowed"
-        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ GLCops/LimitFlashOptions: This cop checks for the use of flash options not in the allowlist. Please limit flash options to those defined in the application configuration.
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ GLCops/LimitFlashOptions: 'error' is not one of the permitted flash keys: [:success, :info, :warning, :danger]
       RUBY
     end
 
@@ -42,8 +42,8 @@ RSpec.describe GLRubocop::GLCops::LimitFlashOptions, :rubocop do
   context 'when checking Alert::Component.new' do
     it 'registers an offense for disallowed type' do
       expect_offense(<<~RUBY)
-        Alert::Component.new(type: :error, message: "msg")
-        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ GLCops/LimitFlashOptions: This cop checks for the use of flash options not in the allowlist. Please limit flash options to those defined in the application configuration.
+        Alert::Component.new(type: :alert, message: "msg")
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ GLCops/LimitFlashOptions: 'alert' is not one of the permitted flash keys: [:success, :info, :warning, :danger]
       RUBY
     end
 
@@ -58,7 +58,7 @@ RSpec.describe GLRubocop::GLCops::LimitFlashOptions, :rubocop do
     it 'registers an offense for disallowed variant' do
       expect_offense(<<~RUBY)
         Notifications::Dismissible::Component.new(variant: :error, message: "msg")
-        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ GLCops/LimitFlashOptions: This cop checks for the use of flash options not in the allowlist. Please limit flash options to those defined in the application configuration.
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ GLCops/LimitFlashOptions: 'error' is not one of the permitted flash keys: [:success, :info, :warning, :danger]
       RUBY
     end
 
