@@ -1,3 +1,3 @@
 module GLRubocop
-  VERSION = '0.3.0'.freeze
+  VERSION = '0.2.16'.freeze
 end
