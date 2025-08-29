@@ -2,6 +2,7 @@
 
 require_relative 'lib/gl_rubocop/version'
 
+# rubocop:disable I18n/RailsI18n/DecorateString
 NON_GEM_FILES = ['Gemfile', 'Gemfile.lock', 'Guardfile', 'bin/lint'].freeze
 
 Gem::Specification.new do |spec|
@@ -37,3 +38,4 @@ Gem::Specification.new do |spec|
 
   spec.metadata['rubygems_mfa_required'] = 'true'
 end
+# rubocop:enable I18n/RailsI18n/DecorateString
