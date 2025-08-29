@@ -16,10 +16,6 @@ module GLRubocop
       #   flash.now[:anything_else] = "Not allowed"
       #   Alert::Component.new(type: :notice, message: "Error")
       #   Notifications::Dismissible::Component.new(variant: :blue_box, message: "Error")
-
-      MSG = 'This cop checks for the use of flash options not in the allowlist. ' \
-            'Please limit flash options to those defined in the application configuration.'
-
       ALLOWED_FLASH_KEYS = %i[success info warning danger].freeze
 
       # Matches the Rails flash hash assignment
@@ -74,7 +70,10 @@ module GLRubocop
         return false unless key
         return false if ALLOWED_FLASH_KEYS.include?(key)
 
-        add_offense(node, message: MSG)
+        add_offense(
+          node,
+          message: "'#{key}' is not one of the permitted flash keys: #{ALLOWED_FLASH_KEYS}"
+        )
       end
     end
   end
