@@ -102,6 +102,8 @@ Gemspec/RubyVersionGlobalsUsage:
   VersionChanged: '1.40'
   Include:
   - "**/*.gemspec"
+I18n/RailsI18n/DecorateString: {}
+I18n/RailsI18n/DecorateStringFormattingUsingInterpolation: {}
 Layout/AccessModifierIndentation:
   VersionAdded: '0.49'
   EnforcedStyle: indent
