@@ -4,6 +4,7 @@ require:
   - rubocop-rspec
   - rubocop-magic_numbers
   - rubocop-haml
+  - rubocop-i18n
   - rubocop-rake
   - rubocop-sorbet
   - ./lib/gl_rubocop/gl_cops/callback_method_names.rb
@@ -65,6 +66,12 @@ GLCops/UniqueIdentifier:
   Enabled: true
   Include:
     - "app/components/**/*.haml"
+
+I18n/GetText:
+  Enabled: false
+
+I18n/RailsI18n:
+  Enabled: true
 
 Layout/ClassStructure:
   Enabled: true
