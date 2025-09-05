@@ -72,6 +72,10 @@ I18n/GetText:
 
 I18n/RailsI18n:
   Enabled: true
+  Exclude:
+    - "spec/**/*"
+    - Gemfile
+    - "*gemspec"
 
 Layout/ClassStructure:
   Enabled: true
