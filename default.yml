@@ -75,7 +75,7 @@ I18n/RailsI18n:
   Exclude:
     - "spec/**/*"
     - Gemfile
-    - "*gemspec"
+    - "*.gemspec"
 
 Layout/ClassStructure:
   Enabled: true
