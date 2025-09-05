@@ -74,6 +74,7 @@ I18n/RailsI18n:
   Enabled: true
   Exclude:
     - "spec/**/*"
+    - "packs/*/spec/**/*"
     - Gemfile
     - "*.gemspec"
 
