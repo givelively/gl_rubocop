@@ -15,6 +15,7 @@ require:
   - ./lib/gl_rubocop/gl_cops/rails_cache.rb
   - ./lib/gl_rubocop/gl_cops/sidekiq_inherits_from_sidekiq_job.rb
   - ./lib/gl_rubocop/gl_cops/unique_identifier.rb
+  - ./lib/gl_rubocop/gl_cops/tailwind_no_contradicting_class_name.rb
 
 AllCops:
   SuggestExtensions: false

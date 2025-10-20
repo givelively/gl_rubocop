@@ -80,4 +80,31 @@ RSpec.describe GLRubocop::GLCops::TailwindNoContradictingClassName do
       end
     end
   end
+
+  context 'when using string literals' do
+    context 'when there are contradicting Tailwind classes' do
+      it 'registers an offense' do
+        expect_offense(<<~RUBY)
+          class_name = "tw:p-4 tw:p-6"
+                       ^^^^^^^^^^^^^^^ GLCops/TailwindNoContradictingClassName: Contradicting Tailwind CSS classes found: tw:p-4, tw:p-6 both affect the same CSS property
+        RUBY
+      end
+    end
+
+    context 'when there are no contradicting Tailwind classes' do
+      it 'does not register an offense' do
+        expect_no_offenses(<<~RUBY)
+          class_name = "tw:p-4 tw:m-6"
+        RUBY
+      end
+    end
+
+    context 'when there are no Tailwind classes' do
+      it 'does not register an offense' do
+        expect_no_offenses(<<~RUBY)
+          class_name = "container p-4 m-6"
+        RUBY
+      end
+    end
+  end
 end

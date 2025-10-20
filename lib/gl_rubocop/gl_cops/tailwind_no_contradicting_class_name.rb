@@ -18,6 +18,7 @@ module GLRubocop
     #   tw:h-5
     #   %button.tw:m-4.tw:p-8
 
+    # rubocop:disable Metrics/ClassLength
     class TailwindNoContradictingClassName < RuboCop::Cop::Cop
       include GLRubocop::HamlContentHelper
       MSG =
@@ -100,6 +101,11 @@ module GLRubocop
         check_haml_content(haml_content, node)
       end
 
+      def on_str(node)
+        # Check string literals for Tailwind classes
+        check_string_for_tailwind_classes(node)
+      end
+
       private
 
       def render_method?(node)
@@ -119,6 +125,30 @@ module GLRubocop
           )
         end
       end
+
+      def check_string_for_tailwind_classes(node)
+        return unless node.str_type?
+
+        content = node.value
+        classes = extract_classes_from_string(content)
+        contradicting_classes = find_contradicting_classes(classes)
+
+        return if contradicting_classes.empty?
+
+        contradicting_classes.each do |group|
+          add_offense(
+            node,
+            message: format(MSG, classes: group.join(', '))
+          )
+        end
+      end
+
+      def extract_classes_from_string(content)
+        # Split by whitespace and filter for Tailwind classes
+        content.split(/\s+/).select { |cls| tailwind_class?(cls) }
+      end
+
+
 
       def extract_all_classes(content)
         classes = []
@@ -210,5 +240,6 @@ module GLRubocop
         first_prop_group.intersect?(second_prop_group)
       end
     end
+    # rubocop:enable Metrics/ClassLength
   end
 end
