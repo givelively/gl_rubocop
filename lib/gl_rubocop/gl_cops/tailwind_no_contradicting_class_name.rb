@@ -148,8 +148,6 @@ module GLRubocop
         content.split(/\s+/).select { |cls| tailwind_class?(cls) }
       end
 
-
-
       def extract_all_classes(content)
         classes = []
 

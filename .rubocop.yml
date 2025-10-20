@@ -3,3 +3,6 @@
 
 inherit_from:
   - default.yml
+
+GLCops/TailwindNoContradictingClassName:
+  Enabled: false
