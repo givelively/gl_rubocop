@@ -161,9 +161,9 @@ module GLRubocop
 
             next unless properties_contradict?(first_property, second_property)
 
-            original_class1 = classes[index]
-            original_class2 = classes[index + j + 1]
-            contradictions << [original_class1, original_class2]
+            original_class = classes[index]
+            contradicting_class = classes[index + j + 1]
+            contradictions << [original_class, contradicting_class]
           end
         end
 
@@ -181,24 +181,23 @@ module GLRubocop
 
       def extract_css_property(class_name)
         # Handle cases like 'w-1', 'mt-4', 'text-left', etc.
-        case class_name
-        when /^(w|h)-/
-          ::Regexp.last_match(1)
-        when /^(m[trblxy]?)-/
-          ::Regexp.last_match(1)
-        when /^(p[trblxy]?)-/
-          ::Regexp.last_match(1)
-        when /^(block|hidden|flex|inline|inline-block|inline-flex|grid|inline-grid|table)$/
-          ::Regexp.last_match(1)
-        when /^(static|relative|absolute|fixed|sticky)$/
-          ::Regexp.last_match(1)
-        when /^(text-(?:left|center|right|justify))$/
-          ::Regexp.last_match(1)
-        when /^(flex-(?:row|row-reverse|col|col-reverse))$/
-          ::Regexp.last_match(1)
-        when /^(justify-(?:start|end|center|between|around|evenly))$/
-          ::Regexp.last_match(1)
+        patterns = [
+          /^(w|h)-/,
+          /^(m[trblxy]?)-/,
+          /^(p[trblxy]?)-/,
+          /^(block|hidden|flex|inline|inline-block|inline-flex|grid|inline-grid|table)$/,
+          /^(static|relative|absolute|fixed|sticky)$/,
+          /^(text-(?:left|center|right|justify))$/,
+          /^(flex-(?:row|row-reverse|col|col-reverse))$/,
+          /^(justify-(?:start|end|center|between|around|evenly))$/
+        ]
+
+        patterns.each do |pattern|
+          match = class_name.match(pattern)
+          return match[1] if match
         end
+
+        nil
       end
 
       def properties_contradict?(first_prop, second_prop)
