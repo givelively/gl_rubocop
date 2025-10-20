@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require_relative '../helpers/haml_content_helper'
+
 module GLRubocop
   module GLCops
     # Cop to detect contradicting Tailwind CSS class names
@@ -17,7 +19,9 @@ module GLRubocop
     #   %button.tw:m-4.tw:p-8
 
     class TailwindNoContradictingClassName < RuboCop::Cop::Cop
-      MSG = 'Contradicting Tailwind CSS classes found: %<classes>s both affect the same CSS property'
+      include GLRubocop::HamlContentHelper
+      MSG =
+        'Contradicting Tailwind CSS classes found: %<classes>s both affect the same CSS property'
       GIVELIVELY_TAILWIND_CLASS_PREFIX = 'tw:'
 
       # Tailwind CSS property groups that should not contradict
@@ -102,17 +106,6 @@ module GLRubocop
         node.method_name == :render && node.arguments.any?
       end
 
-      def haml_file?
-        file_path = processed_source.file_path
-        file_path&.end_with?('.html.haml') && File.exist?(file_path)
-      end
-
-      def read_haml_file
-        File.read(processed_source.file_path)
-      rescue StandardError
-        nil
-      end
-
       def check_haml_content(content, node)
         classes = extract_all_classes(content)
         contradicting_classes = find_contradicting_classes(classes)
@@ -149,62 +142,73 @@ module GLRubocop
         class_name.start_with?(GIVELIVELY_TAILWIND_CLASS_PREFIX)
       end
 
+      # rubocop:disable Metrics/AbcSize, Metrics/MethodLength
       def find_contradicting_classes(classes)
-        matcher = /^#{GIVELIVELY_TAILWIND_CLASS_PREFIX}/o
         # Remove the 'tw:' prefix for property matching
         normalized_classes = classes.map { |cls| cls.sub(matcher, '') }
 
         contradictions = []
 
-        normalized_classes.each_with_index do |class1, i|
-          property1 = extract_property(class1)
-          next unless property1 && PROPERTY_GROUPS[property1]
+        normalized_classes.each_with_index do |first_class, index|
+          first_property = extract_css_property(first_class)
+          next unless valid_property?(first_property)
 
-          normalized_classes[(i + 1)..-1].each_with_index do |class2, j|
-            property2 = extract_property(class2)
-            next unless property2
+          classes_to_compare = normalized_classes[(index + 1)..]
 
-            if properties_contradict?(property1, property2)
-              original_class1 = classes[i]
-              original_class2 = classes[i + j + 1]
-              contradictions << [original_class1, original_class2]
-            end
+          classes_to_compare.each_with_index do |second_class, j|
+            second_property = extract_css_property(second_class)
+            next unless valid_property?(second_property)
+
+            next unless properties_contradict?(first_property, second_property)
+
+            original_class1 = classes[index]
+            original_class2 = classes[index + j + 1]
+            contradictions << [original_class1, original_class2]
           end
         end
 
         contradictions
       end
+      # rubocop:enable Metrics/AbcSize, Metrics/MethodLength
 
-      def extract_property(class_name)
+      def matcher
+        /^#{GIVELIVELY_TAILWIND_CLASS_PREFIX}/o
+      end
+
+      def valid_property?(property)
+        property && PROPERTY_GROUPS[property]
+      end
+
+      def extract_css_property(class_name)
         # Handle cases like 'w-1', 'mt-4', 'text-left', etc.
         case class_name
         when /^(w|h)-/
-          $1
-        when /^(m[trbllxy]?)-/
-          $1
-        when /^(p[trbllxy]?)-/
-          $1
+          ::Regexp.last_match(1)
+        when /^(m[trblxy]?)-/
+          ::Regexp.last_match(1)
+        when /^(p[trblxy]?)-/
+          ::Regexp.last_match(1)
         when /^(block|hidden|flex|inline|inline-block|inline-flex|grid|inline-grid|table)$/
-          $1
+          ::Regexp.last_match(1)
         when /^(static|relative|absolute|fixed|sticky)$/
-          $1
+          ::Regexp.last_match(1)
         when /^(text-(?:left|center|right|justify))$/
-          $1
+          ::Regexp.last_match(1)
         when /^(flex-(?:row|row-reverse|col|col-reverse))$/
-          $1
+          ::Regexp.last_match(1)
         when /^(justify-(?:start|end|center|between|around|evenly))$/
-          $1
+          ::Regexp.last_match(1)
         end
       end
 
-      def properties_contradict?(prop1, prop2)
-        group1 = PROPERTY_GROUPS[prop1]
-        group2 = PROPERTY_GROUPS[prop2]
+      def properties_contradict?(first_prop, second_prop)
+        first_prop_group = PROPERTY_GROUPS[first_prop]
+        second_prop_group = PROPERTY_GROUPS[second_prop]
 
-        return false unless group1 && group2
+        return false unless first_prop_group && second_prop_group
 
         # Check if both properties belong to the same contradicting group
-        (group1 & group2).any?
+        first_prop_group.intersect?(second_prop_group)
       end
     end
   end
