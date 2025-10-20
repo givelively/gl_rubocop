@@ -65,7 +65,7 @@ GLCops/SidekiqInheritsFromSidekiqJob:
 GLCops/UniqueIdentifier:
   Enabled: true
   Include:
-    - "app/components/**/*.haml"
+    - "*.haml"
 
 I18n/GetText:
   Enabled: false

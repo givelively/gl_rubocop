@@ -8,10 +8,14 @@ module GLRubocop
       #   {data-test-id: @unique_id }
       #   {'data-test-id': 'unique-id'}
       #   {"data-test-id": "unique-id"}
+      #   {"data-test-id" => "unique-id"}
       #   {data: {test-id: 'unique-id'}}
+      #   {data: {test_id: 'unique-id'}}
       #   {data: {'test-id': 'unique-id'}}
+      #   {data: {'test-id' => 'unique-id'}}
       #
       # Bad:
+      #   {data: {testid: "unique-id"}}
       #   {data: {testId: "unique-id"}}
       #   {data: {test: {id: "unique-id"}}
 
