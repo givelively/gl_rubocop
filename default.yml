@@ -162,6 +162,7 @@ Metrics/MethodLength:
   Max: 15
 
 Metrics/ParameterLists:
+  Max: 6
   Exclude:
     - "db/seeds/**/*"
 
