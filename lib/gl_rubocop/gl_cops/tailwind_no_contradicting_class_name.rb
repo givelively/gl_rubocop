@@ -152,7 +152,7 @@ module GLRubocop
         classes = []
 
         # Extract from HAML class shortcuts (e.g., %div.tw:w-1.tw:w-2)
-        content.scan(/^[^#]*%\w+(?:\.[^{\s#]+)+/) do |match|
+        content.scan(/^[^#]*%\w+(?:\.[^{\s#]+)+/m) do |match|
           class_shortcuts = match.scan(/\.([^.{\s#]+)/).flatten
           classes.concat(class_shortcuts)
         end

@@ -161,6 +161,26 @@ RSpec.describe GLRubocop::GLCops::TailwindNoContradictingClassName do
         end
       end
     end
+
+    context 'when the HAML template has multiple lines' do
+      context 'when the classes contradict' do
+        let(:template_content) do
+          <<~HAML
+            %div.container
+              %h1 Title
+              %div.content
+                %p.tw:m-4.tw:m-8 Some content here.
+          HAML
+        end
+
+        it 'registers an offense' do
+          expect_offense(<<~RUBY)
+            render "component"
+            ^^^^^^^^^^^^^^^^^^ GLCops/TailwindNoContradictingClassName: Contradicting Tailwind CSS classes found: tw:m-4, tw:m-8 both affect the same CSS property
+          RUBY
+        end
+      end
+    end
   end
 
   context 'when using string literals' do
