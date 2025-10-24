@@ -170,7 +170,7 @@ module GLRubocop
         class_name.start_with?(GIVELIVELY_TAILWIND_CLASS_PREFIX)
       end
 
-      # rubocop:disable Metrics/AbcSize, Metrics/MethodLength
+      # rubocop:disable Metrics/AbcSize, Metrics/MethodLength, Metrics/CyclomaticComplexity
       def find_contradicting_classes(classes)
         # Remove the 'tw:' prefix for property matching
         normalized_classes = classes.map { |cls| cls.sub(matcher, '') }
@@ -178,15 +178,19 @@ module GLRubocop
         contradictions = []
 
         normalized_classes.each_with_index do |first_class, index|
+          first_breakpoint = extract_breakpoint(first_class)
           first_property = extract_css_property(first_class)
           next unless valid_property?(first_property)
 
           classes_to_compare = normalized_classes[(index + 1)..]
 
           classes_to_compare.each_with_index do |second_class, j|
+            second_breakpoint = extract_breakpoint(second_class)
             second_property = extract_css_property(second_class)
             next unless valid_property?(second_property)
 
+            # Only check for contradictions if both classes are for the same breakpoint
+            next unless same_breakpoint?(first_breakpoint, second_breakpoint)
             next unless properties_contradict?(first_property, second_property)
 
             original_class = classes[index]
@@ -197,7 +201,7 @@ module GLRubocop
 
         contradictions
       end
-      # rubocop:enable Metrics/AbcSize, Metrics/MethodLength
+      # rubocop:enable Metrics/AbcSize, Metrics/MethodLength, Metrics/CyclomaticComplexity
 
       def matcher
         /^#{GIVELIVELY_TAILWIND_CLASS_PREFIX}/o
@@ -207,7 +211,12 @@ module GLRubocop
         property && PROPERTY_GROUPS[property]
       end
 
+      # rubocop:disable Metrics/MethodLength
       def extract_css_property(class_name)
+        # Remove breakpoint prefixes (e.g., 'md:', 'lg:', 'sm:', 'xl:', '2xl:')
+        # to get the actual CSS property
+        class_without_breakpoint = class_name.sub(/^(?:sm|md|lg|xl|2xl):/, '')
+
         # Handle cases like 'w-1', 'mt-4', 'text-left', etc.
         patterns = [
           /^(w|h)-/,
@@ -221,11 +230,24 @@ module GLRubocop
         ]
 
         patterns.each do |pattern|
-          match = class_name.match(pattern)
+          match = class_without_breakpoint.match(pattern)
           return match[1] if match
         end
 
         nil
+      end
+      # rubocop:enable Metrics/MethodLength
+
+      def extract_breakpoint(class_name)
+        # Extract breakpoint prefix (e.g., 'md', 'lg', 'sm', 'xl', '2xl')
+        # Returns nil if no breakpoint prefix is found
+        match = class_name.match(/^(sm|md|lg|xl|2xl):/)
+        match ? match[1] : nil
+      end
+
+      def same_breakpoint?(first_breakpoint, second_breakpoint)
+        # Both classes must have the same breakpoint (or both have no breakpoint)
+        first_breakpoint == second_breakpoint
       end
 
       def properties_contradict?(first_prop, second_prop)

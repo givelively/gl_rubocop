@@ -23,17 +23,19 @@ RSpec.describe GLRubocop::GLCops::TailwindNoContradictingClassName do
     end
 
     context 'when the HAML template uses class shortcuts' do
-      let(:template_content) do
-        <<~HAML
-          %div.tw:w-1.tw:w-2
-        HAML
-      end
+      context 'when the class shortcuts contradict' do
+        let(:template_content) do
+          <<~HAML
+            %div.tw:w-1.tw:w-2
+          HAML
+        end
 
-      it 'registers an offense for invalid HAML class shortcuts with tw: prefix' do
-        expect_offense(<<~RUBY)
-          render "component"
-          ^^^^^^^^^^^^^^^^^^ GLCops/TailwindNoContradictingClassName: Contradicting Tailwind CSS classes found: tw:w-1, tw:w-2 both affect the same CSS property
-        RUBY
+        it 'registers an offense' do
+          expect_offense(<<~RUBY)
+            render "component"
+            ^^^^^^^^^^^^^^^^^^ GLCops/TailwindNoContradictingClassName: Contradicting Tailwind CSS classes found: tw:w-1, tw:w-2 both affect the same CSS property
+          RUBY
+        end
       end
 
       context 'when there are no contradicting classes' do
@@ -66,23 +68,103 @@ RSpec.describe GLRubocop::GLCops::TailwindNoContradictingClassName do
     end
 
     context 'when the HAML template uses hash syntax for class attribute' do
-      let(:template_content) do
-        <<~HAML
-          %div{ class: 'tw:m-4 tw:m-8' }
-        HAML
+      context 'when the classes contradict' do
+        let(:template_content) do
+          <<~HAML
+            %div{ class: 'tw:m-4 tw:m-8' }
+          HAML
+        end
+
+        it 'registers an offense for contradicting classes in HAML with class attribute' do
+          expect_offense(<<~RUBY)
+            render "component"
+            ^^^^^^^^^^^^^^^^^^ GLCops/TailwindNoContradictingClassName: Contradicting Tailwind CSS classes found: tw:m-4, tw:m-8 both affect the same CSS property
+          RUBY
+        end
       end
 
-      it 'registers an offense for contradicting classes in HAML with class attribute' do
-        expect_offense(<<~RUBY)
-          render "component"
-          ^^^^^^^^^^^^^^^^^^ GLCops/TailwindNoContradictingClassName: Contradicting Tailwind CSS classes found: tw:m-4, tw:m-8 both affect the same CSS property
-        RUBY
+      context 'when there are no contradicting classes' do
+        let(:template_content) do
+          <<~HAML
+            %div{ class: 'tw:m-4 tw:p-8' }
+          HAML
+        end
+
+        it 'does not register an offense' do
+          expect_no_offenses(<<~RUBY)
+            render "component"
+          RUBY
+        end
+      end
+    end
+
+    context 'when the HAML template uses both class shortcuts and hash syntax' do
+      context 'when the classes contradict' do
+        let(:template_content) do
+          <<~HAML
+            %div.tw:m-4.{ class: 'tw:m-4' }
+          HAML
+        end
+
+        it 'registers an offense' do
+          expect_offense(<<~RUBY)
+            render "component"
+            ^^^^^^^^^^^^^^^^^^ GLCops/TailwindNoContradictingClassName: Contradicting Tailwind CSS classes found: tw:m-4, tw:m-4 both affect the same CSS property
+          RUBY
+        end
+      end
+
+      context 'when there are no contradicting classes' do
+        let(:template_content) do
+          <<~HAML
+            %div.tw:m-4.{ class: 'tw:p-8' }
+          HAML
+        end
+
+        it 'does not register an offense' do
+          expect_no_offenses(<<~RUBY)
+            render "component"
+          RUBY
+        end
+      end
+    end
+
+    context 'when HAML template contains classes with breakpoints' do
+      context 'when the classes contradict' do
+        let(:template_content) do
+          <<~HAML
+            %div{ class: 'tw:md:m-4 tw:md:m-1' }
+          HAML
+        end
+
+        it(
+          'registers an offense'
+        ) do
+          expect_offense(<<~RUBY)
+            render "component"
+            ^^^^^^^^^^^^^^^^^^ GLCops/TailwindNoContradictingClassName: Contradicting Tailwind CSS classes found: tw:md:m-4, tw:md:m-1 both affect the same CSS property
+          RUBY
+        end
+      end
+
+      context 'when the classes do not contradict' do
+        let(:template_content) do
+          <<~HAML
+            %div{ class: 'tw:inline-block tw:md:flex' }
+          HAML
+        end
+
+        it 'does not register an offense' do
+          expect_no_offenses(<<~RUBY)
+            render "component"
+          RUBY
+        end
       end
     end
   end
 
   context 'when using string literals' do
-    context 'when there are contradicting Tailwind classes' do
+    context 'when the classes contradict' do
       it 'registers an offense' do
         expect_offense(<<~RUBY)
           class_name = "tw:p-4 tw:p-6"
@@ -91,7 +173,7 @@ RSpec.describe GLRubocop::GLCops::TailwindNoContradictingClassName do
       end
     end
 
-    context 'when there are no contradicting Tailwind classes' do
+    context 'when there are no contradicting classes' do
       it 'does not register an offense' do
         expect_no_offenses(<<~RUBY)
           class_name = "tw:p-4 tw:m-6"
@@ -104,6 +186,72 @@ RSpec.describe GLRubocop::GLCops::TailwindNoContradictingClassName do
         expect_no_offenses(<<~RUBY)
           class_name = "container p-4 m-6"
         RUBY
+      end
+    end
+
+    context 'when the string classes use breakpoints' do
+      context 'when the classes contradict' do
+        it 'registers an offense' do
+          expect_offense(<<~RUBY)
+            class_name = "tw:lg:h-10 tw:lg:h-20"
+                         ^^^^^^^^^^^^^^^^^^^^^^^ GLCops/TailwindNoContradictingClassName: Contradicting Tailwind CSS classes found: tw:lg:h-10, tw:lg:h-20 both affect the same CSS property
+          RUBY
+        end
+      end
+
+      context 'when there are no contradicting classes' do
+        it 'does not register an offense' do
+          expect_no_offenses(<<~RUBY)
+            class_name = "tw:h-10 tw:lg:h-20"
+          RUBY
+        end
+      end
+    end
+
+    context 'when the string classes are constructed dynamically' do
+      it 'does not register an offense' do
+        expect_no_offenses(<<~RUBY)
+          size = "4"
+          class_name = "tw:m-\#{size} tw:m-6"
+        RUBY
+      end
+    end
+
+    context 'when the string classes are in single quotes' do
+      context 'when the classes contradict' do
+        it 'registers an offense' do
+          expect_offense(<<~RUBY)
+            class_name = 'tw:flex-row tw:flex-col'
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^ GLCops/TailwindNoContradictingClassName: Contradicting Tailwind CSS classes found: tw:flex-row, tw:flex-col both affect the same CSS property
+          RUBY
+        end
+      end
+
+      context 'when there are no contradicting classes' do
+        it 'does not register an offense' do
+          expect_no_offenses(<<~RUBY)
+            class_name = 'tw:flex-row tw:block'
+          RUBY
+        end
+      end
+    end
+
+    context 'when the string classes are values of a hash' do
+      context 'when the classes contradict' do
+        it 'registers an offense' do
+          expect_offense(<<~RUBY)
+            options = { class: "tw:pt-2 tw:pt-4" }
+                               ^^^^^^^^^^^^^^^^^ GLCops/TailwindNoContradictingClassName: Contradicting Tailwind CSS classes found: tw:pt-2, tw:pt-4 both affect the same CSS property
+          RUBY
+        end
+      end
+
+      context 'when there are no contradicting classes' do
+        it 'does not register an offense' do
+          expect_no_offenses(<<~RUBY)
+            options = { class: "tw:pt-2 tw:mb-4" }
+          RUBY
+        end
       end
     end
   end
