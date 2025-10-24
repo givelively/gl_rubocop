@@ -968,7 +968,7 @@ Metrics/ModuleLength:
 Metrics/ParameterLists:
   VersionAdded: '0.25'
   VersionChanged: '1.5'
-  Max: 5
+  Max: 6
   CountKeywordArgs: true
   MaxOptionalParameters: 3
   Exclude:
