@@ -973,6 +973,7 @@ Metrics/ParameterLists:
   MaxOptionalParameters: 3
   Exclude:
   - "/db/seeds/**/*"
+  - "/app/components/**/*"
 Metrics/PerceivedComplexity:
   VersionAdded: '0.25'
   VersionChanged: '0.81'

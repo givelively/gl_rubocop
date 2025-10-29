@@ -40,7 +40,19 @@ RSpec.describe GLRubocop::GLCops::NoStubbingPerformAsync do
 
   it 'registers an offense when using allow perform_in' do
     source = <<~RUBY
-      allow(SomeWorker).to receive(:perform_in)
+      allow(SomeWorker).to receive(:perform_in).with(12)
+    RUBY
+
+    processed_source = parse_source(source)
+    report = commissioner.investigate(processed_source)
+
+    expect(report.offenses.size).to eq(1)
+    expect(report.offenses.first.message).to eq(expected_message)
+  end
+
+  it 'registers an offense when using expect and_return' do
+    source = <<~RUBY
+      expect(SomeWorker).to receive(:perform_async).and_return { 12 }
     RUBY
 
     processed_source = parse_source(source)

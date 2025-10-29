@@ -165,6 +165,7 @@ Metrics/ParameterLists:
   Max: 6
   Exclude:
     - "db/seeds/**/*"
+    - "app/components/**/*"
 
 Metrics/PerceivedComplexity:
   Exclude:
