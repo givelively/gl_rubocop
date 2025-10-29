@@ -385,6 +385,99 @@ RSpec.describe GLRubocop::GLCops::TailwindNoContradictingClassName do
       end
     end
 
+    context 'when the ERB template uses class attributes in rails hashes' do
+      context 'when the classes contradict' do
+        let(:template_content) do
+          <<~ERB
+            <%= radio_button_tag 'option', 'value', { class: 'tw:pt-2 tw:pt-4' } %>
+          ERB
+        end
+
+        it 'registers an offense' do
+          expect_offense(<<~RUBY)
+            render "component"
+            ^^^^^^^^^^^^^^^^^^ GLCops/TailwindNoContradictingClassName: Contradicting Tailwind CSS classes found: tw:pt-2, tw:pt-4 both affect the same CSS property
+          RUBY
+        end
+      end
+
+      context 'when there are no contradicting classes' do
+        let(:template_content) do
+          <<~ERB
+            <%= radio_button_tag 'option', 'value', { class: 'tw:pt-2 tw:mb-4' } %>
+          ERB
+        end
+
+        it 'does not register an offense' do
+          expect_no_offenses(<<~RUBY)
+            render "component"
+          RUBY
+        end
+      end
+    end
+
+    context 'when the ERB template uses class attributes in rails symbol hashes' do
+      context 'when the classes contradict' do
+        let(:template_content) do
+          <<~ERB
+            <%= text_field_tag 'field_name', 'value', :class => 'tw:font-thin tw:font-extrabold' %>
+          ERB
+        end
+
+        it 'registers an offense' do
+          expect_offense(<<~RUBY)
+            render "component"
+            ^^^^^^^^^^^^^^^^^^ GLCops/TailwindNoContradictingClassName: Contradicting Tailwind CSS classes found: tw:font-thin, tw:font-extrabold both affect the same CSS property
+          RUBY
+        end
+      end
+
+      context 'when there are no contradicting classes' do
+        let(:template_content) do
+          <<~ERB
+            <%= text_field_tag 'field_name', 'value', :class => 'tw:font-extrabold tw:text-base' %>
+          ERB
+        end
+
+        it 'does not register an offense' do
+          expect_no_offenses(<<~RUBY)
+            render "component"
+          RUBY
+        end
+      end
+    end
+
+    context 'when the ERB template uses class attributes in content_tag' do
+      context 'when the classes contradict' do
+        let(:template_content) do
+          <<~ERB
+            <%= content_tag :div, "Content", class: 'tw:rounded-lg tw:rounded-l-none' %>
+          ERB
+        end
+
+        it 'registers an offense' do
+          expect_offense(<<~RUBY)
+            render "component"
+            ^^^^^^^^^^^^^^^^^^ GLCops/TailwindNoContradictingClassName: Contradicting Tailwind CSS classes found: tw:rounded-lg, tw:rounded-l-none both affect the same CSS property
+          RUBY
+        end
+      end
+
+      context 'when there are no contradicting classes' do
+        let(:template_content) do
+          <<~ERB
+            <%= content_tag :div, "Content", class: 'tw:rounded-r-md tw:rounded-l-none' %>
+          ERB
+        end
+
+        it 'does not register an offense' do
+          expect_no_offenses(<<~RUBY)
+            render "component"
+          RUBY
+        end
+      end
+    end
+
     context 'when the ERB template contains classes with simple breakpoints' do
       context 'when the classes contradict' do
         let(:template_content) do

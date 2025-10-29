@@ -105,17 +105,20 @@ module GLRubocop
         border_style: %w[
           border-solid border-dashed border-dotted border-double border-none
         ],
-        border_radius: %w[
-          rounded-none rounded-sm rounded rounded-md rounded-lg rounded-xl rounded-2xl rounded-3xl
-          rounded-full rounded-t-none rounded-r-none rounded-b-none rounded-l-none
-          rounded-t-sm rounded-r-sm rounded-b-sm rounded-l-sm
-          rounded-t rounded-r rounded-b rounded-l
-          rounded-t-md rounded-r-md rounded-b-md rounded-l-md
-          rounded-t-lg rounded-r-lg rounded-b-lg rounded-l-lg
-          rounded-t-xl rounded-r-xl rounded-b-xl rounded-l-xl
-          rounded-t-2xl rounded-r-2xl rounded-b-2xl rounded-l-2xl
-          rounded-t-3xl rounded-r-3xl rounded-b-3xl rounded-l-3xl
-          rounded-t-full rounded-r-full rounded-b-full rounded-l-full
+        border_radius_all: %w[
+          rounded rounded-r rounded-l rounded-t rounded-b rounded-full
+        ],
+        border_radius_top: %w[
+          rounded-t border-r border-l
+        ],
+        border_radius_right: %w[
+          rounded-r border-t border-b
+        ],
+        border_radius_bottom: %w[
+          rounded-b border-r border-l
+        ],
+        border_radius_left: %w[
+          rounded-l border-t border-b
         ],
         box_shadow: %w[
           shadow-sm shadow shadow-md shadow-lg shadow-xl shadow-2xl shadow-inner shadow-none
@@ -391,6 +394,10 @@ module GLRubocop
         second_prop_group = CONTRADICTION_GROUPS.select { |_, group| group.include?(second_prop) }.keys
 
         return false unless first_prop_group && second_prop_group
+
+        puts "DEBUG: first_prop=#{first_prop}, groups=#{first_prop_group}"
+        puts "DEBUG: second_prop=#{second_prop}, groups=#{second_prop_group}"
+        puts "DEBUG: intersect? #{first_prop_group.intersect?(second_prop_group)}"
 
         # Check if both properties belong to the same contradicting group
         first_prop_group.intersect?(second_prop_group)
