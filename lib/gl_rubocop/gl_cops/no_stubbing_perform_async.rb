@@ -27,11 +27,11 @@ module GLRubocop
       PATTERN
 
       def on_send(node)
-        if have_received_perform?(node) || receive_perform?(node)
-          # Find the expect or allow context
-          offense_node = find_offense_node(node)
-          add_offense(offense_node) if offense_node
-        end
+        return unless have_received_perform?(node) || receive_perform?(node)
+
+        # Find the expect or allow context
+        offense_node = find_offense_node(node)
+        add_offense(offense_node) if offense_node
       end
 
       private
@@ -39,9 +39,8 @@ module GLRubocop
       def find_offense_node(node)
         current = node.parent
         while current
-          if rspec_stubbing?(current)
-            return current
-          end
+          return current if rspec_stubbing?(current)
+
           current = current.parent
         end
         nil
@@ -49,14 +48,13 @@ module GLRubocop
 
       def rspec_stubbing?(node)
         return false unless node.send_type?
-        return false unless [:to, :not_to, :to_not].include?(node.method_name)
+        return false unless %i[to not_to to_not].include?(node.method_name)
 
         receiver = node.receiver
-        return false unless receiver && receiver.send_type?
+        return false unless receiver&.send_type?
 
-        [:allow, :expect].include?(receiver.method_name)
+        %i[allow expect].include?(receiver.method_name)
       end
     end
   end
-
 end
