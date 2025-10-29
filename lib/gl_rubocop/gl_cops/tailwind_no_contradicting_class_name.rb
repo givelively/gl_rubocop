@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require_relative '../helpers/haml_content_helper'
+require_relative '../helpers/erb_content_helper'
 
 module GLRubocop
   module GLCops
@@ -21,84 +22,122 @@ module GLRubocop
     # rubocop:disable Metrics/ClassLength
     class TailwindNoContradictingClassName < RuboCop::Cop::Cop
       include GLRubocop::HamlContentHelper
+      include GLRubocop::ErbContentHelper
+
       MSG =
         'Contradicting Tailwind CSS classes found: %<classes>s both affect the same CSS property'
       GIVELIVELY_TAILWIND_CLASS_PREFIX = 'tw:'
 
       # Tailwind CSS property groups that should not contradict
-      PROPERTY_GROUPS = {
-        # Width
-        'w' => %w[w],
-        # Height
-        'h' => %w[h],
-        # Margin
-        'm' => %w[m mt mr mb ml mx my],
-        'mt' => %w[m mt my],
-        'mr' => %w[m mr mx],
-        'mb' => %w[m mb my],
-        'ml' => %w[m ml mx],
-        'mx' => %w[m mx mr ml],
-        'my' => %w[m my mt mb],
-        # Padding
-        'p' => %w[p pt pr pb pl px py],
-        'pt' => %w[p pt py],
-        'pr' => %w[p pr px],
-        'pb' => %w[p pb py],
-        'pl' => %w[p pl px],
-        'px' => %w[p px pr pl],
-        'py' => %w[p py pt pb],
-        # Display
-        'block' => %w[block hidden flex inline inline-block inline-flex grid inline-grid table],
-        'hidden' => %w[block hidden flex inline inline-block inline-flex grid inline-grid table],
-        'flex' => %w[block hidden flex inline inline-block inline-flex grid inline-grid table],
-        'inline' => %w[block hidden flex inline inline-block inline-flex grid inline-grid table],
-        'inline-block' => %w[block hidden flex inline inline-block inline-flex grid inline-grid
-                             table],
-        'inline-flex' => %w[block hidden flex inline inline-block inline-flex grid inline-grid
-                            table],
-        'grid' => %w[block hidden flex inline inline-block inline-flex grid inline-grid table],
-        'inline-grid' => %w[block hidden flex inline inline-block inline-flex grid inline-grid
-                            table],
-        'table' => %w[block hidden flex inline inline-block inline-flex grid inline-grid table],
-        # Position
-        'absolute' => %w[static relative absolute fixed sticky],
-        'relative' => %w[static relative absolute fixed sticky],
-        'fixed' => %w[static relative absolute fixed sticky],
-        'static' => %w[static relative absolute fixed sticky],
-        'sticky' => %w[static relative absolute fixed sticky],
-        # Text alignment
-        'text-left' => %w[text-left text-center text-right text-justify],
-        'text-center' => %w[text-left text-center text-right text-justify],
-        'text-right' => %w[text-left text-center text-right text-justify],
-        'text-justify' => %w[text-left text-center text-right text-justify],
-        # Flex direction
-        'flex-row' => %w[flex-row flex-row-reverse flex-col flex-col-reverse],
-        'flex-row-reverse' => %w[flex-row flex-row-reverse flex-col flex-col-reverse],
-        'flex-col' => %w[flex-row flex-row-reverse flex-col flex-col-reverse],
-        'flex-col-reverse' => %w[flex-row flex-row-reverse flex-col flex-col-reverse],
-        # Justify content
-        'justify-start' => %w[justify-start justify-end justify-center justify-between
-                              justify-around justify-evenly],
-        'justify-end' => %w[justify-start justify-end justify-center justify-between justify-around
-                            justify-evenly],
-        'justify-center' => %w[justify-start justify-end justify-center justify-between
-                               justify-around justify-evenly],
-        'justify-between' => %w[justify-start justify-end justify-center justify-between
-                                justify-around justify-evenly],
-        'justify-around' => %w[justify-start justify-end justify-center justify-between
-                               justify-around justify-evenly],
-        'justify-evenly' => %w[justify-start justify-end justify-center justify-between
-                               justify-around justify-evenly]
+      CONTRADICTION_GROUPS = {
+        width: %w[w],
+        height: %w[h],
+        max_width: %w[max-w],
+        max_height: %w[max-h],
+        min_width: %w[min-w],
+        min_height: %w[min-h],
+        margin_top: %w[m my mt],
+        margin_right: %w[m mx mr],
+        margin_bottom: %w[m my mb],
+        margin_left: %w[m mx ml],
+        padding_top: %w[p py pt],
+        padding_right: %w[p px pr],
+        padding_bottom: %w[p py pb],
+        padding_left: %w[p px pl],
+        display: %w[block hidden flex inline inline-block inline-flex grid inline-grid table],
+        position: %w[static relative absolute fixed sticky],
+        text_align: %w[text-left text-center text-right text-justify],
+        flex_direction: %w[flex-row flex-row-reverse flex-col flex-col-reverse],
+        flex_wrap: %w[flex-nowrap flex-wrap flex-wrap-reverse],
+        justify_content: %w[
+          justify-start justify-end justify-center justify-between justify-around justify-evenly
+        ],
+        align_items: %w[items-start items-end items-center items-baseline items-stretch],
+        place_content: %w[
+          place-content-center place-content-start place-content-end place-content-between place-content-around place-content-evenly
+        ],
+        place_items: %w[
+          place-items-start place-items-end place-items-center place-items-baseline place-items-stretch
+        ],
+        place_self: %w[
+          place-self-auto place-self-start place-self-end place-self-center place-self-stretch
+        ],
+        align_content: %w[
+          content-center content-start content-end content-between content-around content-evenly
+        ],
+        align_self: %w[
+          self-auto self-start self-end self-center self-stretch self-baseline
+        ],
+        justify_items: %w[
+          justify-items-start justify-items-end justify-items-center justify-items-stretch
+        ],
+        justify_self: %w[
+          justify-self-auto justify-self-start justify-self-end justify-self-center justify-self-stretch
+        ],
+        font_size: %w[
+          text-xs text-sm text-base text-lg text-xl text-2xl text-3xl text-4xl text-5xl text-6xl
+        ],
+        font_weight: %w[
+          font-thin font-extralight font-light font-normal font-medium font-semibold font-bold
+          font-extrabold font-black
+        ],
+        font_style: %w[italic not-italic],
+        letter_spacing: %w[
+          tracking-tighter tracking-tight tracking-normal tracking-wide tracking-wider tracking-widest
+        ],
+        line_height: %w[
+          leading-none leading-tight leading-snug leading-normal leading-relaxed leading-loose
+        ],
+        text_decoration_line: %w[underline line-through no-underline],
+        text_transform: %w[uppercase lowercase capitalize normal-case],
+        text_decoration_style: %w[
+          decoration-solid decoration-dashed decoration-dotted decoration-double decoration-wavy
+        ],
+        text_wrap: %w[break-normal break-words break-all],
+        vertical_align: %w[
+          align-baseline align-top align-middle align-bottom align-text-top align-text-bottom
+        ],
+        text_overflow: %w[truncate overflow-ellipsis overflow-clip],
+        overflow: %w[
+          overflow-auto overflow-hidden overflow-visible overflow-scroll
+        ],
+        visibility: %w[visible invisible collapse],
+        border_style: %w[
+          border-solid border-dashed border-dotted border-double border-none
+        ],
+        border_radius: %w[
+          rounded-none rounded-sm rounded rounded-md rounded-lg rounded-xl rounded-2xl rounded-3xl
+          rounded-full rounded-t-none rounded-r-none rounded-b-none rounded-l-none
+          rounded-t-sm rounded-r-sm rounded-b-sm rounded-l-sm
+          rounded-t rounded-r rounded-b rounded-l
+          rounded-t-md rounded-r-md rounded-b-md rounded-l-md
+          rounded-t-lg rounded-r-lg rounded-b-lg rounded-l-lg
+          rounded-t-xl rounded-r-xl rounded-b-xl rounded-l-xl
+          rounded-t-2xl rounded-r-2xl rounded-b-2xl rounded-l-2xl
+          rounded-t-3xl rounded-r-3xl rounded-b-3xl rounded-l-3xl
+          rounded-t-full rounded-r-full rounded-b-full rounded-l-full
+        ],
+        box_shadow: %w[
+          shadow-sm shadow shadow-md shadow-lg shadow-xl shadow-2xl shadow-inner shadow-none
+        ]
       }.freeze
+
+      BREAKPOINT_ORDER = %w[sm md lg xl 2xl].freeze
 
       def on_send(node)
         return unless render_method?(node)
-        return unless haml_file?
 
-        haml_content = read_haml_file
-        return unless haml_content
+        if haml_file?
+          haml_content = read_haml_file
+          return unless haml_content
 
-        check_haml_content(haml_content, node)
+          check_haml_content(haml_content, node)
+        elsif erb_file?
+          erb_content = read_erb_file
+          return unless erb_content
+
+          check_erb_content(erb_content, node)
+        end
       end
 
       def on_str(node)
@@ -110,6 +149,55 @@ module GLRubocop
 
       def render_method?(node)
         node.method_name == :render && node.arguments.any?
+      end
+
+      def check_erb_content(content, node)
+        classes = extract_all_erb_classes(content)
+        contradicting_classes = find_contradicting_classes(classes)
+
+        return if contradicting_classes.empty?
+
+        contradicting_classes.each do |group|
+          add_offense(
+            node,
+            message: format(MSG, classes: group.join(', '))
+          )
+        end
+      end
+
+      def extract_all_erb_classes(content)
+        classes = []
+        classes.concat(extract_classes_from_html_attributes(content))
+        classes.concat(extract_classes_from_rails_hash(content))
+        classes.concat(extract_classes_from_rails_symbol_hash(content))
+        classes.concat(extract_classes_from_content_tag(content))
+        classes.concat(extract_classes_from_rails_helpers(content))
+        classes.select { |cls| tailwind_class?(cls) }
+      end
+
+      def extract_classes_from_html_attributes(content)
+        # Example: <div class="tw:w-1 tw:w-2"></div>
+        content.scan(/class\s*=\s*['"]([^'"]+)['"]/) .flat_map { |match| match[0].split(/\s+/) }
+      end
+
+      def extract_classes_from_rails_hash(content)
+        # Example: <%= radio_button_tag { class: 'tw:w-1 tw:w-2' } %>
+        content.scan(/class:\s*['"]([^'"]+)['"]/) .flat_map { |match| match[0].split(/\s+/) }
+      end
+
+      def extract_classes_from_rails_symbol_hash(content)
+        # Example: <%= text_field_tag( ..., :class => 'tw:w-1 tw:w-2' ) %>
+        content.scan(/:class\s*=>\s*['"]([^'"]+)['"]/) .flat_map { |match| match[0].split(/\s+/) }
+      end
+
+      def extract_classes_from_content_tag(content)
+        # Example: <%= content_tag :div, ..., class: 'tw:w-1 tw:w-2' %>
+        content.scan(/content_tag\s+:\w+.*?class:\s*['"]([^'"]+)['"]/) .flat_map { |match| match[0].split(/\s+/) }
+      end
+
+      def extract_classes_from_rails_helpers(content)
+        # Example: <%= link_to 'Name', ..., class: 'tw:w-1 tw:w-2' %>
+        content.scan(/(?:link_to|form_with|form_for|button_to|submit_tag).*?class:\s*['"]([^'"]+)['"]/) .flat_map { |match| match[0].split(/\s+/) }
       end
 
       def check_haml_content(content, node)
@@ -178,19 +266,19 @@ module GLRubocop
         contradictions = []
 
         normalized_classes.each_with_index do |first_class, index|
-          first_breakpoint = extract_breakpoint(first_class)
+          first_breakpoint_range = extract_breakpoint_range(first_class)
           first_property = extract_css_property(first_class)
           next unless valid_property?(first_property)
 
           classes_to_compare = normalized_classes[(index + 1)..]
 
           classes_to_compare.each_with_index do |second_class, j|
-            second_breakpoint = extract_breakpoint(second_class)
+            second_breakpoint_range = extract_breakpoint_range(second_class)
             second_property = extract_css_property(second_class)
             next unless valid_property?(second_property)
 
-            # Only check for contradictions if both classes are for the same breakpoint
-            next unless same_breakpoint?(first_breakpoint, second_breakpoint)
+            # Only check for contradictions if both classes are for overlapping breakpoint ranges
+            next unless breakpoint_ranges_overlap?(first_breakpoint_range, second_breakpoint_range)
             next unless properties_contradict?(first_property, second_property)
 
             original_class = classes[index]
@@ -208,14 +296,16 @@ module GLRubocop
       end
 
       def valid_property?(property)
-        property && PROPERTY_GROUPS[property]
+        property && CONTRADICTION_GROUPS.any? { |_, group| group.include?(property) }
       end
 
       # rubocop:disable Metrics/MethodLength
       def extract_css_property(class_name)
-        # Remove breakpoint prefixes (e.g., 'md:', 'lg:', 'sm:', 'xl:', '2xl:')
-        # to get the actual CSS property
-        class_without_breakpoint = class_name.sub(/^(?:sm|md|lg|xl|2xl):/, '')
+        # Remove breakpoint prefixes (including v4 range syntax and max-only syntax)
+        class_without_breakpoint = class_name.sub(
+          /^(?:(?:sm|md|lg|xl|2xl)(?::max-(?:sm|md|lg|xl|2xl))?:|max-(?:sm|md|lg|xl|2xl):)+/,
+          ''
+        )
 
         # Handle cases like 'w-1', 'mt-4', 'text-left', etc.
         patterns = [
@@ -226,7 +316,31 @@ module GLRubocop
           /^(static|relative|absolute|fixed|sticky)$/,
           /^(text-(?:left|center|right|justify))$/,
           /^(flex-(?:row|row-reverse|col|col-reverse))$/,
-          /^(justify-(?:start|end|center|between|around|evenly))$/
+          /^(justify-(?:start|end|center|between|around|evenly))$/,
+          /^(items-(?:start|end|center|baseline|stretch))$/,
+          /^(place-content-(?:center|start|end|between|around|evenly))$/,
+          /^(place-items-(?:start|end|center|baseline|stretch))$/,
+          /^(place-self-(?:auto|start|end|center|stretch))$/,
+          /^(content-(?:center|start|end|between|around|evenly))$/,
+          /^(self-(?:auto|start|end|center|stretch|baseline))$/,
+          /^(justify-items-(?:start|end|center|stretch))$/,
+          /^(justify-self-(?:auto|start|end|center|stretch))$/,
+          /^(text-(?:xs|sm|base|lg|xl|2xl|3xl|4xl|5xl|6xl))$/,
+          /^(font-(?:thin|extralight|light|normal|medium|semibold|bold|extrabold|black))$/,
+          /^(italic|not-italic)$/,
+          /^(tracking-(?:tighter|tight|normal|wide|wider|widest))$/,
+          /^(leading-(?:none|tight|snug|normal|relaxed|loose))$/,
+          /^(underline|line-through|no-underline)$/,
+          /^(uppercase|lowercase|capitalize|normal-case)$/,
+          /^(decoration-(?:solid|dashed|dotted|double|wavy))$/,
+          /^(break-(?:normal|words|all))$/,
+          /^(align-(?:baseline|top|middle|bottom|text-top|text-bottom))$/,
+          /^(truncate|overflow-(?:ellipsis|clip))$/,
+          /^(overflow-(?:auto|hidden|visible|scroll))$/,
+          /^(visible|invisible|collapse)$/,
+          /^(border-(?:solid|dashed|dotted|double|none))$/,
+          /^(rounded(?:-(?:none|sm|md|lg|xl|2xl|3xl|full|t-none|r-none|b-none|l-none|t-sm|r-sm|b-sm|l-sm|t-md|r-md|b-md|l-md|t-lg|r-lg|b-lg|l-lg|t-xl|r-xl|b-xl|l-xl|t-2xl|r-2xl|b-2xl|l-2xl|t-3xl|r-3xl|b-3xl|l-3xl|t-full|r-full|b-full|l-full))?)$/,
+          /^(shadow(?:-(?:sm|md|lg|xl|2xl|inner|none))?)$/
         ]
 
         patterns.each do |pattern|
@@ -238,27 +352,50 @@ module GLRubocop
       end
       # rubocop:enable Metrics/MethodLength
 
-      def extract_breakpoint(class_name)
-        # Extract breakpoint prefix (e.g., 'md', 'lg', 'sm', 'xl', '2xl')
-        # Returns nil if no breakpoint prefix is found
-        match = class_name.match(/^(sm|md|lg|xl|2xl):/)
-        match ? match[1] : nil
+      def extract_breakpoint_range(class_name)
+        # Extract breakpoint range (e.g., 'md', 'lg:max-xl', 'sm:max-md')
+        # Returns a hash with :min and :max keys, or nil if no breakpoint
+
+        # Match Tailwind v4 range syntax: breakpoint:max-breakpoint: or just breakpoint:
+        range_match = class_name.match(/^(sm|md|lg|xl|2xl)(?::max-(sm|md|lg|xl|2xl))?:/)
+        return nil unless range_match
+
+        min_breakpoint = range_match[1]
+        max_breakpoint = range_match[2]
+
+        {
+          min: min_breakpoint,
+          max: max_breakpoint
+        }
       end
 
-      def same_breakpoint?(first_breakpoint, second_breakpoint)
-        # Both classes must have the same breakpoint (or both have no breakpoint)
-        first_breakpoint == second_breakpoint
+      # rubocop:disable Metrics/CyclomaticComplexity, Metrics/AbcSize
+      def breakpoint_ranges_overlap?(first_range, second_range)
+        # If either range is nil (no breakpoint), they're considered the same (base styles)
+        return true if first_range.nil? && second_range.nil?
+        return false if first_range.nil? || second_range.nil?
+
+        # Get numeric indices for comparison
+        first_min_index = BREAKPOINT_ORDER.index(first_range[:min])
+        first_max_index = first_range[:max] ? BREAKPOINT_ORDER.index(first_range[:max]) : BREAKPOINT_ORDER.length - 1
+
+        second_min_index = BREAKPOINT_ORDER.index(second_range[:min])
+        second_max_index = second_range[:max] ? BREAKPOINT_ORDER.index(second_range[:max]) : BREAKPOINT_ORDER.length - 1
+
+        # Check for overlap: ranges overlap if one starts before the other ends
+        !(first_max_index < second_min_index || second_max_index < first_min_index)
       end
 
       def properties_contradict?(first_prop, second_prop)
-        first_prop_group = PROPERTY_GROUPS[first_prop]
-        second_prop_group = PROPERTY_GROUPS[second_prop]
+        first_prop_group = CONTRADICTION_GROUPS.select { |_, group| group.include?(first_prop) }.keys
+        second_prop_group = CONTRADICTION_GROUPS.select { |_, group| group.include?(second_prop) }.keys
 
         return false unless first_prop_group && second_prop_group
 
         # Check if both properties belong to the same contradicting group
         first_prop_group.intersect?(second_prop_group)
       end
+      # rubocop:enable Metrics/CyclomaticComplexity, Metrics/AbcSize
     end
     # rubocop:enable Metrics/ClassLength
   end
