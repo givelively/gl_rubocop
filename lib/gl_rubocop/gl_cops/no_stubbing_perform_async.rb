@@ -16,44 +16,47 @@ module GLRubocop
       MSG = "Don't stub perform async. Use the rspec-sidekick matchers instead: " \
             'expect(JobClass).to have_enqueued_sidekiq_job'.freeze
 
-      # This pattern captures expectations for perform_async and perform_in
-      # expect(SomeWorker).not_to have_received(:perform_async)
-      # expect(SomeWorker).to have_received(:perform_async)
-      # expect(SomeWorker).to have_received(:perform_in)
-      def_node_matcher :perform_method_expectation?, <<~PATTERN
-        (send#{' '}
-          (send nil? :expect $_)#{' '}
-          {:not_to :to_not :to}#{' '}
-          (send nil? :have_received (sym {:perform_async :perform_in}) ...))
+      # Match have_received with perform_async or perform_in
+      def_node_matcher :have_received_perform?, <<~PATTERN
+        (send nil? :have_received (sym {:perform_async :perform_in}) ...)
       PATTERN
 
-      # This pattern captures allow statements for perform_async and perform_in
-      # allow(SomeWorker).to receive(:perform_async)
-      # allow(SomeWorker).to receive(:perform_in)
-      def_node_matcher :perform_method_allow?, <<~PATTERN
-        (send
-          (send nil? :allow $_)
-          :to
-          (send nil? :receive (sym {:perform_async :perform_in}) ...))
+      # Match receive with perform_async or perform_in
+      def_node_matcher :receive_perform?, <<~PATTERN
+        (send nil? :receive (sym {:perform_async :perform_in}) ...)
       PATTERN
 
       def on_send(node)
-        check_expectation(node) || check_allow(node)
+        if have_received_perform?(node) || receive_perform?(node)
+          # Find the expect or allow context
+          offense_node = find_offense_node(node)
+          add_offense(offense_node) if offense_node
+        end
       end
 
       private
 
-      def check_expectation(node)
-        perform_method_expectation?(node) { return add_offense(node) }
-
-        false
+      def find_offense_node(node)
+        current = node.parent
+        while current
+          if rspec_stubbing?(current)
+            return current
+          end
+          current = current.parent
+        end
+        nil
       end
 
-      def check_allow(node)
-        perform_method_allow?(node) { return add_offense(node) }
+      def rspec_stubbing?(node)
+        return false unless node.send_type?
+        return false unless [:to, :not_to, :to_not].include?(node.method_name)
 
-        false
+        receiver = node.receiver
+        return false unless receiver && receiver.send_type?
+
+        [:allow, :expect].include?(receiver.method_name)
       end
     end
   end
+
 end
