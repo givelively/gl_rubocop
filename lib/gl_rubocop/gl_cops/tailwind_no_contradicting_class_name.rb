@@ -54,10 +54,12 @@ module GLRubocop
         ],
         align_items: %w[items-start items-end items-center items-baseline items-stretch],
         place_content: %w[
-          place-content-center place-content-start place-content-end place-content-between place-content-around place-content-evenly
+          place-content-center place-content-start place-content-end place-content-between
+          place-content-around place-content-evenly
         ],
         place_items: %w[
-          place-items-start place-items-end place-items-center place-items-baseline place-items-stretch
+          place-items-start place-items-end place-items-center place-items-baseline
+          place-items-stretch
         ],
         place_self: %w[
           place-self-auto place-self-start place-self-end place-self-center place-self-stretch
@@ -72,7 +74,8 @@ module GLRubocop
           justify-items-start justify-items-end justify-items-center justify-items-stretch
         ],
         justify_self: %w[
-          justify-self-auto justify-self-start justify-self-end justify-self-center justify-self-stretch
+          justify-self-auto justify-self-start justify-self-end justify-self-center
+          justify-self-stretch
         ],
         font_size: %w[
           text-xs text-sm text-base text-lg text-xl text-2xl text-3xl text-4xl text-5xl text-6xl
@@ -158,34 +161,22 @@ module GLRubocop
         classes.concat(extract_classes_from_html_attributes(content))
         classes.concat(extract_classes_from_rails_hash(content))
         classes.concat(extract_classes_from_rails_symbol_hash(content))
-        classes.concat(extract_classes_from_content_tag(content))
-        classes.concat(extract_classes_from_rails_helpers(content))
         classes.select { |cls| tailwind_class?(cls) }
       end
 
       def extract_classes_from_html_attributes(content)
         # Example: <div class="tw:w-1 tw:w-2"></div>
-        content.scan(/class\s*=\s*['"]([^'"]+)['"]/) .flat_map { |match| match[0].split(/\s+/) }
+        content.scan(/class\s*=\s*['"]([^'"]+)['"]/).flat_map { |match| match[0].split(/\s+/) }
       end
 
       def extract_classes_from_rails_hash(content)
         # Example: <%= radio_button_tag { class: 'tw:w-1 tw:w-2' } %>
-        content.scan(/class:\s*['"]([^'"]+)['"]/) .flat_map { |match| match[0].split(/\s+/) }
+        content.scan(/class:\s*['"]([^'"]+)['"]/).flat_map { |match| match[0].split(/\s+/) }
       end
 
       def extract_classes_from_rails_symbol_hash(content)
         # Example: <%= text_field_tag( ..., :class => 'tw:w-1 tw:w-2' ) %>
-        content.scan(/:class\s*=>\s*['"]([^'"]+)['"]/) .flat_map { |match| match[0].split(/\s+/) }
-      end
-
-      def extract_classes_from_content_tag(content)
-        # Example: <%= content_tag :div, ..., class: 'tw:w-1 tw:w-2' %>
-        content.scan(/content_tag\s+:\w+.*?class:\s*['"]([^'"]+)['"]/) .flat_map { |match| match[0].split(/\s+/) }
-      end
-
-      def extract_classes_from_rails_helpers(content)
-        # Example: <%= link_to 'Name', ..., class: 'tw:w-1 tw:w-2' %>
-        content.scan(/(?:link_to|form_with|form_for|button_to|submit_tag).*?class:\s*['"]([^'"]+)['"]/) .flat_map { |match| match[0].split(/\s+/) }
+        content.scan(/:class\s*=>\s*['"]([^'"]+)['"]/).flat_map { |match| match[0].split(/\s+/) }
       end
 
       def check_haml_content(content, node)
@@ -249,10 +240,7 @@ module GLRubocop
       # rubocop:disable Metrics/AbcSize, Metrics/MethodLength, Metrics/CyclomaticComplexity
       def find_contradicting_classes(classes)
         # Remove the 'tw:' prefix for property matching
-        puts "Original classes: #{classes.inspect}"
         normalized_classes = classes.map { |cls| cls.sub(matcher, '') }
-
-        puts "Normalized classes: #{normalized_classes.inspect}"
 
         contradictions = []
 
@@ -262,8 +250,6 @@ module GLRubocop
           next unless valid_property?(first_property)
 
           classes_to_compare = normalized_classes[(index + 1)..]
-
-          puts "classes_to_compare: #{classes_to_compare.inspect}"
 
           classes_to_compare.each_with_index do |second_class, j|
             second_breakpoint_range = extract_breakpoint_range(second_class)
@@ -300,9 +286,10 @@ module GLRubocop
           ''
         )
 
-        # Handle cases like 'w-1', 'mt-4', 'text-left', etc.
         patterns = [
           /^(w|h)-/,
+          /^(max-w|max-h)-/,
+          /^(min-w|min-h)-/,
           /^(m[trblxy]?)-/,
           /^(p[trblxy]?)-/,
           /^(block|hidden|flex|inline|inline-block|inline-flex|grid|inline-grid|table)$/,
@@ -361,7 +348,6 @@ module GLRubocop
         }
       end
 
-      # rubocop:disable Metrics/CyclomaticComplexity, Metrics/AbcSize
       def breakpoint_ranges_overlap?(first_range, second_range)
         # If either range is nil (no breakpoint), they're considered the same (base styles)
         return true if first_range.nil? && second_range.nil?
@@ -369,27 +355,34 @@ module GLRubocop
 
         # Get numeric indices for comparison
         first_min_index = BREAKPOINT_ORDER.index(first_range[:min])
-        first_max_index = first_range[:max] ? BREAKPOINT_ORDER.index(first_range[:max]) : BREAKPOINT_ORDER.length - 1
+        first_max_index = max_index(first_range)
 
         second_min_index = BREAKPOINT_ORDER.index(second_range[:min])
-        second_max_index = second_range[:max] ? BREAKPOINT_ORDER.index(second_range[:max]) : BREAKPOINT_ORDER.length - 1
+        second_max_index = max_index(second_range)
 
         # Check for overlap: ranges overlap if one starts before the other ends
         !(first_max_index < second_min_index || second_max_index < first_min_index)
       end
 
+      def max_index(range)
+        return BREAKPOINT_ORDER.index(range[:max]) if range[:max]
+
+        BREAKPOINT_ORDER.length - 1
+      end
+
       def properties_contradict?(first_prop, second_prop)
-        first_prop_group = CONTRADICTION_GROUPS.select { |_, group| group.include?(first_prop) }.keys
-        second_prop_group = CONTRADICTION_GROUPS.select { |_, group| group.include?(second_prop) }.keys
+        first_prop_group = CONTRADICTION_GROUPS.select do |_, group|
+          group.include?(first_prop)
+        end.keys
+        second_prop_group = CONTRADICTION_GROUPS.select do |_, group|
+          group.include?(second_prop)
+        end.keys
 
         return false unless first_prop_group && second_prop_group
-
-        puts "Comparing properties: #{first_prop} (group: #{first_prop_group}) vs #{second_prop} (group: #{second_prop_group})"
 
         # Check if both properties belong to the same contradicting group
         first_prop_group.intersect?(second_prop_group)
       end
-      # rubocop:enable Metrics/CyclomaticComplexity, Metrics/AbcSize
     end
     # rubocop:enable Metrics/ClassLength
   end

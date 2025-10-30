@@ -478,6 +478,37 @@ RSpec.describe GLRubocop::GLCops::TailwindNoContradictingClassName do
       end
     end
 
+    context 'when the ERB template uses class attributes in rails helpers' do
+      context 'when the classes contradict' do
+        let(:template_content) do
+          <<~ERB
+            <%= link_to 'Click here', '#', class: 'tw:min-w-8 tw:min-w-16' %>
+          ERB
+        end
+
+        it 'registers an offense' do
+          expect_offense(<<~RUBY)
+            render "component"
+            ^^^^^^^^^^^^^^^^^^ GLCops/TailwindNoContradictingClassName: Contradicting Tailwind CSS classes found: tw:min-w-8, tw:min-w-16 both affect the same CSS property
+          RUBY
+        end
+      end
+
+      context 'when there are no contradicting classes' do
+        let(:template_content) do
+          <<~ERB
+            <%= link_to 'Click here', '#', class: 'tw:rounded-b-lg tw:rounded-t-md' %>
+          ERB
+        end
+
+        it 'does not register an offense' do
+          expect_no_offenses(<<~RUBY)
+            render "component"
+          RUBY
+        end
+      end
+    end
+
     context 'when the ERB template contains classes with simple breakpoints' do
       context 'when the classes contradict' do
         let(:template_content) do
@@ -575,7 +606,7 @@ RSpec.describe GLRubocop::GLCops::TailwindNoContradictingClassName do
       end
     end
 
-    context 'when the string classes use breakpoints' do
+    context 'when the string classes contain simple breakpoints' do
       context 'when the classes contradict' do
         it 'registers an offense' do
           expect_offense(<<~RUBY)
@@ -590,6 +621,27 @@ RSpec.describe GLRubocop::GLCops::TailwindNoContradictingClassName do
           expect_no_offenses(<<~RUBY)
             class_name = "tw:h-10 tw:lg:h-20"
           RUBY
+        end
+      end
+    end
+
+    context 'when the string classes contain breakpoint ranges' do
+      context 'when the breakpoints use upper and lower bound ranges' do
+        context 'when the breakpoints overlap' do
+          it 'registers an offense' do
+            expect_offense(<<~RUBY)
+              class_name = "tw:md:h-10 tw:lg:max-xl:h-20"
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ GLCops/TailwindNoContradictingClassName: Contradicting Tailwind CSS classes found: tw:md:h-10, tw:lg:max-xl:h-20 both affect the same CSS property
+            RUBY
+          end
+        end
+
+        context 'when the breakpoints do not overlap' do
+          it 'does not register an offense' do
+            expect_no_offenses(<<~RUBY)
+              class_name = "tw:sm:max-md:h-10 tw:lg:max-xl:h-20"
+            RUBY
+          end
         end
       end
     end
