@@ -86,7 +86,8 @@ module GLRubocop
         ],
         font_style: %w[italic not-italic],
         letter_spacing: %w[
-          tracking-tighter tracking-tight tracking-normal tracking-wide tracking-wider tracking-widest
+          tracking-tighter tracking-tight tracking-normal tracking-wide tracking-wider
+          tracking-widest
         ],
         line_height: %w[
           leading-none leading-tight leading-snug leading-normal leading-relaxed leading-loose
