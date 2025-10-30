@@ -3,7 +3,7 @@ require:
   - rubocop-rails
   - rubocop-rspec
   - rubocop-magic_numbers
-  - rubocop-haml
+  - rubocop-rspec
   - rubocop-i18n
   - rubocop-rake
   - rubocop-sorbet
