@@ -71,14 +71,14 @@ RSpec.describe GLRubocop::GLCops::TailwindNoContradictingClassName do
       context 'when the classes contradict' do
         let(:template_content) do
           <<~HAML
-            %div{ class: 'tw:m-4 tw:m-8' }
+            %div{ class: 'tw:mt-4 tw:m-8' }
           HAML
         end
 
         it 'registers an offense for contradicting classes in HAML with class attribute' do
           expect_offense(<<~RUBY)
             render "component"
-            ^^^^^^^^^^^^^^^^^^ GLCops/TailwindNoContradictingClassName: Contradicting Tailwind CSS classes found: tw:m-4, tw:m-8 both affect the same CSS property
+            ^^^^^^^^^^^^^^^^^^ GLCops/TailwindNoContradictingClassName: Contradicting Tailwind CSS classes found: tw:mt-4, tw:m-8 both affect the same CSS property
           RUBY
         end
       end
@@ -447,18 +447,18 @@ RSpec.describe GLRubocop::GLCops::TailwindNoContradictingClassName do
       end
     end
 
-    context 'when the ERB template uses class attributes in content_tag' do
+    context 'when the ERB template uses content tag with class attributes' do
       context 'when the classes contradict' do
         let(:template_content) do
           <<~ERB
-            <%= content_tag :div, "Content", class: 'tw:rounded-lg tw:rounded-l-none' %>
+            <%= content_tag :div, 'Hello', class: 'tw:overflow-auto tw:overflow-visible' %>
           ERB
         end
 
         it 'registers an offense' do
           expect_offense(<<~RUBY)
             render "component"
-            ^^^^^^^^^^^^^^^^^^ GLCops/TailwindNoContradictingClassName: Contradicting Tailwind CSS classes found: tw:rounded-lg, tw:rounded-l-none both affect the same CSS property
+            ^^^^^^^^^^^^^^^^^^ GLCops/TailwindNoContradictingClassName: Contradicting Tailwind CSS classes found: tw:overflow-auto, tw:overflow-visible both affect the same CSS property
           RUBY
         end
       end
@@ -466,7 +466,7 @@ RSpec.describe GLRubocop::GLCops::TailwindNoContradictingClassName do
       context 'when there are no contradicting classes' do
         let(:template_content) do
           <<~ERB
-            <%= content_tag :div, "Content", class: 'tw:rounded-r-md tw:rounded-l-none' %>
+            <%= content_tag :div, 'Hello', class: 'tw:overflow-auto tw:text-center' %>
           ERB
         end
 

@@ -105,21 +105,6 @@ module GLRubocop
         border_style: %w[
           border-solid border-dashed border-dotted border-double border-none
         ],
-        border_radius_all: %w[
-          rounded rounded-r rounded-l rounded-t rounded-b rounded-full
-        ],
-        border_radius_top: %w[
-          rounded-t border-r border-l
-        ],
-        border_radius_right: %w[
-          rounded-r border-t border-b
-        ],
-        border_radius_bottom: %w[
-          rounded-b border-r border-l
-        ],
-        border_radius_left: %w[
-          rounded-l border-t border-b
-        ],
         box_shadow: %w[
           shadow-sm shadow shadow-md shadow-lg shadow-xl shadow-2xl shadow-inner shadow-none
         ]
@@ -264,7 +249,10 @@ module GLRubocop
       # rubocop:disable Metrics/AbcSize, Metrics/MethodLength, Metrics/CyclomaticComplexity
       def find_contradicting_classes(classes)
         # Remove the 'tw:' prefix for property matching
+        puts "Original classes: #{classes.inspect}"
         normalized_classes = classes.map { |cls| cls.sub(matcher, '') }
+
+        puts "Normalized classes: #{normalized_classes.inspect}"
 
         contradictions = []
 
@@ -274,6 +262,8 @@ module GLRubocop
           next unless valid_property?(first_property)
 
           classes_to_compare = normalized_classes[(index + 1)..]
+
+          puts "classes_to_compare: #{classes_to_compare.inspect}"
 
           classes_to_compare.each_with_index do |second_class, j|
             second_breakpoint_range = extract_breakpoint_range(second_class)
@@ -342,7 +332,6 @@ module GLRubocop
           /^(overflow-(?:auto|hidden|visible|scroll))$/,
           /^(visible|invisible|collapse)$/,
           /^(border-(?:solid|dashed|dotted|double|none))$/,
-          /^(rounded(?:-(?:none|sm|md|lg|xl|2xl|3xl|full|t-none|r-none|b-none|l-none|t-sm|r-sm|b-sm|l-sm|t-md|r-md|b-md|l-md|t-lg|r-lg|b-lg|l-lg|t-xl|r-xl|b-xl|l-xl|t-2xl|r-2xl|b-2xl|l-2xl|t-3xl|r-3xl|b-3xl|l-3xl|t-full|r-full|b-full|l-full))?)$/,
           /^(shadow(?:-(?:sm|md|lg|xl|2xl|inner|none))?)$/
         ]
 
@@ -395,9 +384,7 @@ module GLRubocop
 
         return false unless first_prop_group && second_prop_group
 
-        puts "DEBUG: first_prop=#{first_prop}, groups=#{first_prop_group}"
-        puts "DEBUG: second_prop=#{second_prop}, groups=#{second_prop_group}"
-        puts "DEBUG: intersect? #{first_prop_group.intersect?(second_prop_group)}"
+        puts "Comparing properties: #{first_prop} (group: #{first_prop_group}) vs #{second_prop} (group: #{second_prop_group})"
 
         # Check if both properties belong to the same contradicting group
         first_prop_group.intersect?(second_prop_group)
