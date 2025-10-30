@@ -68,7 +68,9 @@ GLCops/InteractorInheritsFromInteractorBase:
   Include:
   - app/interactors/**/*
 GLCops/LimitFlashOptions: {}
-GLCops/NoStubbingPerformAsync: {}
+GLCops/NoStubbingPerformAsync:
+  Include:
+  - "**/*spec.rb"
 GLCops/PreventErbFiles: {}
 GLCops/RailsCache: {}
 GLCops/SidekiqInheritsFromSidekiqJob:
