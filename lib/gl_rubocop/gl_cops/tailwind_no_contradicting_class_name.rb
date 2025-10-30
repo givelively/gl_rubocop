@@ -161,26 +161,26 @@ module GLRubocop
         classes.concat(extract_classes_from_html_attributes(content))
         classes.concat(extract_classes_from_rails_hash(content))
         classes.concat(extract_classes_from_rails_symbol_hash(content))
-        classes.select { |cls| tailwind_class?(cls) }
+        classes.select { |class_name| tailwind_class?(class_name) }
       end
 
       def extract_classes_from_html_attributes(content)
         # Example: <div class="tw:w-1 tw:w-2"></div>
-        content.scan(/class\s*=\s*['"]([^'"]+)['"]/).flat_map { |match| match[0].split(/\s+/) }
+        content.scan(/class\s*=\s*['"]([^'"]+)['"]/).flat_map { |match| match.first.split(/\s+/) }
       end
 
       def extract_classes_from_rails_hash(content)
         # Example: <%= radio_button_tag { class: 'tw:w-1 tw:w-2' } %>
-        content.scan(/class:\s*['"]([^'"]+)['"]/).flat_map { |match| match[0].split(/\s+/) }
+        content.scan(/class:\s*['"]([^'"]+)['"]/).flat_map { |match| match.first.split(/\s+/) }
       end
 
       def extract_classes_from_rails_symbol_hash(content)
         # Example: <%= text_field_tag( ..., :class => 'tw:w-1 tw:w-2' ) %>
-        content.scan(/:class\s*=>\s*['"]([^'"]+)['"]/).flat_map { |match| match[0].split(/\s+/) }
+        content.scan(/:class\s*=>\s*['"]([^'"]+)['"]/).flat_map { |match| match.first.split(/\s+/) }
       end
 
       def check_haml_content(content, node)
-        classes = extract_all_classes(content)
+        classes = extract_all_haml_classes(content)
         contradicting_classes = find_contradicting_classes(classes)
 
         return if contradicting_classes.empty?
@@ -215,7 +215,7 @@ module GLRubocop
         content.split(/\s+/).select { |cls| tailwind_class?(cls) }
       end
 
-      def extract_all_classes(content)
+      def extract_all_haml_classes(content)
         classes = []
 
         # Extract from HAML class shortcuts (e.g., %div.tw:w-1.tw:w-2)
@@ -226,39 +226,35 @@ module GLRubocop
 
         # Extract from HAML hash syntax (e.g., %div{ class: 'tw:m-4 tw:m-8' })
         content.scan(/class:\s*['"]([^'"]+)['"]/) do |match|
-          class_list = match[0].split(/\s+/)
+          class_list = match.first.split(/\s+/)
           classes.concat(class_list)
         end
 
-        classes.select { |cls| tailwind_class?(cls) }
+        classes.select { |class_name| tailwind_class?(class_name) }
       end
 
       def tailwind_class?(class_name)
         class_name.start_with?(GIVELIVELY_TAILWIND_CLASS_PREFIX)
       end
 
-      # rubocop:disable Metrics/AbcSize, Metrics/MethodLength, Metrics/CyclomaticComplexity
+      # rubocop:disable Metrics/AbcSize, Metrics/MethodLength
       def find_contradicting_classes(classes)
         # Remove the 'tw:' prefix for property matching
-        normalized_classes = classes.map { |cls| cls.sub(matcher, '') }
+        normalized_classes = classes.map { |class_name| class_name.sub(matcher, '') }
 
         contradictions = []
 
         normalized_classes.each_with_index do |first_class, index|
-          first_breakpoint_range = extract_breakpoint_range(first_class)
-          first_property = extract_css_property(first_class)
-          next unless valid_property?(first_property)
+          first_class_data = extract_class_data(first_class)
+          next unless valid_property?(first_class_data[:css_property])
 
           classes_to_compare = normalized_classes[(index + 1)..]
 
           classes_to_compare.each_with_index do |second_class, j|
-            second_breakpoint_range = extract_breakpoint_range(second_class)
-            second_property = extract_css_property(second_class)
-            next unless valid_property?(second_property)
+            second_class_data = extract_class_data(second_class)
+            next unless valid_property?(second_class_data[:css_property])
 
-            # Only check for contradictions if both classes are for overlapping breakpoint ranges
-            next unless breakpoint_ranges_overlap?(first_breakpoint_range, second_breakpoint_range)
-            next unless properties_contradict?(first_property, second_property)
+            next unless contradiction_found?(first_class_data, second_class_data)
 
             original_class = classes[index]
             contradicting_class = classes[index + j + 1]
@@ -268,7 +264,40 @@ module GLRubocop
 
         contradictions
       end
-      # rubocop:enable Metrics/AbcSize, Metrics/MethodLength, Metrics/CyclomaticComplexity
+      # rubocop:enable Metrics/AbcSize, Metrics/MethodLength
+
+      def contradiction_found?(first_class_data, second_class_data)
+        breakpoint_ranges_overlap?(first_class_data[:breakpoint_range],
+                                   second_class_data[:breakpoint_range]) &&
+          container_queries_overlap?(first_class_data[:container_query],
+                                     second_class_data[:container_query]) &&
+          properties_contradict?(first_class_data[:css_property], second_class_data[:css_property])
+      end
+
+      def extract_class_data(class_name)
+        {
+          css_property: extract_css_property(class_name),
+          breakpoint_range: extract_breakpoint_range(class_name),
+          container_query: extract_container_query(class_name)
+        }
+      end
+
+      # Extracts container query (e.g., @md:) from class name
+      def extract_container_query(class_name)
+        match = class_name.match(/^@([a-zA-Z0-9_-]+):/)
+        match ? match[1] : nil
+      end
+
+      def container_queries_overlap?(first_container, second_container)
+        # If both have a container query, they overlap
+        return true if first_container && second_container
+
+        # If neither has a container query, they overlap (global)
+        return true if first_container.nil? && second_container.nil?
+
+        # If only one has a container query, treat as non-overlapping
+        false
+      end
 
       def matcher
         /^#{GIVELIVELY_TAILWIND_CLASS_PREFIX}/o
@@ -280,8 +309,10 @@ module GLRubocop
 
       # rubocop:disable Metrics/MethodLength
       def extract_css_property(class_name)
+        # Remove container query prefix (e.g., @md:)
+        class_without_container = class_name.sub(/^@([a-zA-Z0-9_-]+):/, '')
         # Remove breakpoint prefixes (including v4 range syntax and max-only syntax)
-        class_without_breakpoint = class_name.sub(
+        class_without_breakpoint = class_without_container.sub(
           /^(?:(?:sm|md|lg|xl|2xl)(?::max-(?:sm|md|lg|xl|2xl))?:|max-(?:sm|md|lg|xl|2xl):)+/,
           ''
         )
