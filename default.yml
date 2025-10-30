@@ -50,6 +50,8 @@ GLCops/LimitFlashOptions:
 
 GLCops/NoStubbingPerformAsync:
   Enabled: true
+  Include:
+    - "**/*spec.rb"
 
 GLCops/PreventErbFiles:
   Enabled: true
