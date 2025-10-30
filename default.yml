@@ -3,7 +3,7 @@ require:
   - rubocop-rails
   - rubocop-rspec
   - rubocop-magic_numbers
-  - rubocop-rspec
+  - rubocop-erb
   - rubocop-i18n
   - rubocop-rake
   - rubocop-sorbet
@@ -67,7 +67,7 @@ GLCops/SidekiqInheritsFromSidekiqJob:
 GLCops/UniqueIdentifier:
   Enabled: true
   Include:
-    - "app/components/**/*.haml"
+    - "app/components/**/*.erb"
 
 I18n/GetText:
   Enabled: false

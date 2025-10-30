@@ -79,7 +79,7 @@ GLCops/SidekiqInheritsFromSidekiqJob:
   - app/**/*_job.rb
 GLCops/UniqueIdentifier:
   Include:
-  - app/components/**/*.haml
+  - app/components/**/*.erb
 Gemspec/DuplicatedAssignment:
   Severity: warning
   VersionAdded: '0.52'
@@ -115,11 +115,15 @@ Layout/ArgumentAlignment:
   VersionChanged: '0.77'
   EnforcedStyle: with_first_argument
   IndentationWidth:
+  Exclude:
+  - "/**/*.erb"
 Layout/ArrayAlignment:
   VersionAdded: '0.49'
   VersionChanged: '0.77'
   EnforcedStyle: with_first_element
   IndentationWidth:
+  Exclude:
+  - "/**/*.erb"
 Layout/AssignmentIndentation:
   VersionAdded: '0.49'
   VersionChanged: '1.45'
@@ -138,6 +142,8 @@ Layout/BlockAlignment:
   - either
   - start_of_block
   - start_of_line
+  Exclude:
+  - "/**/*.erb"
 Layout/BlockEndNewline:
   VersionAdded: '0.49'
 Layout/CaseIndentation:
@@ -166,10 +172,14 @@ Layout/ClosingHeredocIndentation:
   VersionAdded: '0.57'
 Layout/ClosingParenthesisIndentation:
   VersionAdded: '0.49'
+  Exclude:
+  - "/**/*.erb"
 Layout/CommentIndentation:
   AllowForAlignment: false
   VersionAdded: '0.49'
   VersionChanged: '1.24'
+  Exclude:
+  - "/**/*.erb"
 Layout/ConditionPosition:
   VersionAdded: '0.53'
   VersionChanged: '0.83'
@@ -194,6 +204,8 @@ Layout/EmptyComment:
 Layout/EmptyLineAfterGuardClause:
   VersionAdded: '0.56'
   VersionChanged: '0.59'
+  Exclude:
+  - "/**/*.erb"
 Layout/EmptyLineAfterMagicComment:
   VersionAdded: '0.49'
 Layout/EmptyLineBetweenDefs:
@@ -245,6 +257,8 @@ Layout/EndAlignment:
   - variable
   - start_of_line
   Severity: warning
+  Exclude:
+  - "/**/*.erb"
 Layout/EndOfLine:
   VersionAdded: '0.49'
   EnforcedStyle: native
@@ -258,21 +272,29 @@ Layout/FirstArgumentIndentation:
   VersionChanged: '0.77'
   EnforcedStyle: special_for_inner_method_call_in_parentheses
   IndentationWidth:
+  Exclude:
+  - "/**/*.erb"
 Layout/FirstArrayElementIndentation:
   VersionAdded: '0.68'
   VersionChanged: '0.77'
   EnforcedStyle: special_inside_parentheses
   IndentationWidth:
+  Exclude:
+  - "/**/*.erb"
 Layout/FirstHashElementIndentation:
   VersionAdded: '0.68'
   VersionChanged: '0.77'
   EnforcedStyle: special_inside_parentheses
   IndentationWidth:
+  Exclude:
+  - "/**/*.erb"
 Layout/FirstParameterIndentation:
   VersionAdded: '0.49'
   VersionChanged: '0.77'
   EnforcedStyle: consistent
   IndentationWidth:
+  Exclude:
+  - "/**/*.erb"
 Layout/HashAlignment:
   AllowMultipleStyles: true
   VersionAdded: '0.49'
@@ -293,12 +315,16 @@ Layout/HashAlignment:
   - always_ignore
   - ignore_implicit
   - ignore_explicit
+  Exclude:
+  - "/**/*.erb"
 Layout/HeredocIndentation:
   VersionAdded: '0.49'
   VersionChanged: '0.85'
 Layout/IndentationConsistency:
   VersionAdded: '0.49'
   EnforcedStyle: normal
+  Exclude:
+  - "/**/*.erb"
 Layout/IndentationStyle:
   VersionAdded: '0.49'
   VersionChanged: '0.82'
@@ -308,8 +334,12 @@ Layout/IndentationWidth:
   VersionAdded: '0.49'
   Width: 2
   AllowedPatterns: []
+  Exclude:
+  - "/**/*.erb"
 Layout/InitialIndentation:
   VersionAdded: '0.49'
+  Exclude:
+  - "/**/*.erb"
 Layout/LeadingCommentSpace:
   VersionAdded: '0.49'
   VersionChanged: '0.73'
@@ -318,6 +348,8 @@ Layout/LeadingCommentSpace:
 Layout/LeadingEmptyLines:
   VersionAdded: '0.57'
   VersionChanged: '0.77'
+  Exclude:
+  - "/**/*.erb"
 Layout/LineLength:
   VersionAdded: '0.25'
   VersionChanged: '1.4'
@@ -331,33 +363,49 @@ Layout/LineLength:
   AllowedPatterns:
   - "^ *#"
   - ^\s*['"].*['"]\s*$
+  Exclude:
+  - "/**/*.erb"
 Layout/MultilineArrayBraceLayout:
   VersionAdded: '0.49'
   EnforcedStyle: symmetrical
+  Exclude:
+  - "/**/*.erb"
 Layout/MultilineBlockLayout:
   VersionAdded: '0.49'
 Layout/MultilineHashBraceLayout:
   VersionAdded: '0.49'
   EnforcedStyle: symmetrical
+  Exclude:
+  - "/**/*.erb"
 Layout/MultilineMethodCallBraceLayout:
   VersionAdded: '0.49'
   EnforcedStyle: symmetrical
+  Exclude:
+  - "/**/*.erb"
 Layout/MultilineMethodCallIndentation:
   VersionAdded: '0.49'
   EnforcedStyle: aligned
   IndentationWidth:
+  Exclude:
+  - "/**/*.erb"
 Layout/MultilineMethodDefinitionBraceLayout:
   VersionAdded: '0.49'
   EnforcedStyle: symmetrical
+  Exclude:
+  - "/**/*.erb"
 Layout/MultilineOperationIndentation:
   VersionAdded: '0.49'
   EnforcedStyle: aligned
   IndentationWidth:
+  Exclude:
+  - "/**/*.erb"
 Layout/ParameterAlignment:
   VersionAdded: '0.49'
   VersionChanged: '0.77'
   EnforcedStyle: with_first_parameter
   IndentationWidth:
+  Exclude:
+  - "/**/*.erb"
 Layout/RescueEnsureAlignment:
   VersionAdded: '0.49'
 Layout/SpaceAfterColon:
@@ -461,10 +509,14 @@ Layout/TrailingEmptyLines:
   VersionAdded: '0.49'
   VersionChanged: '0.77'
   EnforcedStyle: final_newline
+  Exclude:
+  - "/**/*.erb"
 Layout/TrailingWhitespace:
   VersionAdded: '0.49'
   VersionChanged: '1.0'
   AllowInHeredoc: false
+  Exclude:
+  - "/**/*.erb"
 Lint/AmbiguousBlockAssociation:
   VersionAdded: '0.48'
   VersionChanged: '1.13'
@@ -571,6 +623,8 @@ Lint/EmptyExpression:
 Lint/EmptyFile:
   AllowComments: true
   VersionAdded: '0.90'
+  Exclude:
+  - "/**/*.erb"
 Lint/EmptyInterpolation:
   AutoCorrect: contextual
   VersionAdded: '0.20'
@@ -646,6 +700,8 @@ Lint/OrderedMagicComments:
   VersionChanged: '1.37'
 Lint/OutOfRangeRegexpRef:
   VersionAdded: '0.89'
+  Exclude:
+  - "/**/*.erb"
 Lint/ParenthesesAsGroupedExpression:
   VersionAdded: '0.12'
   VersionChanged: '0.83'
@@ -747,6 +803,8 @@ Lint/SuppressedException:
   VersionChanged: '1.12'
 Lint/Syntax:
   VersionAdded: '0.9'
+  Exclude:
+  - "/**/*.erb"
 Lint/ToJSON:
   VersionAdded: '0.66'
 Lint/TopLevelReturnWithArgument:
@@ -796,6 +854,8 @@ Lint/UselessAssignment:
   AutoCorrect: contextual
   VersionAdded: '0.11'
   VersionChanged: '1.61'
+  Exclude:
+  - "/**/*.erb"
 Lint/UselessElseWithoutRescue:
   VersionAdded: '0.17'
   VersionChanged: '1.31'
@@ -815,6 +875,8 @@ Lint/Void:
   VersionAdded: '0.9'
   VersionChanged: '1.61'
   CheckForMethodsWithNoSideEffects: false
+  Exclude:
+  - "/**/*.erb"
 MagicNumbers/Base: {}
 MagicNumbers/NoArgument:
   Exclude:
@@ -862,6 +924,7 @@ Metrics/BlockLength:
   - "/**/*.gemspec"
   - "**/*_spec.rb"
   - "**/spec/**/*"
+  - "/**/*.erb"
   - "/app/admin/**/*"
   - "/db/**/*"
   - "/config/routes/*"
@@ -875,6 +938,8 @@ Metrics/BlockNesting:
   VersionChanged: '0.47'
   CountBlocks: false
   Max: 3
+  Exclude:
+  - "/**/*.erb"
 Metrics/ClassLength:
   VersionAdded: '0.25'
   VersionChanged: '0.87'
@@ -955,7 +1020,8 @@ Naming/ConstantName:
 Naming/FileName:
   VersionAdded: '0.50'
   VersionChanged: '1.23'
-  Exclude: []
+  Exclude:
+  - "/**/*.erb"
   ExpectMatchingDefinition: false
   CheckDefinitionPathHierarchy: true
   CheckDefinitionPathHierarchyRoots:
@@ -1985,6 +2051,8 @@ Style/HashTransformValues:
 Style/IdenticalConditionalBranches:
   VersionAdded: '0.36'
   VersionChanged: '1.19'
+  Exclude:
+  - "/**/*.erb"
 Style/IfInsideElse:
   AllowIfModifier: false
   VersionAdded: '0.36'
@@ -1992,6 +2060,8 @@ Style/IfInsideElse:
 Style/IfUnlessModifier:
   VersionAdded: '0.9'
   VersionChanged: '0.30'
+  Exclude:
+  - "/**/*.erb"
 Style/IfUnlessModifierOfIfUnless:
   VersionAdded: '0.39'
   VersionChanged: '0.87'
@@ -2063,6 +2133,8 @@ Style/MultilineMemoization:
 Style/MultilineTernaryOperator:
   VersionAdded: '0.9'
   VersionChanged: '0.86'
+  Exclude:
+  - "/**/*.erb"
 Style/MultilineWhenThen:
   VersionAdded: '0.73'
 Style/MultipleComparison:
@@ -2109,11 +2181,15 @@ Style/NestedParenthesizedCalls:
 Style/NestedTernaryOperator:
   VersionAdded: '0.9'
   VersionChanged: '0.86'
+  Exclude:
+  - "/**/*.erb"
 Style/Next:
   VersionAdded: '0.22'
   VersionChanged: '0.35'
   EnforcedStyle: skip_modifier_ifs
   MinBodyLength: 3
+  Exclude:
+  - "/**/*.erb"
 Style/NilComparison:
   VersionAdded: '0.12'
   VersionChanged: '0.59'
@@ -2161,6 +2237,8 @@ Style/OrAssignment:
   VersionAdded: '0.50'
 Style/ParallelAssignment:
   VersionAdded: '0.32'
+  Exclude:
+  - "/**/*.erb"
 Style/ParenthesesAroundCondition:
   VersionAdded: '0.9'
   VersionChanged: '0.56'
@@ -2250,6 +2328,8 @@ Style/RegexpLiteral:
 Style/RescueModifier:
   VersionAdded: '0.9'
   VersionChanged: '0.34'
+  Exclude:
+  - "/**/*.erb"
 Style/RescueStandardError:
   VersionAdded: '0.52'
   EnforcedStyle: explicit
@@ -2273,6 +2353,8 @@ Style/Semicolon:
   VersionAdded: '0.9'
   VersionChanged: '0.19'
   AllowAsExpressionSeparator: false
+  Exclude:
+  - "/**/*.erb"
 Style/SignalException:
   VersionAdded: '0.11'
   VersionChanged: '0.37'
@@ -2351,6 +2433,8 @@ Style/TrailingCommaInArguments:
   - comma
   - consistent_comma
   - no_comma
+  Exclude:
+  - "/**/*.erb"
 Style/TrailingCommaInArrayLiteral:
   VersionAdded: '0.53'
   EnforcedStyleForMultiline: no_comma
@@ -2358,6 +2442,8 @@ Style/TrailingCommaInArrayLiteral:
   - comma
   - consistent_comma
   - no_comma
+  Exclude:
+  - "/**/*.erb"
 Style/TrailingCommaInHashLiteral:
   EnforcedStyleForMultiline: no_comma
   SupportedStylesForMultiline:
@@ -2365,6 +2451,8 @@ Style/TrailingCommaInHashLiteral:
   - consistent_comma
   - no_comma
   VersionAdded: '0.53'
+  Exclude:
+  - "/**/*.erb"
 Style/TrailingMethodEndStatement:
   VersionAdded: '0.52'
 Style/TrailingUnderscoreVariable:
@@ -2407,9 +2495,13 @@ Style/WhenThen:
   VersionAdded: '0.9'
 Style/WhileUntilDo:
   VersionAdded: '0.9'
+  Exclude:
+  - "/**/*.erb"
 Style/WhileUntilModifier:
   VersionAdded: '0.9'
   VersionChanged: '0.30'
+  Exclude:
+  - "/**/*.erb"
 Style/WordArray:
   VersionAdded: '0.9'
   VersionChanged: '1.19'
