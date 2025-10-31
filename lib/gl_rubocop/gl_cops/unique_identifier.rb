@@ -38,12 +38,11 @@ module GLRubocop
       end
 
       def test_id_value
-        str_match = identifiable_line[/data-test-id='|"[^'|"]*/]
+        str_match = identifiable_line[/data-test-id=('|")[^'|"]*/]
 
         return '' unless str_match
 
-        value = str_match.gsub(/data-test-id=./, '')
-        value.start_with?('"', "'") ? value[1..-2] : value
+        str_match.gsub(/data-test-id=./, '')
       end
 
       def valid_method_name?(node)
