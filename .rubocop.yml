@@ -5,4 +5,6 @@ inherit_from:
   - default.yml
 
 GLCops/TailwindNoContradictingClassName:
+  # We disable the TailwindNoContradictingClassName cop for this gem's codebase
+  # because we have legitimate cases of contradicting class names in our test fixtures.
   Enabled: false
