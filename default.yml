@@ -51,6 +51,8 @@ GLCops/LimitFlashOptions:
 
 GLCops/NoStubbingPerformAsync:
   Enabled: true
+  Include:
+    - "**/*spec.rb"
 
 GLCops/PreventErbFiles:
   Enabled: true
@@ -166,6 +168,7 @@ Metrics/ParameterLists:
   Max: 6
   Exclude:
     - "db/seeds/**/*"
+    - "app/components/**/*"
 
 Metrics/PerceivedComplexity:
   Exclude:
