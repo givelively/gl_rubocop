@@ -112,6 +112,8 @@ module GLRubocop
         box_shadow: %w[
           shadow-sm shadow shadow-md shadow-lg shadow-xl shadow-2xl shadow-inner shadow-none
         ]
+        # Add more property groups as needed, currently we have chosen to omit color-related properties and border-radius classes
+        # to reduce false positives in common use cases.
       }.freeze
 
       BREAKPOINT_ORDER = %w[sm md lg xl 2xl].freeze
