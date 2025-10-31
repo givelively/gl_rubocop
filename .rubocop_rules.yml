@@ -71,7 +71,7 @@ GLCops/LimitFlashOptions: {}
 GLCops/NoStubbingPerformAsync:
   Include:
   - "**/*spec.rb"
-GLCops/PreventErbFiles: {}
+GLCops/PreventHamlFiles: {}
 GLCops/RailsCache: {}
 GLCops/SidekiqInheritsFromSidekiqJob:
   Include:
