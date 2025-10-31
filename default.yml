@@ -4,6 +4,7 @@ require:
   - rubocop-rspec
   - rubocop-magic_numbers
   - rubocop-erb
+  - rubocop-haml
   - rubocop-i18n
   - rubocop-rake
   - rubocop-sorbet

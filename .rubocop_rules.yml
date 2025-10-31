@@ -117,6 +117,7 @@ Layout/ArgumentAlignment:
   IndentationWidth:
   Exclude:
   - "/**/*.erb"
+  - "/**/*.haml"
 Layout/ArrayAlignment:
   VersionAdded: '0.49'
   VersionChanged: '0.77'
@@ -124,6 +125,7 @@ Layout/ArrayAlignment:
   IndentationWidth:
   Exclude:
   - "/**/*.erb"
+  - "/**/*.haml"
 Layout/AssignmentIndentation:
   VersionAdded: '0.49'
   VersionChanged: '1.45'
@@ -144,6 +146,7 @@ Layout/BlockAlignment:
   - start_of_line
   Exclude:
   - "/**/*.erb"
+  - "/**/*.haml"
 Layout/BlockEndNewline:
   VersionAdded: '0.49'
 Layout/CaseIndentation:
@@ -174,6 +177,7 @@ Layout/ClosingParenthesisIndentation:
   VersionAdded: '0.49'
   Exclude:
   - "/**/*.erb"
+  - "/**/*.haml"
 Layout/CommentIndentation:
   AllowForAlignment: false
   VersionAdded: '0.49'
@@ -206,6 +210,7 @@ Layout/EmptyLineAfterGuardClause:
   VersionChanged: '0.59'
   Exclude:
   - "/**/*.erb"
+  - "/**/*.haml"
 Layout/EmptyLineAfterMagicComment:
   VersionAdded: '0.49'
 Layout/EmptyLineBetweenDefs:
@@ -259,6 +264,7 @@ Layout/EndAlignment:
   Severity: warning
   Exclude:
   - "/**/*.erb"
+  - "/**/*.haml"
 Layout/EndOfLine:
   VersionAdded: '0.49'
   EnforcedStyle: native
@@ -274,6 +280,7 @@ Layout/FirstArgumentIndentation:
   IndentationWidth:
   Exclude:
   - "/**/*.erb"
+  - "/**/*.haml"
 Layout/FirstArrayElementIndentation:
   VersionAdded: '0.68'
   VersionChanged: '0.77'
@@ -281,6 +288,7 @@ Layout/FirstArrayElementIndentation:
   IndentationWidth:
   Exclude:
   - "/**/*.erb"
+  - "/**/*.haml"
 Layout/FirstHashElementIndentation:
   VersionAdded: '0.68'
   VersionChanged: '0.77'
@@ -288,6 +296,7 @@ Layout/FirstHashElementIndentation:
   IndentationWidth:
   Exclude:
   - "/**/*.erb"
+  - "/**/*.haml"
 Layout/FirstParameterIndentation:
   VersionAdded: '0.49'
   VersionChanged: '0.77'
@@ -295,6 +304,7 @@ Layout/FirstParameterIndentation:
   IndentationWidth:
   Exclude:
   - "/**/*.erb"
+  - "/**/*.haml"
 Layout/HashAlignment:
   AllowMultipleStyles: true
   VersionAdded: '0.49'
@@ -317,6 +327,7 @@ Layout/HashAlignment:
   - ignore_explicit
   Exclude:
   - "/**/*.erb"
+  - "/**/*.haml"
 Layout/HeredocIndentation:
   VersionAdded: '0.49'
   VersionChanged: '0.85'
@@ -325,6 +336,7 @@ Layout/IndentationConsistency:
   EnforcedStyle: normal
   Exclude:
   - "/**/*.erb"
+  - "/**/*.haml"
 Layout/IndentationStyle:
   VersionAdded: '0.49'
   VersionChanged: '0.82'
@@ -336,6 +348,7 @@ Layout/IndentationWidth:
   AllowedPatterns: []
   Exclude:
   - "/**/*.erb"
+  - "/**/*.haml"
 Layout/InitialIndentation:
   VersionAdded: '0.49'
   Exclude:
@@ -365,11 +378,13 @@ Layout/LineLength:
   - ^\s*['"].*['"]\s*$
   Exclude:
   - "/**/*.erb"
+  - "/**/*.haml"
 Layout/MultilineArrayBraceLayout:
   VersionAdded: '0.49'
   EnforcedStyle: symmetrical
   Exclude:
   - "/**/*.erb"
+  - "/**/*.haml"
 Layout/MultilineBlockLayout:
   VersionAdded: '0.49'
 Layout/MultilineHashBraceLayout:
@@ -377,28 +392,33 @@ Layout/MultilineHashBraceLayout:
   EnforcedStyle: symmetrical
   Exclude:
   - "/**/*.erb"
+  - "/**/*.haml"
 Layout/MultilineMethodCallBraceLayout:
   VersionAdded: '0.49'
   EnforcedStyle: symmetrical
   Exclude:
   - "/**/*.erb"
+  - "/**/*.haml"
 Layout/MultilineMethodCallIndentation:
   VersionAdded: '0.49'
   EnforcedStyle: aligned
   IndentationWidth:
   Exclude:
   - "/**/*.erb"
+  - "/**/*.haml"
 Layout/MultilineMethodDefinitionBraceLayout:
   VersionAdded: '0.49'
   EnforcedStyle: symmetrical
   Exclude:
   - "/**/*.erb"
+  - "/**/*.haml"
 Layout/MultilineOperationIndentation:
   VersionAdded: '0.49'
   EnforcedStyle: aligned
   IndentationWidth:
   Exclude:
   - "/**/*.erb"
+  - "/**/*.haml"
 Layout/ParameterAlignment:
   VersionAdded: '0.49'
   VersionChanged: '0.77'
@@ -406,6 +426,7 @@ Layout/ParameterAlignment:
   IndentationWidth:
   Exclude:
   - "/**/*.erb"
+  - "/**/*.haml"
 Layout/RescueEnsureAlignment:
   VersionAdded: '0.49'
 Layout/SpaceAfterColon:
@@ -511,12 +532,14 @@ Layout/TrailingEmptyLines:
   EnforcedStyle: final_newline
   Exclude:
   - "/**/*.erb"
+  - "/**/*.haml"
 Layout/TrailingWhitespace:
   VersionAdded: '0.49'
   VersionChanged: '1.0'
   AllowInHeredoc: false
   Exclude:
   - "/**/*.erb"
+  - "/**/*.haml"
 Lint/AmbiguousBlockAssociation:
   VersionAdded: '0.48'
   VersionChanged: '1.13'
@@ -625,6 +648,7 @@ Lint/EmptyFile:
   VersionAdded: '0.90'
   Exclude:
   - "/**/*.erb"
+  - "/**/*.haml"
 Lint/EmptyInterpolation:
   AutoCorrect: contextual
   VersionAdded: '0.20'
@@ -805,6 +829,7 @@ Lint/Syntax:
   VersionAdded: '0.9'
   Exclude:
   - "/**/*.erb"
+  - "/**/*.haml"
 Lint/ToJSON:
   VersionAdded: '0.66'
 Lint/TopLevelReturnWithArgument:
@@ -856,6 +881,7 @@ Lint/UselessAssignment:
   VersionChanged: '1.61'
   Exclude:
   - "/**/*.erb"
+  - "/**/*.haml"
 Lint/UselessElseWithoutRescue:
   VersionAdded: '0.17'
   VersionChanged: '1.31'
@@ -877,6 +903,7 @@ Lint/Void:
   CheckForMethodsWithNoSideEffects: false
   Exclude:
   - "/**/*.erb"
+  - "/**/*.haml"
 MagicNumbers/Base: {}
 MagicNumbers/NoArgument:
   Exclude:
@@ -925,6 +952,7 @@ Metrics/BlockLength:
   - "**/*_spec.rb"
   - "**/spec/**/*"
   - "/**/*.erb"
+  - "/**/*.haml"
   - "/app/admin/**/*"
   - "/db/**/*"
   - "/config/routes/*"
@@ -940,6 +968,7 @@ Metrics/BlockNesting:
   Max: 3
   Exclude:
   - "/**/*.erb"
+  - "/**/*.haml"
 Metrics/ClassLength:
   VersionAdded: '0.25'
   VersionChanged: '0.87'
@@ -1022,6 +1051,7 @@ Naming/FileName:
   VersionChanged: '1.23'
   Exclude:
   - "/**/*.erb"
+  - "/**/*.haml"
   ExpectMatchingDefinition: false
   CheckDefinitionPathHierarchy: true
   CheckDefinitionPathHierarchyRoots:
@@ -2053,6 +2083,7 @@ Style/IdenticalConditionalBranches:
   VersionChanged: '1.19'
   Exclude:
   - "/**/*.erb"
+  - "/**/*.haml"
 Style/IfInsideElse:
   AllowIfModifier: false
   VersionAdded: '0.36'
@@ -2062,6 +2093,7 @@ Style/IfUnlessModifier:
   VersionChanged: '0.30'
   Exclude:
   - "/**/*.erb"
+  - "/**/*.haml"
 Style/IfUnlessModifierOfIfUnless:
   VersionAdded: '0.39'
   VersionChanged: '0.87'
@@ -2135,6 +2167,7 @@ Style/MultilineTernaryOperator:
   VersionChanged: '0.86'
   Exclude:
   - "/**/*.erb"
+  - "/**/*.haml"
 Style/MultilineWhenThen:
   VersionAdded: '0.73'
 Style/MultipleComparison:
@@ -2183,6 +2216,7 @@ Style/NestedTernaryOperator:
   VersionChanged: '0.86'
   Exclude:
   - "/**/*.erb"
+  - "/**/*.haml"
 Style/Next:
   VersionAdded: '0.22'
   VersionChanged: '0.35'
@@ -2190,6 +2224,7 @@ Style/Next:
   MinBodyLength: 3
   Exclude:
   - "/**/*.erb"
+  - "/**/*.haml"
 Style/NilComparison:
   VersionAdded: '0.12'
   VersionChanged: '0.59'
@@ -2239,6 +2274,7 @@ Style/ParallelAssignment:
   VersionAdded: '0.32'
   Exclude:
   - "/**/*.erb"
+  - "/**/*.haml"
 Style/ParenthesesAroundCondition:
   VersionAdded: '0.9'
   VersionChanged: '0.56'
@@ -2330,6 +2366,7 @@ Style/RescueModifier:
   VersionChanged: '0.34'
   Exclude:
   - "/**/*.erb"
+  - "/**/*.haml"
 Style/RescueStandardError:
   VersionAdded: '0.52'
   EnforcedStyle: explicit
@@ -2355,6 +2392,7 @@ Style/Semicolon:
   AllowAsExpressionSeparator: false
   Exclude:
   - "/**/*.erb"
+  - "/**/*.haml"
 Style/SignalException:
   VersionAdded: '0.11'
   VersionChanged: '0.37'
@@ -2435,6 +2473,7 @@ Style/TrailingCommaInArguments:
   - no_comma
   Exclude:
   - "/**/*.erb"
+  - "/**/*.haml"
 Style/TrailingCommaInArrayLiteral:
   VersionAdded: '0.53'
   EnforcedStyleForMultiline: no_comma
@@ -2444,6 +2483,7 @@ Style/TrailingCommaInArrayLiteral:
   - no_comma
   Exclude:
   - "/**/*.erb"
+  - "/**/*.haml"
 Style/TrailingCommaInHashLiteral:
   EnforcedStyleForMultiline: no_comma
   SupportedStylesForMultiline:
@@ -2453,6 +2493,7 @@ Style/TrailingCommaInHashLiteral:
   VersionAdded: '0.53'
   Exclude:
   - "/**/*.erb"
+  - "/**/*.haml"
 Style/TrailingMethodEndStatement:
   VersionAdded: '0.52'
 Style/TrailingUnderscoreVariable:
@@ -2497,11 +2538,13 @@ Style/WhileUntilDo:
   VersionAdded: '0.9'
   Exclude:
   - "/**/*.erb"
+  - "/**/*.haml"
 Style/WhileUntilModifier:
   VersionAdded: '0.9'
   VersionChanged: '0.30'
   Exclude:
   - "/**/*.erb"
+  - "/**/*.haml"
 Style/WordArray:
   VersionAdded: '0.9'
   VersionChanged: '1.19'
