@@ -4,20 +4,15 @@ module GLRubocop
       # This cop ensures that view components include a data-test-id attribute.
       #
       # Good:
-      #   {data-test-id: 'unique-id'}
-      #   {data-test-id: @unique_id }
-      #   {'data-test-id': 'unique-id'}
-      #   {"data-test-id": "unique-id"}
-      #   {data: {test-id: 'unique-id'}}
-      #   {data: {'test-id': 'unique-id'}}
+      #   data-test-id="unique-id"
       #
       # Bad:
-      #   {data: {testId: "unique-id"}}
-      #   {data: {test: {id: "unique-id"}}
-
+      #   data-testid="unique-id"
+      #   data-testId="unique-id"
+      #   data-test_id="unique-id"
       MSG = 'View components must include a data-test-id attribute'.freeze
       EMPTY_MSG = 'data-test-id attribute must not be empty'.freeze
-      UNIQUE_IDENTIFIER = 'test-id'.freeze
+      UNIQUE_IDENTIFIER = 'data-test-id='.freeze
 
       def on_send(node)
         return unless file_exists? && valid_method_name?(node)
@@ -42,18 +37,12 @@ module GLRubocop
         @raw_content ||= File.read(processed_source.file_path)
       end
 
-      def regex_for_indentifier_and_value
-        key = Regexp.quote(UNIQUE_IDENTIFIER)
-        /(?:["']?data-#{key}["']?|data:.?\{["']?#{key}["']?):\s*(["']([^"']*)["']|@\w+)/
-      end
-
       def test_id_value
-        match = identifiable_line.match(regex_for_indentifier_and_value)
+        str_match = identifiable_line[/data-test-id=('|")[^'|"]*/]
 
-        return '' unless match
+        return '' unless str_match
 
-        value = match[1]
-        value.start_with?('"', "'") ? value[1..-2] : value
+        str_match.gsub(/data-test-id=./, '')
       end
 
       def valid_method_name?(node)

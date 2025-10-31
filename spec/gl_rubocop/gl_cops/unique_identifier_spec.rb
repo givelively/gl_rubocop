@@ -12,8 +12,8 @@ RSpec.describe GLRubocop::GLCops::UniqueIdentifier do
   let(:config) { RuboCop::Config.new }
 
   let!(:processed_source) { parse_source(source) }
-  let(:source) { '' }
-  let(:file_path) { '/path/to/component.html.haml' }
+  let(:source) { 'render "component"' }
+  let(:file_path) { '/path/to/component.html.erb' }
 
   before do
     allow_any_instance_of(described_class).to receive(:processed_source)
@@ -24,11 +24,10 @@ RSpec.describe GLRubocop::GLCops::UniqueIdentifier do
   end
 
   context 'when render method is used without data-test-id' do
-    let(:source) { 'render "component"' }
     let(:template_content) do
-      <<~HAML
-        %div Some content
-      HAML
+      <<~ERB
+        <div>Some content</div>
+      ERB
     end
 
     it 'registers an offense' do
@@ -40,11 +39,10 @@ RSpec.describe GLRubocop::GLCops::UniqueIdentifier do
   end
 
   context 'when render method is used with empty data-test-id' do
-    let(:source) { 'render "component"' }
     let(:template_content) do
-      <<~HAML
-        %div{data-test-id: ""} Some content
-      HAML
+      <<~ERB
+        <div data-test-id="">Some content</div>
+      ERB
     end
 
     it 'registers an offense' do
@@ -56,11 +54,10 @@ RSpec.describe GLRubocop::GLCops::UniqueIdentifier do
   end
 
   context 'when render method is used with non-empty data-test-id' do
-    let(:source) { 'render "component"' }
     let(:template_content) do
-      <<~HAML
-        %div{data-test-id: "unique-id"} Some content
-      HAML
+      <<~ERB
+        <div data-test-id="unique-id">Some content</div>
+      ERB
     end
 
     it 'does not register an offense' do
@@ -70,37 +67,11 @@ RSpec.describe GLRubocop::GLCops::UniqueIdentifier do
     end
   end
 
-  context 'when render method is used with valid data-test-id formats' do
-    let(:source) { 'render "component"' }
-
-    valid_templates = [
-      '%div{data-test-id: "unique-id"} Some content',
-      '%div{data-test-id: @unique_id} Some content',
-      '%div{"data-test-id": "unique-id"} Some content',
-      '%div{\'data-test-id\': \'unique-id\'} Some content',
-      '%div{data: {\'test-id\': \'unique-id\'}} Some content',
-      '%div{data: {test-id: "unique-id"}} Some content'
-    ]
-
-    valid_templates.each do |template|
-      context "when template content is #{template}" do
-        let(:template_content) { template }
-
-        it 'does not register an offense' do
-          expect_no_offenses(<<~RUBY)
-            render "component"
-          RUBY
-        end
-      end
-    end
-  end
-
   context 'when render method is used with invalid data-test-id formats' do
-    let(:source) { 'render "component"' }
-
     invalid_templates = [
-      '%div{data: {testId: "unique-id"}} Some content',
-      '%div{data: {test: {id: "unique-id"}}} Some content'
+      '<div data-testId="unique-id">Some content</div>',
+      '<div data-testid="unique-id">Some content</div>',
+      '<div data-test_id="unique-id">Some content</div>'
     ]
 
     invalid_templates.each do |template|
