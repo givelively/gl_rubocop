@@ -355,7 +355,7 @@ RSpec.describe GLRubocop::GLCops::TailwindNoContradictingClassName do
       context 'when there are no contradicting classes' do
         let(:template_content) do
           <<~ERB
-            <div class="tw:text-center tw:m-4"></div>
+            <div class="tw:text-center tw:m-4"><span class="tw:m-3"></span></div>
           ERB
         end
 
@@ -534,7 +534,7 @@ RSpec.describe GLRubocop::GLCops::TailwindNoContradictingClassName do
       context 'when there are no contradicting classes' do
         let(:template_content) do
           <<~ERB
-            <div class="tw:h-10 tw:lg:h-20"></div>
+            <div class="tw:h-10 tw:lg:h-20 tw:flex"><span class="tw:flex"></span></div>
           ERB
         end
 
