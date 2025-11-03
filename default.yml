@@ -66,6 +66,11 @@ GLCops/SidekiqInheritsFromSidekiqJob:
     - "app/**/*_worker.rb"
     - "app/**/*_job.rb"
 
+
+GLCops/TailwindNoContradictingClassName:
+  # Disabling the tailwind no contradicting class name for some fixes
+  Enabled: false
+
 GLCops/UniqueIdentifier:
   Enabled: true
   Include:
