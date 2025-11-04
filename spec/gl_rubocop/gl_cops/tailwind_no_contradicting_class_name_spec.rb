@@ -287,6 +287,23 @@ RSpec.describe GLRubocop::GLCops::TailwindNoContradictingClassName do
           RUBY
         end
       end
+
+      context 'when there are no contradicting classes' do
+        let(:template_content) do
+          <<~HAML
+            %div.container
+              %h1 Title
+              %div.content.tw:m-4
+                %p.tw:p-8 Some content here.
+          HAML
+        end
+
+        it 'does not register an offense' do
+          expect_no_offenses(<<~RUBY)
+            render "component"
+          RUBY
+        end
+      end
     end
 
     context 'when the HAML template contains classes with arbitrary values' do
@@ -749,6 +766,26 @@ RSpec.describe GLRubocop::GLCops::TailwindNoContradictingClassName do
           RUBY
         end
       end
+    end
+  end
+
+  context 'when distinguishing contradictions' do
+    it 'does not consider display flex to contradict flex direction' do
+      expect_no_offenses(<<~RUBY)
+        class_name = "tw:flex tw:flex-col tw:md:flex-row "
+      RUBY
+    end
+
+    it 'does not consider width to contradict max-width' do
+      expect_no_offenses(<<~RUBY)
+        class_name = "tw:w-4 tw:max-w-8"
+      RUBY
+    end
+
+    it 'does not consider width to contradict min-width' do
+      expect_no_offenses(<<~RUBY)
+        class_name = "tw:w-4 tw:min-w-2"
+      RUBY
     end
   end
 end

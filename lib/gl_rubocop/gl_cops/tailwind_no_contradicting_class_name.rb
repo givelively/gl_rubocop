@@ -145,54 +145,62 @@ module GLRubocop
         node.method_name == :render && node.arguments.any?
       end
 
-      def check_erb_content(content, node)
-        classes = extract_all_erb_classes(content)
-        contradicting_classes = find_contradicting_classes(classes)
+          def check_erb_content(content, node)
+        class_groups = extract_all_erb_classes(content)
 
-        return if contradicting_classes.empty?
+        class_groups.each do |classes|
+          contradicting_classes = find_contradicting_classes(classes)
+          next if contradicting_classes.empty?
 
-        contradicting_classes.each do |group|
-          add_offense(
-            node,
-            message: format(MSG, classes: group.join(', '))
-          )
+          contradicting_classes.each do |group|
+            add_offense(
+              node,
+              message: format(MSG, classes: group.join(', '))
+            )
+          end
         end
       end
 
       def extract_all_erb_classes(content)
-        classes = []
-        classes.concat(extract_classes_from_html_attributes(content))
-        classes.concat(extract_classes_from_rails_hash(content))
-        classes.concat(extract_classes_from_rails_symbol_hash(content))
-        classes.select { |class_name| tailwind_class?(class_name) }
+        class_groups = []
+        class_groups.concat(extract_erb_classes_from_html_attributes(content))
+        class_groups.concat(extract_erb_classes_from_rails_hash(content))
+        class_groups.concat(extract_erb_classes_from_rails_symbol_hash(content))
+
+        # Filter each group to only include Tailwind classes
+        class_groups
+          .map { |group| group.select { |class_name| tailwind_class?(class_name) } }
+          .reject(&:empty?)
       end
 
-      def extract_classes_from_html_attributes(content)
+      def extract_erb_classes_from_html_attributes(content)
         # Example: <div class="tw:w-1 tw:w-2"></div>
-        content.scan(/class\s*=\s*['"]([^'"]+)['"]/).flat_map { |match| match.first.split(/\s+/) }
+        content.scan(/class\s*=\s*['"]([^'"]+)['"]/).map { |match| match.first.split(/\s+/) }
       end
 
-      def extract_classes_from_rails_hash(content)
+      def extract_erb_classes_from_rails_hash(content)
         # Example: <%= radio_button_tag { class: 'tw:w-1 tw:w-2' } %>
-        content.scan(/class:\s*['"]([^'"]+)['"]/).flat_map { |match| match.first.split(/\s+/) }
+        content.scan(/class:\s*['"]([^'"]+)['"]/).map { |match| match.first.split(/\s+/) }
       end
 
-      def extract_classes_from_rails_symbol_hash(content)
+      def extract_erb_classes_from_rails_symbol_hash(content)
         # Example: <%= text_field_tag( ..., :class => 'tw:w-1 tw:w-2' ) %>
-        content.scan(/:class\s*=>\s*['"]([^'"]+)['"]/).flat_map { |match| match.first.split(/\s+/) }
+        content.scan(/:class\s*=>\s*['"]([^'"]+)['"]/).map { |match| match.first.split(/\s+/) }
       end
 
       def check_haml_content(content, node)
-        classes = extract_all_haml_classes(content)
-        contradicting_classes = find_contradicting_classes(classes)
+        class_groups = extract_all_haml_classes(content)
 
-        return if contradicting_classes.empty?
+        class_groups.each do |classes|
+          contradicting_classes = find_contradicting_classes(classes)
+          next if contradicting_classes.empty?
 
-        contradicting_classes.each do |group|
-          add_offense(
-            node,
-            message: format(MSG, classes: group.join(', '))
-          )
+          contradicting_classes.each do |group|
+            add_offense(
+              node,
+              message: format(MSG, classes: group.join(', '))
+            )
+          end
         end
       end
 
@@ -208,6 +216,7 @@ module GLRubocop
         contradicting_classes.each do |group|
           add_offense(
             node,
+            # TODO: Add location for better highlighting
             message: format(MSG, classes: group.join(', '))
           )
         end
@@ -219,21 +228,43 @@ module GLRubocop
       end
 
       def extract_all_haml_classes(content)
+        class_groups = []
+
+        content.each_line do |line|
+          next if haml_comment_line?(line)
+
+          element_classes = []
+          element_classes.concat(extract_haml_class_shortcuts(line))
+          element_classes.concat(extract_haml_hash_syntax_classes(line))
+
+          class_groups << element_classes unless element_classes.empty?
+        end
+
+        filter_tailwind_class_groups(class_groups)
+      end
+
+      def haml_comment_line?(line)
+        line.strip.start_with?('#')
+      end
+
+      def extract_haml_class_shortcuts(line)
+        return [] unless line.match?(/^[^#]*%\w+(?:\.[^{\s#]+)/)
+
+        line.scan(/\.([^.{\s#]+)/).flatten
+      end
+
+      def extract_haml_hash_syntax_classes(line)
         classes = []
-
-        # Extract from HAML class shortcuts (e.g., %div.tw:w-1.tw:w-2)
-        content.scan(/^[^#]*%\w+(?:\.[^{\s#]+)+/m) do |match|
-          class_shortcuts = match.scan(/\.([^.{\s#]+)/).flatten
-          classes.concat(class_shortcuts)
+        line.scan(/class:\s*['"]([^'"]+)['"]/) do |match|
+          classes.concat(match.first.split(/\s+/))
         end
+        classes
+      end
 
-        # Extract from HAML hash syntax (e.g., %div{ class: 'tw:m-4 tw:m-8' })
-        content.scan(/class:\s*['"]([^'"]+)['"]/) do |match|
-          class_list = match.first.split(/\s+/)
-          classes.concat(class_list)
-        end
-
-        classes.select { |class_name| tailwind_class?(class_name) }
+      def filter_tailwind_class_groups(class_groups)
+        class_groups
+          .map { |group| group.select { |class_name| tailwind_class?(class_name) } }
+          .reject(&:empty?)
       end
 
       def tailwind_class?(class_name)
