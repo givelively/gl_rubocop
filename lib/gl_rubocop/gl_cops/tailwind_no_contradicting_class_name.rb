@@ -145,7 +145,7 @@ module GLRubocop
         node.method_name == :render && node.arguments.any?
       end
 
-          def check_erb_content(content, node)
+      def check_erb_content(content, node)
         class_groups = extract_all_erb_classes(content)
 
         class_groups.each do |classes|
@@ -155,6 +155,7 @@ module GLRubocop
           contradicting_classes.each do |group|
             add_offense(
               node,
+              # TODO: Add location for better highlighting
               message: format(MSG, classes: group.join(', '))
             )
           end
@@ -198,6 +199,7 @@ module GLRubocop
           contradicting_classes.each do |group|
             add_offense(
               node,
+              # TODO: Add location for better highlighting
               message: format(MSG, classes: group.join(', '))
             )
           end
