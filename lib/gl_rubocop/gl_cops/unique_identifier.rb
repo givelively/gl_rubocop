@@ -15,7 +15,7 @@ module GLRubocop
       UNIQUE_IDENTIFIER = 'data-test-id='.freeze
 
       def on_send(node)
-        return unless file_exists? && valid_method_name?(node)
+        return unless file_exists? && valid_file_name? && valid_method_name?(node)
 
         return add_offense(node) unless raw_content.include?(UNIQUE_IDENTIFIER)
 
@@ -26,6 +26,10 @@ module GLRubocop
 
       def file_exists?
         File.exist?(processed_source.file_path)
+      end
+
+      def valid_file_name?
+        File.basename(processed_source.file_path) == 'component.html.erb'
       end
 
       def identifiable_line

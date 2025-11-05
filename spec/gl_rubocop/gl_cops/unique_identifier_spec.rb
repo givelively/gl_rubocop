@@ -62,7 +62,22 @@ RSpec.describe GLRubocop::GLCops::UniqueIdentifier do
 
     it 'does not register an offense' do
       expect_no_offenses(<<~RUBY)
-        render "component", "data-test-id": "unique-id"
+        render "component"
+      RUBY
+    end
+  end
+
+  context 'when in a preview file' do
+    let(:file_path) { '/path/to/component_preview/default.html.erb' }
+    let(:template_content) do
+      <<~ERB
+        <div>Some content</div>
+      ERB
+    end
+
+    it 'does not register an offense' do
+      expect_no_offenses(<<~RUBY)
+        render "component"
       RUBY
     end
   end

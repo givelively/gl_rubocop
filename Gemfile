@@ -7,6 +7,8 @@ gemspec
 
 group :development, :test do
   gem 'gl_lint'
+  gem 'guard'
+  gem 'guard-rspec'
   gem 'rake'
   gem 'rspec'
 end
