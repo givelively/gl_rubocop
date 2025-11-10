@@ -12,7 +12,7 @@ module GLRubocop
     #   def initialize(name, age)
     #   def initialize(name, age:)
     class ViewComponentInitializeKeywordArgs < RuboCop::Cop::Cop
-      MSG = 'ViewComponent initialize methods must use keyword arguments only.'
+      MSG = 'ViewComponent initialize methods must use keyword arguments only.'.freeze
 
       def on_def(node)
         return unless node.method_name == :initialize

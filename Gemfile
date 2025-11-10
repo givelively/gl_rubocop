@@ -6,6 +6,7 @@ source 'https://rubygems.org'
 gemspec
 
 group :development, :test do
+  gem 'benchmark'
   gem 'gl_lint'
   gem 'guard'
   gem 'guard-rspec'
