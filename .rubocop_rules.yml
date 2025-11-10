@@ -82,7 +82,7 @@ GLCops/UniqueIdentifier:
   - app/components/**/*.erb
 GLCops/ViewComponentInitializeKeywordArgs:
   Include:
-  - app/components/**/*_component.rb
+  - app/components/**/component.rb
 Gemspec/DuplicatedAssignment:
   Severity: warning
   VersionAdded: '0.52'

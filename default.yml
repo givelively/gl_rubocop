@@ -79,7 +79,7 @@ GLCops/UniqueIdentifier:
 GLCops/ViewComponentInitializeKeywordArgs:
   Enabled: true
   Include:
-    - "app/components/**/*_component.rb"
+    - "app/components/**/component.rb"
 
 I18n/GetText:
   Enabled: false
