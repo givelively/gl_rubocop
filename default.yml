@@ -17,6 +17,7 @@ require:
   - ./lib/gl_rubocop/gl_cops/sidekiq_inherits_from_sidekiq_job.rb
   - ./lib/gl_rubocop/gl_cops/unique_identifier.rb
   - ./lib/gl_rubocop/gl_cops/tailwind_no_contradicting_class_name.rb
+  - ./lib/gl_rubocop/gl_cops/view_component_initialize_keyword_args.rb
 
 AllCops:
   SuggestExtensions: false
@@ -74,6 +75,11 @@ GLCops/UniqueIdentifier:
   Enabled: true
   Include:
     - "app/components/**/*.erb"
+
+GLCops/ViewComponentInitializeKeywordArgs:
+  Enabled: true
+  Include:
+    - "app/components/**/*_component.rb"
 
 I18n/GetText:
   Enabled: false

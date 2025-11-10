@@ -80,6 +80,9 @@ GLCops/SidekiqInheritsFromSidekiqJob:
 GLCops/UniqueIdentifier:
   Include:
   - app/components/**/*.erb
+GLCops/ViewComponentInitializeKeywordArgs:
+  Include:
+  - app/components/**/*_component.rb
 Gemspec/DuplicatedAssignment:
   Severity: warning
   VersionAdded: '0.52'
