@@ -83,11 +83,13 @@ RSpec.describe GLRubocop::GLCops::UniqueIdentifier do
   end
 
   context 'when render method is used with invalid data-test-id formats' do
+    # rubocop:disable GLCops/ValidDataTestId, Lint/RedundantCopDisableDirective
     invalid_templates = [
       '<div data-testId="unique-id">Some content</div>',
       '<div data-testid="unique-id">Some content</div>',
       '<div data-test_id="unique-id">Some content</div>'
     ]
+    # rubocop:enable GLCops/ValidDataTestId, Lint/RedundantCopDisableDirective
 
     invalid_templates.each do |template|
       context "when template content is #{template}" do

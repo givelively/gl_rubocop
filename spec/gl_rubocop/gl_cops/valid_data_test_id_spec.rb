@@ -20,6 +20,7 @@ RSpec.describe GLRubocop::GLCops::ValidDataTestId do
     allow(File).to receive(:read).with(file_path).and_return(template_content)
   end
 
+  # rubocop:disable GLCops/ValidDataTestId, Lint/RedundantCopDisableDirective
   context 'when in an ERB file' do
     let(:file_path) { '/path/to/component.html.erb' }
 
@@ -180,4 +181,5 @@ RSpec.describe GLRubocop::GLCops::ValidDataTestId do
       RUBY
     end
   end
+  # rubocop:enable GLCops/ValidDataTestId, Lint/RedundantCopDisableDirective
 end
