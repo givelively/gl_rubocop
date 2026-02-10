@@ -12,25 +12,9 @@ module GLRubocop
       MSG = 'Use data-test-id instead of %<invalid>s'
 
       # Invalid variations of data-test-id
-      INVALID_PATTERNS = [
-        # HTML-style: data-testid="value"
-        /\bdata-testid\s*=/i,
-        /\bdata-testId\s*=/,
-        /\bdata_test_id\s*=/,
-        /\bdataTestId\s*=/,
-        # HAML/Ruby hash-style with double quotes: "data-testid": "value"
-        /"data-testid"\s*:/i,
-        /"data-testId"\s*:/,
-        /"dataTestId"\s*:/,
-        # HAML/Ruby hash-style with single quotes: 'data-testid': "value"
-        /'data-testid'\s*:/i,
-        /'data-testId'\s*:/,
-        /'dataTestId'\s*:/,
-        # Ruby hash-style without quotes: data_testid: "value"
-        /\bdata_testid\s*:/i,
-        /\bdata_test_id\s*:/,
-        /\bdataTestId\s*:/
-      ].freeze
+      # Matches: data-testid, data_test_id, datatestid, dataTestId, etc.
+      # Does NOT match: data-test-id (the valid format)
+      INVALID_PATTERN = /\bdata(?!-test-id\b)[-_]?test[-_]?id\b/i
 
       def investigate(processed_source)
         return unless haml_file? || erb_file?
@@ -50,33 +34,27 @@ module GLRubocop
       private
 
       def check_file_content(content, processed_source)
-        INVALID_PATTERNS.each do |pattern|
-          next unless content.match?(pattern)
+        return unless content.match?(INVALID_PATTERN)
 
-          match = content.match(pattern)
-          invalid_attr = match[0].split(/[=:]/).first.gsub(/["']/, '')
-          range = processed_source.buffer.source_range
-          add_offense(
-            nil,
-            location: range,
-            message: format(MSG, invalid: invalid_attr)
-          )
-          break
-        end
+        match = content.match(INVALID_PATTERN)
+        invalid_attr = match[0].split(/[=:]/).first.gsub(/["']/, '')
+        range = processed_source.buffer.source_range
+        add_offense(
+          nil,
+          location: range,
+          message: format(MSG, invalid: invalid_attr)
+        )
       end
 
       def check_string_content(content, node)
-        INVALID_PATTERNS.each do |pattern|
-          next unless content.match?(pattern)
+        return unless content.match?(INVALID_PATTERN)
 
-          match = content.match(pattern)
-          invalid_attr = match[0].split(/[=:]/).first.gsub(/["']/, '')
-          add_offense(
-            node,
-            message: format(MSG, invalid: invalid_attr)
-          )
-          break
-        end
+        match = content.match(INVALID_PATTERN)
+        invalid_attr = match[0].split(/[=:]/).first.gsub(/["']/, '')
+        add_offense(
+          node,
+          message: format(MSG, invalid: invalid_attr)
+        )
       end
     end
   end
