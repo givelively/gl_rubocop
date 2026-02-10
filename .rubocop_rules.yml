@@ -80,6 +80,11 @@ GLCops/SidekiqInheritsFromSidekiqJob:
 GLCops/UniqueIdentifier:
   Include:
   - app/components/**/*.erb
+GLCops/ValidDataTestId:
+  Include:
+  - "**/*.erb"
+  - "**/*.haml"
+  - "**/*.rb"
 GLCops/ViewComponentInitializeKeywordArgs:
   Include:
   - app/components/**/component.rb
