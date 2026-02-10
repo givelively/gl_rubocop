@@ -162,6 +162,54 @@ RSpec.describe GLRubocop::GLCops::ValidDataTestId do
         RUBY
       end
     end
+
+    context 'with invalid data-testId format in HAML hash with single quotes' do
+      let(:template_content) do
+        <<~HAML
+          %div{ 'data-testId': "unique-id" }
+            Some content
+        HAML
+      end
+
+      it 'registers an offense' do
+        expect_offense(<<~RUBY)
+          render "component"
+          ^^^^^^^^^^^^^^^^^^ GLCops/ValidDataTestId: Use data-test-id instead of data-testId
+        RUBY
+      end
+    end
+
+    context 'with invalid data-testid format in HAML hash with single quotes' do
+      let(:template_content) do
+        <<~HAML
+          %div{ 'data-testid': "unique-id" }
+            Some content
+        HAML
+      end
+
+      it 'registers an offense' do
+        expect_offense(<<~RUBY)
+          render "component"
+          ^^^^^^^^^^^^^^^^^^ GLCops/ValidDataTestId: Use data-test-id instead of data-testid
+        RUBY
+      end
+    end
+
+    context 'with invalid dataTestId format in HAML hash with single quotes' do
+      let(:template_content) do
+        <<~HAML
+          %div{ 'dataTestId': "unique-id" }
+            Some content
+        HAML
+      end
+
+      it 'registers an offense' do
+        expect_offense(<<~RUBY)
+          render "component"
+          ^^^^^^^^^^^^^^^^^^ GLCops/ValidDataTestId: Use data-test-id instead of dataTestId
+        RUBY
+      end
+    end
   end
 
   context 'when checking string literals in Ruby code' do

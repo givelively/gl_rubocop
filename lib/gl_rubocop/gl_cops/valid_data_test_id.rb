@@ -18,22 +18,27 @@ module GLRubocop
         /\bdata-testId\s*=/,
         /\bdata_test_id\s*=/,
         /\bdataTestId\s*=/,
-        # HAML/Ruby hash-style: "data-testid": "value" or data_testid: "value"
+        # HAML/Ruby hash-style with double quotes: "data-testid": "value"
         /"data-testid"\s*:/i,
         /"data-testId"\s*:/,
         /"dataTestId"\s*:/,
+        # HAML/Ruby hash-style with single quotes: 'data-testid': "value"
+        /'data-testid'\s*:/i,
+        /'data-testId'\s*:/,
+        /'dataTestId'\s*:/,
+        # Ruby hash-style without quotes: data_testid: "value"
         /\bdata_testid\s*:/i,
         /\bdata_test_id\s*:/,
         /\bdataTestId\s*:/
       ].freeze
 
-      def on_send(node)
+      def investigate(processed_source)
         return unless haml_file? || erb_file?
 
         content = haml_file? ? read_haml_file : read_erb_file
         return unless content
 
-        check_content(content, node)
+        check_file_content(content, processed_source)
       end
 
       def on_str(node)
@@ -44,14 +49,16 @@ module GLRubocop
 
       private
 
-      def check_content(content, node)
+      def check_file_content(content, processed_source)
         INVALID_PATTERNS.each do |pattern|
           next unless content.match?(pattern)
 
           match = content.match(pattern)
           invalid_attr = match[0].split(/[=:]/).first.gsub(/["']/, '')
+          range = processed_source.buffer.source_range
           add_offense(
-            node,
+            nil,
+            location: range,
             message: format(MSG, invalid: invalid_attr)
           )
           break
