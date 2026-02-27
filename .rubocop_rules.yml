@@ -64,6 +64,9 @@ FactoryBot/FactoryClassName:
   VersionAdded: '1.37'
   VersionChanged: '2.24'
 GLCops/CallbackMethodNames: {}
+GLCops/ConsolidateRequestSystemSpecs:
+  Include:
+  - "**/*spec.rb"
 GLCops/InteractorInheritsFromInteractorBase:
   Include:
   - app/interactors/**/*
@@ -85,6 +88,9 @@ GLCops/ValidDataTestId:
   - "**/*.erb"
   - "**/*.haml"
   - "**/*.rb"
+GLCops/VcrCassetteNames:
+  Include:
+  - "**/*spec.rb"
 GLCops/ViewComponentInitializeKeywordArgs:
   Include:
   - app/components/**/component.rb
