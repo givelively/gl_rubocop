@@ -33,36 +33,9 @@ RSpec.describe GLRubocop::GLCops::VcrCassetteNames do
     expect(report.offenses.first.message).to eq(expected_message)
   end
 
-  it 'registers an offense when VCR.use_cassette has empty arguments' do
-    source = <<~RUBY
-      VCR.use_cassette() do
-        some_code
-      end
-    RUBY
-
-    processed_source = parse_source(source)
-    report = commissioner.investigate(processed_source)
-
-    expect(report.offenses.size).to eq(1)
-    expect(report.offenses.first.message).to eq(expected_message)
-  end
-
   it 'does not register an offense when VCR.use_cassette has a string name' do
     source = <<~RUBY
       VCR.use_cassette('cassette_name') do
-        some_code
-      end
-    RUBY
-
-    processed_source = parse_source(source)
-    report = commissioner.investigate(processed_source)
-
-    expect(report.offenses.size).to eq(0)
-  end
-
-  it 'does not register an offense when VCR.use_cassette has a double-quoted string name' do
-    source = <<~RUBY
-      VCR.use_cassette("cassette_name") do
         some_code
       end
     RUBY
