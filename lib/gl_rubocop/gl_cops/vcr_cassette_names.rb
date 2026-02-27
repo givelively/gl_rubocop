@@ -15,7 +15,8 @@ module GLRubocop
     #   describe 'something', :vcr do
     class VcrCassetteNames < RuboCop::Cop::Cop
       MSG = 'VCR cassettes must have a name. Example: VCR.use_cassette("cassette_name") { ... }'
-      RSPEC_MSG = 'VCR cassettes must have a name. Example: describe "test", vcr: { cassette_name: :my_cassette } do'
+      RSPEC_MSG = 'VCR cassettes must have a name. ' \
+                  'Example: describe "test", vcr: { cassette_name: :my_cassette } do'
 
       RSPEC_METHODS = %i[describe context it specify example].freeze
 
@@ -40,7 +41,7 @@ module GLRubocop
 
       def check_vcr_use_cassette(node)
         return unless vcr_use_cassette?(node)
-        return if has_cassette_name?(node)
+        return if cassette_name?(node)
 
         add_offense(node, message: MSG)
       end
@@ -59,23 +60,25 @@ module GLRubocop
 
       def check_vcr_hash_metadata(hash_node)
         hash_node.pairs.each do |pair|
-          next unless pair.key.sym_type? && pair.key.value == :vcr
+          next unless vcr_pair?(pair)
 
-          value = pair.value
-          if value.hash_type?
-            # Check if the hash contains cassette_name key
-            has_cassette_name = value.pairs.any? do |inner_pair|
-              inner_pair.key.sym_type? && inner_pair.key.value == :cassette_name
-            end
-            add_offense(pair, message: RSPEC_MSG) unless has_cassette_name
-          else
-            # vcr: true or vcr: some_value without hash
-            add_offense(pair, message: RSPEC_MSG)
-          end
+          add_offense(pair, message: RSPEC_MSG) unless valid_vcr_value?(pair.value)
         end
       end
 
-      def has_cassette_name?(node)
+      def vcr_pair?(pair)
+        pair.key.sym_type? && pair.key.value == :vcr
+      end
+
+      def valid_vcr_value?(value)
+        return false unless value.hash_type?
+
+        value.pairs.any? do |inner_pair|
+          inner_pair.key.sym_type? && inner_pair.key.value == :cassette_name
+        end
+      end
+
+      def cassette_name?(node)
         # Check if the first argument exists and is a string
         return false if node.arguments.empty?
 
