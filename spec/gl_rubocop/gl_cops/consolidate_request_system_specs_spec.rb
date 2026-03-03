@@ -81,12 +81,18 @@ RSpec.describe GLRubocop::GLCops::ConsolidateRequestSystemSpecs do
       expect(report.offenses.size).to eq(2)
     end
 
-    it 'does not register an offense when there is only one it block' do
+    it 'does not register an offense when there is only one it block per describe' do
       source = <<~RUBY
         RSpec.describe UsersController, type: :request do
           describe 'GET /users' do
             it 'returns users' do
               get users_path
+              expect(response).to be_successful
+            end
+          end
+          describe 'GET /users/id' do
+            it 'returns users' do
+              get users_path(12)
               expect(response).to be_successful
             end
           end
