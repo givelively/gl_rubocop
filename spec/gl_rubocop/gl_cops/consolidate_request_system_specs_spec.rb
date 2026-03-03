@@ -155,6 +155,15 @@ RSpec.describe GLRubocop::GLCops::ConsolidateRequestSystemSpecs do
               click_button 'Login'
               expect(page).to have_content('Welcome')
             end
+            context 'with invalid user' do
+              it 'fails to log in' do
+                visit login_path
+                fill_in 'Email', with: 'user@example.com'
+                click_button 'Login'
+                expect(page).to redirect_to(login_path)
+                expect(flash[:error]).to be_present
+              end
+            end
           end
         end
       RUBY
