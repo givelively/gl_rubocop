@@ -21,4 +21,3 @@ module GLRubocop
     end
   end
 end
-

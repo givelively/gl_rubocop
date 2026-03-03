@@ -61,7 +61,10 @@ module GLRubocop
         current = node
         while current
           if current.block_type?
-            @spec_type_cache[current] = request_or_system_type?(current) unless @spec_type_cache.key?(current)
+            unless @spec_type_cache.key?(current)
+              @spec_type_cache[current] =
+                request_or_system_type?(current)
+            end
             return true if @spec_type_cache[current]
           end
           current = current.parent
