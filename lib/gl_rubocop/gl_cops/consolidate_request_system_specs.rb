@@ -12,6 +12,18 @@ module GLRubocop
     #         expect(response).to be_successful
     #       end
     #     end
+    #     describe 'GET /users/id' do
+    #       it 'returns user' do
+    #         get user_path(12)
+    #         expect(response).to be_successful
+    #       end
+    #       context 'with unknown user' do
+    #         it 'returns user' do
+    #           get user_path(12)
+    #           expect(response).to be_successful
+    #         end
+    #       end
+    #     end
     #   end
     #
     # Bad:
