@@ -1,4 +1,3 @@
-# rubocop:disable I18n/RailsI18n/DecorateString
 module GLRubocop
   module GLCops
     # This cop ensures that ViewComponent initialize methods use keyword arguments only.
@@ -27,4 +26,3 @@ module GLRubocop
     end
   end
 end
-# rubocop:enable I18n/RailsI18n/DecorateString

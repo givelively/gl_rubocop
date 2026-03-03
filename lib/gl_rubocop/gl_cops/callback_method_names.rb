@@ -1,4 +1,3 @@
-# rubocop:disable I18n/RailsI18n/DecorateString
 module GLRubocop
   module GLCops
     # This cop ensures that controller callbacks are named methods, not inline blocks.
@@ -22,4 +21,3 @@ module GLRubocop
     end
   end
 end
-# rubocop:enable I18n/RailsI18n/DecorateString

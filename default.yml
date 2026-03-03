@@ -9,15 +9,17 @@ require:
   - rubocop-rake
   - rubocop-sorbet
   - ./lib/gl_rubocop/gl_cops/callback_method_names.rb
+  - ./lib/gl_rubocop/gl_cops/consolidate_request_system_specs.rb
   - ./lib/gl_rubocop/gl_cops/interactor_inherits_from_interactor_base.rb
   - ./lib/gl_rubocop/gl_cops/limit_flash_options.rb
   - ./lib/gl_rubocop/gl_cops/no_stubbing_perform_async.rb
   - ./lib/gl_rubocop/gl_cops/prevent_haml_files.rb
   - ./lib/gl_rubocop/gl_cops/rails_cache.rb
   - ./lib/gl_rubocop/gl_cops/sidekiq_inherits_from_sidekiq_job.rb
-  - ./lib/gl_rubocop/gl_cops/unique_identifier.rb
   - ./lib/gl_rubocop/gl_cops/tailwind_no_contradicting_class_name.rb
+  - ./lib/gl_rubocop/gl_cops/unique_identifier.rb
   - ./lib/gl_rubocop/gl_cops/valid_data_test_id.rb
+  - ./lib/gl_rubocop/gl_cops/vcr_cassette_names.rb
   - ./lib/gl_rubocop/gl_cops/view_component_initialize_keyword_args.rb
 
 AllCops:
@@ -43,6 +45,11 @@ Capybara/NegationMatcher:
 
 GLCops/CallbackMethodNames:
   Enabled: true
+
+GLCops/ConsolidateRequestSystemSpecs:
+  Enabled: true
+  Include:
+    - "**/*spec.rb"
 
 GLCops/InteractorInheritsFromInteractorBase:
   Enabled: true
@@ -83,6 +90,11 @@ GLCops/ValidDataTestId:
     - "**/*.erb"
     - "**/*.haml"
     - "**/*.rb"
+
+GLCops/VcrCassetteNames:
+  Enabled: true
+  Include:
+    - "**/*spec.rb"
 
 GLCops/ViewComponentInitializeKeywordArgs:
   Enabled: true
