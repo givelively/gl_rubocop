@@ -2,7 +2,11 @@
 
 module GLRubocop
   module GLCops
-    # This cop ensures that request and system specs consolidate examples in a single it block.
+    # This cop ensures request and system specs consolidate examples in a single it block,
+    #   per each describe and context.
+    # Reason: Setup for specs should go in let/before blocks - which are different for each context.
+    #   it blocks with the same setup should be consolidated to keep our tests fast.
+    #
     #
     # Good:
     #   RSpec.describe UsersController, type: :request do
@@ -10,17 +14,24 @@ module GLRubocop
     #       it 'returns users' do
     #         get users_path
     #         expect(response).to be_successful
+    #         expect(response).to render_template(:index)
+    #
+    #         get users_path, headers: {format: :json}
+    #         expect(response).to be_successful
+    #         expect(response.content_type).to eq('application/json')
     #       end
     #     end
     #     describe 'GET /users/id' do
+    #       let(:user_id) { user.id }
     #       it 'returns user' do
-    #         get user_path(12)
+    #         get user_path(user_id)
     #         expect(response).to be_successful
     #       end
     #       context 'with unknown user' do
-    #         it 'returns user' do
-    #           get user_path(12)
-    #           expect(response).to be_successful
+    #         let(:user_id) { 111111 }
+    #         it 'does not return user' do
+    #           get user_path(user_id)
+    #           expect(response).not_to be_successful
     #         end
     #       end
     #     end
