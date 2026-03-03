@@ -8,3 +8,7 @@ GLCops/TailwindNoContradictingClassName:
   # We disable the TailwindNoContradictingClassName cop for this gem's codebase
   # because we have legitimate cases of contradicting class names in our test fixtures.
   Enabled: false
+
+I18n/RailsI18n/DecorateString:
+  # We don't translate strings in this repo
+  Enabled: false
