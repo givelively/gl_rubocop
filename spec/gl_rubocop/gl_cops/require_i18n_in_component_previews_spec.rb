@@ -13,20 +13,6 @@ RSpec.describe GLRubocop::GLCops::RequireI18nInComponentPreviews do
     'GLCops/RequireI18nInComponentPreviews: Use i18n helpers (t() or I18n.t()) instead of naked strings in component previews.'
   end
 
-  it 'registers an offense for a naked string as a keyword argument default' do
-    source = <<~RUBY
-      def initialize(text: 'Default Button')
-        render(Core::Button::Component.new(text: text))
-      end
-    RUBY
-
-    processed_source = parse_source(source)
-    report = commissioner.investigate(processed_source)
-
-    expect(report.offenses.size).to eq(1)
-    expect(report.offenses.first.message).to eq(expected_message)
-  end
-
   it 'registers an offense for a naked string passed as a component argument' do
     source = <<~RUBY
       def initialize(text: 'Default Button')
