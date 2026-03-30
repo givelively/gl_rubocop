@@ -76,6 +76,9 @@ GLCops/NoStubbingPerformAsync:
   - "**/*spec.rb"
 GLCops/PreventHamlFiles: {}
 GLCops/RailsCache: {}
+GLCops/RequireI18nInComponentPreviews:
+  Include:
+  - app/components/**/component_preview.rb
 GLCops/SidekiqInheritsFromSidekiqJob:
   Include:
   - app/**/*_worker.rb
