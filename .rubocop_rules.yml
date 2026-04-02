@@ -85,6 +85,15 @@ GLCops/ValidDataTestId:
   - "**/*.erb"
   - "**/*.haml"
   - "**/*.rb"
+GLCops/ViewComponentClassNaming:
+  Include:
+  - app/components/**/*.rb
+GLCops/ViewComponentDirectoryStructure:
+  Include:
+  - app/components/**/component.rb
+GLCops/ViewComponentInheritance:
+  Include:
+  - app/components/**/component.rb
 GLCops/ViewComponentInitializeKeywordArgs:
   Include:
   - app/components/**/component.rb

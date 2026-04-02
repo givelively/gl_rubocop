@@ -19,6 +19,9 @@ require:
   - ./lib/gl_rubocop/gl_cops/tailwind_no_contradicting_class_name.rb
   - ./lib/gl_rubocop/gl_cops/valid_data_test_id.rb
   - ./lib/gl_rubocop/gl_cops/view_component_initialize_keyword_args.rb
+  - ./lib/gl_rubocop/gl_cops/view_component_class_naming.rb
+  - ./lib/gl_rubocop/gl_cops/view_component_inheritance.rb
+  - ./lib/gl_rubocop/gl_cops/view_component_directory_structure.rb
 
 AllCops:
   SuggestExtensions: false
@@ -83,6 +86,21 @@ GLCops/ValidDataTestId:
     - "**/*.erb"
     - "**/*.haml"
     - "**/*.rb"
+
+GLCops/ViewComponentClassNaming:
+  Enabled: true
+  Include:
+    - "app/components/**/*.rb"
+
+GLCops/ViewComponentDirectoryStructure:
+  Enabled: true
+  Include:
+    - "app/components/**/component.rb"
+
+GLCops/ViewComponentInheritance:
+  Enabled: true
+  Include:
+    - "app/components/**/component.rb"
 
 GLCops/ViewComponentInitializeKeywordArgs:
   Enabled: true
