@@ -64,6 +64,9 @@ FactoryBot/FactoryClassName:
   VersionAdded: '1.37'
   VersionChanged: '2.24'
 GLCops/CallbackMethodNames: {}
+GLCops/ConsolidateRequestSystemSpecs:
+  Include:
+  - "**/*spec.rb"
 GLCops/InteractorInheritsFromInteractorBase:
   Include:
   - app/interactors/**/*
@@ -85,6 +88,7 @@ GLCops/ValidDataTestId:
   - "**/*.erb"
   - "**/*.haml"
   - "**/*.rb"
+<<<<<<< michaelgorman/DEV-11927/view_component_cops
 GLCops/ViewComponentClassNaming:
   Include:
   - app/components/**/*.rb
@@ -94,6 +98,11 @@ GLCops/ViewComponentDirectoryStructure:
 GLCops/ViewComponentInheritance:
   Include:
   - app/components/**/component.rb
+=======
+GLCops/VcrCassetteNames:
+  Include:
+  - "**/*spec.rb"
+>>>>>>> main
 GLCops/ViewComponentInitializeKeywordArgs:
   Include:
   - app/components/**/component.rb
@@ -121,7 +130,6 @@ Gemspec/RubyVersionGlobalsUsage:
   VersionChanged: '1.40'
   Include:
   - "**/*.gemspec"
-I18n/RailsI18n/DecorateString: {}
 I18n/RailsI18n/DecorateStringFormattingUsingInterpolation: {}
 Layout/AccessModifierIndentation:
   VersionAdded: '0.49'
