@@ -1,6 +1,6 @@
 module GLRubocop
   module GLCops
-    # This cop checks that all ViewComponent classes inherit from a whitelisted base module.
+    # This cop checks that all ViewComponent classes inherit from an allowlisted base module.
     class ViewComponentClassNaming < RuboCop::Cop::Base
       def on_class(node)
         class_name = node.identifier.const_name
