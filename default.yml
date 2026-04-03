@@ -94,7 +94,6 @@ GLCops/ValidDataTestId:
     - "**/*.haml"
     - "**/*.rb"
 
-<<<<<<< michaelgorman/DEV-11927/view_component_cops
 GLCops/ViewComponentClassNaming:
   Enabled: true
   Include:
@@ -109,12 +108,10 @@ GLCops/ViewComponentInheritance:
   Enabled: true
   Include:
     - "app/components/**/component.rb"
-=======
 GLCops/VcrCassetteNames:
   Enabled: true
   Include:
     - "**/*spec.rb"
->>>>>>> main
 
 GLCops/ViewComponentInitializeKeywordArgs:
   Enabled: true

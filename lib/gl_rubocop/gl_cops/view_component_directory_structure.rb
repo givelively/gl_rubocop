@@ -7,7 +7,7 @@ module GLRubocop
 
       def on_class(node)
         return true if node.identifier.const_name == 'ApplicationViewComponent'
-        base_module = node.parent_module_name.split('::').first
+        base_module = node.parent_module_name&.split('::')&.first
         return true if ALLOWED_MODULES.include?(base_module)
 
         add_offense(node, message: format(MSG, allowed: ALLOWED_MODULES.join(', ')))
