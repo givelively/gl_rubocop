@@ -1,6 +1,6 @@
 module GLRubocop
   module GLCops
-    # This cop checks that all ViewComponent classes inherit from a whitelisted base module.
+    # This cop checks that all ViewComponent classes inherit from an allowlisted base module.
     class ViewComponentDirectoryStructure < RuboCop::Cop::Base
       MSG = 'ViewComponent must belong to an allowed base module: %<allowed>s'.freeze
       ALLOWED_MODULES = %w[Core Admin NonprofitAdmin Packs].freeze
