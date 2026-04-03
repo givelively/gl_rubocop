@@ -1,6 +1,6 @@
 module GLRubocop
   module GLCops
-    # This cop checks that all ViewComponent classes inherit from a whitelisted base module.
+    # This cop checks that all ViewComponent classes inherit from an allowlisted base module.
     class ViewComponentInheritance < RuboCop::Cop::Base
       INHERITANCE_MSG = 'ViewComponent must inherit from ApplicationViewComponent'.freeze
       MODULE_NAME_MSG = 'ViewComponent must inherit from an allowed base module: %<allowed>s'.freeze
