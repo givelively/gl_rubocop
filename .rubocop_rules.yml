@@ -88,7 +88,9 @@ GLCops/ValidDataTestId:
   - "**/*.erb"
   - "**/*.haml"
   - "**/*.rb"
-<<<<<<< michaelgorman/DEV-11927/view_component_cops
+GLCops/VcrCassetteNames:
+  Include:
+  - "**/*spec.rb"
 GLCops/ViewComponentClassNaming:
   Include:
   - app/components/**/*.rb
@@ -98,11 +100,6 @@ GLCops/ViewComponentDirectoryStructure:
 GLCops/ViewComponentInheritance:
   Include:
   - app/components/**/component.rb
-=======
-GLCops/VcrCassetteNames:
-  Include:
-  - "**/*spec.rb"
->>>>>>> main
 GLCops/ViewComponentInitializeKeywordArgs:
   Include:
   - app/components/**/component.rb

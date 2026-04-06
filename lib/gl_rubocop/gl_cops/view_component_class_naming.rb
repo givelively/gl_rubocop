@@ -1,6 +1,17 @@
 module GLRubocop
   module GLCops
-    # This cop checks that all ViewComponent classes inherit from an allowlisted base module.
+    # This cop checks that the class name is "Component" or "ApplicationViewComponent".
+    #
+    # Good:
+    #   class Component < ViewComponent::Base
+    #   end
+    #
+    #   class ApplicationViewComponent < ViewComponent::Base
+    #   end
+    #
+    # Bad:
+    #   class UserCardComponent < ViewComponent::Base
+    #   end
     class ViewComponentClassNaming < RuboCop::Cop::Base
       def on_class(node)
         class_name = node.identifier.const_name
