@@ -17,7 +17,7 @@ module GLRubocop
     #   end
     class ViewComponentDirectoryStructure < RuboCop::Cop::Base
       MSG = 'ViewComponent must belong to an allowed base module: %<allowed>s'.freeze
-      ALLOWED_MODULES = %w[Core Admin NonprofitAdmin Packs].freeze
+      ALLOWED_MODULES = %w[Core Admin NonprofitAdmin Packs Users].freeze
 
       def on_class(node)
         return true if node.identifier.const_name == 'ApplicationViewComponent'
