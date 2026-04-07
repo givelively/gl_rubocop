@@ -11,7 +11,7 @@ module GLRubocop
     #   end
     #
     # Bad:
-    #   module Users
+    #   module Billing
     #     class Component < ApplicationViewComponent
     #     end
     #   end
