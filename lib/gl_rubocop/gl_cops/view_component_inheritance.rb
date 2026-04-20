@@ -17,8 +17,6 @@ module GLRubocop
     #   end
     class ViewComponentInheritance < RuboCop::Cop::Base
       INHERITANCE_MSG = 'ViewComponent must inherit from ApplicationViewComponent'.freeze
-      MODULE_NAME_MSG = 'ViewComponent must inherit from an allowed base module: %<allowed>s'.freeze
-      ALLOWED_MODULES = %w[Core Admin NonprofitAdmin Packs SimpleWidget SmartDonations].freeze
 
       def on_class(node)
         return true if inherits_from_application_view_component(node)
