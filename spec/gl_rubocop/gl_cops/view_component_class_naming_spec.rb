@@ -11,32 +11,47 @@ RSpec.describe GLRubocop::GLCops::ViewComponentClassNaming, :rubocop do
 
   let(:config) { RuboCop::Config.new }
 
-  it 'does not register an offense for Component' do
+  it 'does not register an offense for Component inheriting from ViewComponent::Base' do
     expect_no_offenses(<<~RUBY)
-      class Component
+      class Component < ViewComponent::Base
       end
     RUBY
   end
 
-  it 'does not register an offense for ApplicationViewComponent' do
+  it 'does not register an offense for ApplicationViewComponent inheriting from ViewComponent::Base' do
     expect_no_offenses(<<~RUBY)
-      class ApplicationViewComponent
+      class ApplicationViewComponent < ViewComponent::Base
       end
     RUBY
   end
 
-  it 'registers an offense for any other class name' do
-    expect_offense(<<~RUBY)
+  it 'does not register an offense for classes not inheriting from ViewComponent::Base or ApplicationViewComponent' do
+    expect_no_offenses(<<~RUBY)
       class UserComponent
-      ^^^^^^^^^^^^^^^^^^^ GLCops/ViewComponentClassNaming: ViewComponent class names must be "Component".
       end
     RUBY
   end
 
-  it 'registers an offense for namespaced class names' do
+  it 'registers an offense for any other class name inheriting from ViewComponent::Base' do
     expect_offense(<<~RUBY)
-      class UI::Component
-      ^^^^^^^^^^^^^^^^^^^ GLCops/ViewComponentClassNaming: ViewComponent class names must be "Component".
+      class UserComponent < ViewComponent::Base
+      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ GLCops/ViewComponentClassNaming: ViewComponent class names must be "Component".
+      end
+    RUBY
+  end
+
+  it 'registers an offense for any other class name inheriting from ApplicationViewComponent' do
+    expect_offense(<<~RUBY)
+      class UserComponent < ApplicationViewComponent
+      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ GLCops/ViewComponentClassNaming: ViewComponent class names must be "Component".
+      end
+    RUBY
+  end
+
+  it 'registers an offense for namespaced class names inheriting from ViewComponent::Base' do
+    expect_offense(<<~RUBY)
+      class UI::Component < ViewComponent::Base
+      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ GLCops/ViewComponentClassNaming: ViewComponent class names must be "Component".
       end
     RUBY
   end
