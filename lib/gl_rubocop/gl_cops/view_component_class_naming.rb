@@ -19,8 +19,6 @@ module GLRubocop
     class ViewComponentClassNaming < RuboCop::Cop::Base
       def on_class(node)
         parent_class = node.parent_class&.const_name
-        puts "Checking class #{node.identifier.const_name} with parent #{parent_class}"
-        
         if parent_class == 'ApplicationViewComponent'
           return true if node.identifier.const_name == 'Component'
 
