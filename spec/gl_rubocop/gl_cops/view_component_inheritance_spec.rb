@@ -11,40 +11,69 @@ RSpec.describe GLRubocop::GLCops::ViewComponentInheritance, :rubocop do
 
   let(:config) { RuboCop::Config.new }
 
-  it 'does not register an offense when inheriting from ApplicationViewComponent' do
+  it 'does not register an offense for ApplicationViewComponent itself' do
+    expect_no_offenses(<<~RUBY)
+      class ApplicationViewComponent
+      end
+    RUBY
+  end
+
+  it 'does not register an offense for ApplicationViewComponentPreview itself' do
+    expect_no_offenses(<<~RUBY)
+      class ApplicationViewComponentPreview
+      end
+    RUBY
+  end
+
+  it 'does not register an offense when a component inherits from ApplicationViewComponent' do
     expect_no_offenses(<<~RUBY)
       class MyComponent < ApplicationViewComponent
       end
     RUBY
   end
 
-  it 'does not register an offense when inheriting from ViewComponent::Base' do
-    expect_no_offenses(<<~RUBY)
-      class MyComponent < ViewComponent::Base
-      end
-    RUBY
-  end
-
-  it 'registers an offense when inheriting from another class' do
+  it 'registers an offense when a component inherits from another class' do
     expect_offense(<<~RUBY)
-      class MyComponent < SomeOtherClass
-      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ GLCops/ViewComponentInheritance: ViewComponent must inherit from ApplicationViewComponent
+      class MyComponent < ViewComponent::Base
+      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ GLCops/ViewComponentInheritance: ViewComponents must inherit from ApplicationViewComponent
       end
     RUBY
   end
 
-  it 'registers an offense when not inheriting from any class' do
+  it 'registers an offense when a component does not inherit from any class' do
     expect_offense(<<~RUBY)
       class MyComponent
-      ^^^^^^^^^^^^^^^^^ GLCops/ViewComponentInheritance: ViewComponent must inherit from ApplicationViewComponent
+      ^^^^^^^^^^^^^^^^^ GLCops/ViewComponentInheritance: ViewComponents must inherit from ApplicationViewComponent
       end
     RUBY
   end
 
-  it 'registers an offense when inheriting from a namespaced class' do
+  it 'does not register an offense when a preview inherits from ApplicationViewComponentPreview' do
+    expect_no_offenses(<<~RUBY)
+      class MyComponentPreview < ApplicationViewComponentPreview
+      end
+    RUBY
+  end
+
+  it 'registers an offense when a preview inherits from another class' do
     expect_offense(<<~RUBY)
-      class MyComponent < Admin::BaseComponent
-      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ GLCops/ViewComponentInheritance: ViewComponent must inherit from ApplicationViewComponent
+      class MyComponentPreview < ViewComponent::Preview
+      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ GLCops/ViewComponentInheritance: ViewComponentPreviews must inherit from ApplicationViewComponentPreview
+      end
+    RUBY
+  end
+
+  it 'registers an offense when a preview does not inherit from any class' do
+    expect_offense(<<~RUBY)
+      class MyComponentPreview
+      ^^^^^^^^^^^^^^^^^^^^^^^^ GLCops/ViewComponentInheritance: ViewComponentPreviews must inherit from ApplicationViewComponentPreview
+      end
+    RUBY
+  end
+
+  it 'does not register an offense for classes that are not components or previews' do
+    expect_no_offenses(<<~RUBY)
+      class SomeService < SomeBase
       end
     RUBY
   end
