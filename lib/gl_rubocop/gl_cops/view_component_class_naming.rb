@@ -13,10 +13,10 @@ module GLRubocop
     #   class UserCardComponent < ViewComponent::Base
     #   end
     class ViewComponentClassNaming < RuboCop::Cop::Base
-      ALLOWED_PARENT_CLASSES = %w[ViewComponent::Base ApplicationViewComponent].freeze
+      TARGET_PARENT_CLASSES = %w[ViewComponent::Base ApplicationViewComponent].freeze
 
       def on_class(node)
-        return unless ALLOWED_PARENT_CLASSES.include?(node.parent_class&.const_name)
+        return unless TARGET_PARENT_CLASSES.include?(node.parent_class&.const_name)
 
         class_name = node.identifier.const_name
         return true if class_name == 'Component'
