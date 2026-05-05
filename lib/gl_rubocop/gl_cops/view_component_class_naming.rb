@@ -1,28 +1,35 @@
 module GLRubocop
   module GLCops
-    # This cop checks that the class name is "Component" or "ApplicationViewComponent".
+    # This cop checks naming for classes inheriting from
+    # ApplicationViewComponent or ApplicationViewComponentPreview.
     #
     # Good:
-    #   class Component < ViewComponent::Base
+    #   class Component < ApplicationViewComponent
     #   end
     #
-    #   class ApplicationViewComponent < ViewComponent::Base
+    #   class ComponentPreview < ApplicationViewComponentPreview
     #   end
     #
     # Bad:
-    #   class UserCardComponent < ViewComponent::Base
+    #   class UserCardComponent < ApplicationViewComponent
+    #   end
+    #
+    #   class UserCardComponentPreview < ApplicationViewComponentPreview
     #   end
     class ViewComponentClassNaming < RuboCop::Cop::Base
-      TARGET_PARENT_CLASSES = %w[ViewComponent::Base ApplicationViewComponent].freeze
-
       def on_class(node)
-        return unless TARGET_PARENT_CLASSES.include?(node.parent_class&.const_name)
+        parent_class = node.parent_class&.const_name
+        if parent_class == 'ApplicationViewComponent'
+          return true if node.identifier.const_name == 'Component'
 
-        class_name = node.identifier.const_name
-        return true if class_name == 'Component'
-        return true if class_name == 'ApplicationViewComponent'
+          add_offense(node, message: 'ViewComponent class names must be "Component".')
+        elsif parent_class == 'ApplicationViewComponentPreview'
+          return true if node.identifier.const_name == 'ComponentPreview'
 
-        add_offense(node, message: 'ViewComponent class names must be "Component".')
+          add_offense(node, message: 'ViewComponentPreview class names must be "ComponentPreview".')
+        else
+          true
+        end
       end
     end
   end

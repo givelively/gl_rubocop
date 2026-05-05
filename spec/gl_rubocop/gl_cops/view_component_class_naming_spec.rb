@@ -11,31 +11,30 @@ RSpec.describe GLRubocop::GLCops::ViewComponentClassNaming, :rubocop do
 
   let(:config) { RuboCop::Config.new }
 
-  it 'does not register an offense for Component inheriting from ViewComponent::Base' do
+  it 'does not register an offense for Component inheriting from ApplicationViewComponent' do
     expect_no_offenses(<<~RUBY)
-      class Component < ViewComponent::Base
+      class Component < ApplicationViewComponent
       end
     RUBY
   end
 
-  it 'does not register an offense for ApplicationViewComponent inheriting from ViewComponent::Base' do
+  it 'does not register an offense for ComponentPreview inheriting from ApplicationViewComponentPreview' do
     expect_no_offenses(<<~RUBY)
-      class ApplicationViewComponent < ViewComponent::Base
+      class ComponentPreview < ApplicationViewComponentPreview
       end
     RUBY
   end
 
-  it 'does not register an offense for classes not inheriting from ViewComponent::Base or ApplicationViewComponent' do
+  it 'does not register an offense for classes not inheriting from ApplicationViewComponent or ApplicationViewComponentPreview' do
     expect_no_offenses(<<~RUBY)
       class UserComponent
       end
     RUBY
   end
 
-  it 'registers an offense for any other class name inheriting from ViewComponent::Base' do
-    expect_offense(<<~RUBY)
+  it 'does not register an offense for classes inheriting from ViewComponent::Base' do
+    expect_no_offenses(<<~RUBY)
       class UserComponent < ViewComponent::Base
-      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ GLCops/ViewComponentClassNaming: ViewComponent class names must be "Component".
       end
     RUBY
   end
@@ -48,10 +47,26 @@ RSpec.describe GLRubocop::GLCops::ViewComponentClassNaming, :rubocop do
     RUBY
   end
 
-  it 'registers an offense for namespaced class names inheriting from ViewComponent::Base' do
+  it 'registers an offense for any other class name inheriting from ApplicationViewComponentPreview' do
     expect_offense(<<~RUBY)
-      class UI::Component < ViewComponent::Base
-      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ GLCops/ViewComponentClassNaming: ViewComponent class names must be "Component".
+      class UserComponentPreview < ApplicationViewComponentPreview
+      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ GLCops/ViewComponentClassNaming: ViewComponentPreview class names must be "ComponentPreview".
+      end
+    RUBY
+  end
+
+  it 'registers an offense for namespaced class names inheriting from ApplicationViewComponent' do
+    expect_offense(<<~RUBY)
+      class UI::Component < ApplicationViewComponent
+      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ GLCops/ViewComponentClassNaming: ViewComponent class names must be "Component".
+      end
+    RUBY
+  end
+
+  it 'registers an offense for namespaced class names inheriting from ApplicationViewComponentPreview' do
+    expect_offense(<<~RUBY)
+      class UI::ComponentPreview < ApplicationViewComponentPreview
+      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ GLCops/ViewComponentClassNaming: ViewComponentPreview class names must be "ComponentPreview".
       end
     RUBY
   end
