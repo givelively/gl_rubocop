@@ -99,7 +99,7 @@ GLCops/ViewComponentDirectoryStructure:
   - app/components/**/component.rb
 GLCops/ViewComponentInheritance:
   Include:
-  - app/components/**/component.rb
+  - app/components/**/*.rb
 GLCops/ViewComponentInitializeKeywordArgs:
   Include:
   - app/components/**/component.rb

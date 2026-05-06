@@ -112,7 +112,7 @@ GLCops/ViewComponentDirectoryStructure:
 GLCops/ViewComponentInheritance:
   Enabled: true
   Include:
-    - "app/components/**/component.rb"
+    - "app/components/**/*.rb"
 
 GLCops/ViewComponentInitializeKeywordArgs:
   Enabled: true
