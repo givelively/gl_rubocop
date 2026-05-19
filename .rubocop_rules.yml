@@ -71,6 +71,9 @@ GLCops/InteractorInheritsFromInteractorBase:
   Include:
   - app/interactors/**/*
 GLCops/LimitFlashOptions: {}
+GLCops/NoStubbingEnv:
+  Include:
+  - "**/*spec.rb"
 GLCops/NoStubbingPerformAsync:
   Include:
   - "**/*spec.rb"
