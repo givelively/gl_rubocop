@@ -22,6 +22,9 @@ require:
   - ./lib/gl_rubocop/gl_cops/valid_data_test_id.rb
   - ./lib/gl_rubocop/gl_cops/vcr_cassette_names.rb
   - ./lib/gl_rubocop/gl_cops/view_component_initialize_keyword_args.rb
+  - ./lib/gl_rubocop/gl_cops/no_hardcoded_strings_in_erb_text_elements.rb
+  - ./lib/gl_rubocop/gl_cops/text_and_content_variable_naming.rb
+  - ./lib/gl_rubocop/gl_cops/no_hardcoded_string_assignment_to_text_or_content_variable.rb
 
 AllCops:
   SuggestExtensions: false
@@ -106,6 +109,21 @@ GLCops/ViewComponentInitializeKeywordArgs:
   Enabled: true
   Include:
     - "app/components/**/component.rb"
+
+GLCops/NoHardcodedStringsInErbTextElements:
+  Enabled: true
+  Include:
+    - "app/components/**/*.erb"
+
+GLCops/TextAndContentVariableNaming:
+  Enabled: true
+  Include:
+    - "app/components/**/*.erb"
+
+GLCops/NoHardcodedStringAssignmentToTextOrContentVariable:
+  Enabled: true
+  Include:
+    - "app/components/**/*.rb"
 
 I18n/GetText:
   Enabled: false
