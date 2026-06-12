@@ -52,7 +52,7 @@ module GLRubocop
             match_start = Regexp.last_match.begin(0)
             line_number = content[0...match_start].count("\n") + 1
             range = processed_source.buffer.source_range
-            add_offense(nil, location: range, message: format(MSG, tag: tag, line: line_number))
+            add_offense(nil, location: range, message: format(MSG, tag:, line: line_number))
           end
         end
       end
