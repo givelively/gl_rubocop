@@ -71,6 +71,12 @@ GLCops/InteractorInheritsFromInteractorBase:
   Include:
   - app/interactors/**/*
 GLCops/LimitFlashOptions: {}
+GLCops/NoHardcodedStringAssignmentToTextOrContentVariable:
+  Include:
+  - app/components/**/*.rb
+GLCops/NoHardcodedStringsInErbTextElements:
+  Include:
+  - app/components/**/*.erb
 GLCops/NoStubbingPerformAsync:
   Include:
   - "**/*spec.rb"
@@ -83,6 +89,9 @@ GLCops/SidekiqInheritsFromSidekiqJob:
   Include:
   - app/**/*_worker.rb
   - app/**/*_job.rb
+GLCops/TextAndContentVariableNaming:
+  Include:
+  - app/components/**/*.erb
 GLCops/UniqueIdentifier:
   Include:
   - app/components/**/*.erb

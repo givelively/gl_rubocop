@@ -37,7 +37,7 @@ RSpec.describe GLRubocop::GLCops::TextAndContentVariableNaming do
     it 'registers an offense' do
       expect_offense(<<~RUBY)
         render "component"
-        ^^^^^^^^^^^^^^^^^^ GLCops/TextAndContentVariableNaming: `message` is rendered inside a text element.Rename it with a `_text` suffix (plain text) or `_content` suffix (HTML content).
+        ^^^^^^^^^^^^^^^^^^ GLCops/TextAndContentVariableNaming: `message` is rendered inside a text element. Rename it with a `_text` suffix (plain text) or `_content` suffix (HTML content).
       RUBY
     end
   end
@@ -48,7 +48,7 @@ RSpec.describe GLRubocop::GLCops::TextAndContentVariableNaming do
     it 'registers an offense' do
       expect_offense(<<~RUBY)
         render "component"
-        ^^^^^^^^^^^^^^^^^^ GLCops/TextAndContentVariableNaming: `title` is rendered inside a text element.Rename it with a `_text` suffix (plain text) or `_content` suffix (HTML content).
+        ^^^^^^^^^^^^^^^^^^ GLCops/TextAndContentVariableNaming: `title` is rendered inside a text element. Rename it with a `_text` suffix (plain text) or `_content` suffix (HTML content).
       RUBY
     end
   end
@@ -145,7 +145,7 @@ RSpec.describe GLRubocop::GLCops::TextAndContentVariableNaming do
     it 'registers an offense for @thing' do
       expect_offense(<<~RUBY)
         render "component"
-        ^^^^^^^^^^^^^^^^^^ GLCops/TextAndContentVariableNaming: `thing` is rendered inside a text element.Rename it with a `_text` suffix (plain text) or `_content` suffix (HTML content).
+        ^^^^^^^^^^^^^^^^^^ GLCops/TextAndContentVariableNaming: `thing` is rendered inside a text element. Rename it with a `_text` suffix (plain text) or `_content` suffix (HTML content).
       RUBY
     end
   end
@@ -156,7 +156,7 @@ RSpec.describe GLRubocop::GLCops::TextAndContentVariableNaming do
     it 'registers an offense' do
       expect_offense(<<~RUBY)
         render "component"
-        ^^^^^^^^^^^^^^^^^^ GLCops/TextAndContentVariableNaming: `label` is rendered inside a text element.Rename it with a `_text` suffix (plain text) or `_content` suffix (HTML content).
+        ^^^^^^^^^^^^^^^^^^ GLCops/TextAndContentVariableNaming: `label` is rendered inside a text element. Rename it with a `_text` suffix (plain text) or `_content` suffix (HTML content).
       RUBY
     end
   end
@@ -169,7 +169,7 @@ RSpec.describe GLRubocop::GLCops::TextAndContentVariableNaming do
     it 'registers an offense for the first matching element' do
       expect_offense(<<~RUBY)
         render "component"
-        ^^^^^^^^^^^^^^^^^^ GLCops/TextAndContentVariableNaming: `body` is rendered inside a text element.Rename it with a `_text` suffix (plain text) or `_content` suffix (HTML content).
+        ^^^^^^^^^^^^^^^^^^ GLCops/TextAndContentVariableNaming: `body` is rendered inside a text element. Rename it with a `_text` suffix (plain text) or `_content` suffix (HTML content).
       RUBY
     end
   end
