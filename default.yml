@@ -63,6 +63,16 @@ GLCops/InteractorInheritsFromInteractorBase:
 GLCops/LimitFlashOptions:
   Enabled: true
 
+GLCops/NoHardcodedStringAssignmentToTextOrContentVariable:
+  Enabled: true
+  Include:
+    - "app/components/**/*.rb"
+
+GLCops/NoHardcodedStringsInErbTextElements:
+  Enabled: true
+  Include:
+    - "app/components/**/*.erb"
+
 GLCops/NoStubbingPerformAsync:
   Enabled: true
   Include:
@@ -88,6 +98,11 @@ GLCops/TailwindNoContradictingClassName:
   # Disabling the tailwind no contradicting class name for some fixes
   Enabled: false
 
+GLCops/TextAndContentVariableNaming:
+  Enabled: true
+  Include:
+    - "app/components/**/*.erb"
+
 GLCops/UniqueIdentifier:
   Enabled: true
   Include:
@@ -109,21 +124,6 @@ GLCops/ViewComponentInitializeKeywordArgs:
   Enabled: true
   Include:
     - "app/components/**/component.rb"
-
-GLCops/NoHardcodedStringsInErbTextElements:
-  Enabled: true
-  Include:
-    - "app/components/**/*.erb"
-
-GLCops/TextAndContentVariableNaming:
-  Enabled: true
-  Include:
-    - "app/components/**/*.erb"
-
-GLCops/NoHardcodedStringAssignmentToTextOrContentVariable:
-  Enabled: true
-  Include:
-    - "app/components/**/*.rb"
 
 I18n/GetText:
   Enabled: false
