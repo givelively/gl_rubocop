@@ -24,7 +24,7 @@ module GLRubocop
     class TextAndContentVariableNaming < RuboCop::Cop::Cop
       include GLRubocop::ErbContentHelper
 
-      MSG = '`%<name>s` is rendered inside a text element. ' \
+      MSG = '`%<name>s` (line %<line>d) is rendered inside a text element. ' \
             'Rename it with a `_text` suffix (plain text) or `_content` suffix (HTML content).'
 
       TEXT_TAGS = %w[
@@ -53,16 +53,21 @@ module GLRubocop
         TEXT_TAGS.each do |tag|
           pattern = element_pattern(tag)
           content.scan(pattern) do |groups|
-            body = groups[0]
-
-            body.scan(BARE_VAR_PATTERN) do |var_match|
-              var_name = var_match[0]
-              next if properly_named?(var_name)
-
-              range = processed_source.buffer.source_range
-              add_offense(nil, location: range, message: format(MSG, name: var_name))
-            end
+            body_start = Regexp.last_match.begin(1)
+            check_body_variables(groups[0], body_start, content, processed_source)
           end
+        end
+      end
+
+      def check_body_variables(body, body_start, content, processed_source)
+        body.scan(BARE_VAR_PATTERN) do |var_match|
+          var_name = var_match[0]
+          next if properly_named?(var_name)
+
+          absolute_offset = body_start + Regexp.last_match.begin(0)
+          line_number = content[0...absolute_offset].count("\n") + 1
+          msg = format(MSG, name: var_name, line: line_number)
+          add_offense(nil, location: processed_source.buffer.source_range, message: msg)
         end
       end
 
