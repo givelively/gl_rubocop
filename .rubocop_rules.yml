@@ -71,15 +71,15 @@ GLCops/InteractorInheritsFromInteractorBase:
   Include:
   - app/interactors/**/*
 GLCops/LimitFlashOptions: {}
-GLCops/NoStubbingEnv:
-  Include:
-  - "**/*spec.rb"
 GLCops/NoHardcodedStringAssignmentToTextOrContentVariable:
   Include:
   - app/components/**/*.rb
 GLCops/NoHardcodedStringsInErbTextElements:
   Include:
   - app/components/**/*.erb
+GLCops/NoStubbingEnv:
+  Include:
+  - "**/*spec.rb"
 GLCops/NoStubbingPerformAsync:
   Include:
   - "**/*spec.rb"
