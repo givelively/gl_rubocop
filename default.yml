@@ -12,6 +12,7 @@ require:
   - ./lib/gl_rubocop/gl_cops/consolidate_request_system_specs.rb
   - ./lib/gl_rubocop/gl_cops/interactor_inherits_from_interactor_base.rb
   - ./lib/gl_rubocop/gl_cops/limit_flash_options.rb
+  - ./lib/gl_rubocop/gl_cops/no_stubbing_env.rb
   - ./lib/gl_rubocop/gl_cops/no_stubbing_perform_async.rb
   - ./lib/gl_rubocop/gl_cops/prevent_haml_files.rb
   - ./lib/gl_rubocop/gl_cops/rails_cache.rb
@@ -22,6 +23,9 @@ require:
   - ./lib/gl_rubocop/gl_cops/valid_data_test_id.rb
   - ./lib/gl_rubocop/gl_cops/vcr_cassette_names.rb
   - ./lib/gl_rubocop/gl_cops/view_component_initialize_keyword_args.rb
+  - ./lib/gl_rubocop/gl_cops/view_component_class_naming.rb
+  - ./lib/gl_rubocop/gl_cops/view_component_inheritance.rb
+  - ./lib/gl_rubocop/gl_cops/view_component_directory_structure.rb
   - ./lib/gl_rubocop/gl_cops/no_hardcoded_strings_in_erb_text_elements.rb
   - ./lib/gl_rubocop/gl_cops/text_and_content_variable_naming.rb
   - ./lib/gl_rubocop/gl_cops/no_hardcoded_string_assignment_to_text_or_content_variable.rb
@@ -62,6 +66,11 @@ GLCops/InteractorInheritsFromInteractorBase:
 
 GLCops/LimitFlashOptions:
   Enabled: true
+
+GLCops/NoStubbingEnv:
+  Enabled: true
+  Include:
+    - "**/*spec.rb"
 
 GLCops/NoHardcodedStringAssignmentToTextOrContentVariable:
   Enabled: true
@@ -119,6 +128,21 @@ GLCops/VcrCassetteNames:
   Enabled: true
   Include:
     - "**/*spec.rb"
+
+GLCops/ViewComponentClassNaming:
+  Enabled: true
+  Include:
+    - "app/components/**/*.rb"
+
+GLCops/ViewComponentDirectoryStructure:
+  Enabled: true
+  Include:
+    - "app/components/**/component.rb"
+
+GLCops/ViewComponentInheritance:
+  Enabled: true
+  Include:
+    - "app/components/**/*.rb"
 
 GLCops/ViewComponentInitializeKeywordArgs:
   Enabled: true
