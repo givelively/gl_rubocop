@@ -1,5 +1,5 @@
 ---
-name: rubocop-cop
+name: gl-cops
 description: >
   Invoke for any task creating a new custom RuboCop cop in this gem: scaffolding a new cop file,
   choosing the right RuboCop node handler method, writing the offense header comment block,
