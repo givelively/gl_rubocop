@@ -83,6 +83,10 @@ GLCops/NoStubbingEnv:
 GLCops/NoStubbingPerformAsync:
   Include:
   - "**/*spec.rb"
+GLCops/NoTransactionInControllers:
+  Include:
+  - app/controllers/**/*
+  - packs/**/app/controllers/**/*
 GLCops/PreventHamlFiles: {}
 GLCops/RailsCache: {}
 GLCops/SidekiqInheritsFromSidekiqJob:
