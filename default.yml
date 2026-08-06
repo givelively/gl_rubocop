@@ -91,6 +91,7 @@ GLCops/NoTransactionInControllers:
   Enabled: true
   Include:
     - "app/controllers/**/*"
+    - "packs/**/app/controllers/**/*"
 
 GLCops/PreventHamlFiles:
   Enabled: true
