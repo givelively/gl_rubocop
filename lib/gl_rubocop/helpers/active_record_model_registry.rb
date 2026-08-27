@@ -1,17 +1,8 @@
-# frozen_string_literal: true
-
 require 'set'
 require 'parser/current'
 
 module GLRubocop
   module Helpers
-    # Scans a host application's model files to determine which constants transitively
-    # inherit from ApplicationRecord/ActiveRecord::Base.
-    #
-    # This exists because directories like app/models commonly hold plain Ruby objects
-    # (wrappers, value objects, wrapped API responses) alongside real ActiveRecord
-    # models, so a class's location alone doesn't tell us whether using it directly in
-    # a controller is actually a database-layer/networking-layer violation.
     class ActiveRecordModelRegistry
       DEFAULT_GLOBS = [
         'app/models/**/*.rb',
@@ -21,8 +12,6 @@ module GLRubocop
       AR_BASE_CLASSES = ['ApplicationRecord', 'ActiveRecord::Base'].freeze
 
       class << self
-        # Memoized per (project_root, globs), so the filesystem is scanned once per
-        # RuboCop process no matter how many controller files are linted.
         def for(project_root:, globs: DEFAULT_GLOBS)
           @cache ||= {}
           @cache[[project_root,
@@ -39,8 +28,6 @@ module GLRubocop
         @globs = globs
       end
 
-      # Returns a Set of fully-qualified AR-derived model names, e.g.
-      # #<Set: {"Nonprofit", "Webhook::Endpoint", "Datawarehouse::BaseRecord"}>
       def model_names
         parents = collect_class_parents
         Set.new(parents.keys.select { |name| ar_derived?(name, parents) })
@@ -62,8 +49,6 @@ module GLRubocop
         parents
       end
 
-      # A syntax error in an unrelated model file should never crash the lint run of
-      # the controller currently being checked.
       def parse(path)
         Parser::CurrentRuby.parse(File.read(path))
       rescue Parser::SyntaxError, EncodingError
@@ -129,7 +114,7 @@ module GLRubocop
         info = parents[name]
         return false unless info
 
-        seen[name] = false # guards against inheritance cycles
+        seen[name] = false
         parent = info[:parent]
         return false unless parent
 
@@ -139,8 +124,6 @@ module GLRubocop
         result
       end
 
-      # Approximates Ruby's constant lookup: search the enclosing namespaces outward
-      # before falling back to the bare name.
       def resolve_const(name, namespace, parents)
         return name if parents.key?(name)
 
