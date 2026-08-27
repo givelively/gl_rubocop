@@ -77,6 +77,10 @@ GLCops/NoHardcodedStringAssignmentToTextOrContentVariable:
 GLCops/NoHardcodedStringsInErbTextElements:
   Include:
   - app/components/**/*.erb
+GLCops/NoModelUsageInControllers:
+  Include:
+  - app/controllers/**/*
+  - packs/**/app/controllers/**/*
 GLCops/NoStubbingEnv:
   Include:
   - "**/*spec.rb"
