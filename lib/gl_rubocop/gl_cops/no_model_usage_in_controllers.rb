@@ -1,5 +1,3 @@
-# frozen_string_literal: true
-
 require_relative '../helpers/active_record_model_registry'
 
 module GLRubocop
@@ -24,16 +22,14 @@ module GLRubocop
     #   nonprofit.update!(name: params[:name])
     class NoModelUsageInControllers < RuboCop::Cop::Base
       MSG = 'Do not use the `%<model>s` model directly in a controller. Move this ' \
-            'logic into a GLCommand.'
+            'logic into a GLCommand.'.freeze
 
-      # Methods that construct/query an AR model from its class, e.g. Nonprofit.find(...)
       CLASS_LEVEL_METHODS = %i[
         find find_by find_by! find_or_create_by find_or_create_by!
         where create create! new all order includes joins pluck
         exists? count first last update_all destroy_all
       ].freeze
 
-      # Methods that persist/mutate an already-referenced instance, e.g. nonprofit.save
       INSTANCE_LEVEL_METHODS = %i[save save! update update! destroy destroy!].freeze
 
       def on_send(node)
@@ -52,8 +48,6 @@ module GLRubocop
         model_vars[var_name] = model_name_for(value.receiver) if assigns_model?(value)
       end
 
-      # Local variables are only tracked within a single method body, since that's
-      # the only scope RuboCop can safely reason about without full type inference.
       def on_def(_node)
         model_vars.clear
       end
@@ -83,11 +77,6 @@ module GLRubocop
         value.respond_to?(:send_type?) && value.send_type? && value.receiver&.const_type?
       end
 
-      # Returns the model's name if the constant is confirmed AR-derived, otherwise nil.
-      #
-      # Deliberately requires an exact fully-qualified match rather than a bare last-
-      # segment fallback: e.g. a reference to `V2::User` must never match an unrelated
-      # top-level `User` AR model just because they share a final segment.
       def model_name_for(const_node)
         name = full_const_name(const_node)
         name if model_names.include?(name)
