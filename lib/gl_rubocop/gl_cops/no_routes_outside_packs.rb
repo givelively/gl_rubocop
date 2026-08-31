@@ -84,7 +84,10 @@ module GLRubocop
         return unless to_value&.str_type?
 
         controller_part = to_value.value.to_s.split('#').first
-        return if controller_part.blank?
+        # rubocop:disable Rails/Blank -- avoid depending on ActiveSupport, which
+        # gl_rubocop does not declare as a direct gem dependency.
+        return if controller_part.nil? || controller_part.empty?
+        # rubocop:enable Rails/Blank
 
         check_controller_path(send_node, build_controller_path(namespace, controller_part))
       end
@@ -97,15 +100,13 @@ module GLRubocop
       end
 
       def explicit_controller_option(send_node)
-        value = keyword_value(send_node, :controller)
-        value.value.to_s if value&.str_type?
+        string_or_symbol_value(keyword_value(send_node, :controller))
       end
 
       def resource_name_for(send_node)
-        first_arg = send_node.arguments.first
-        return nil unless first_arg && (first_arg.sym_type? || first_arg.str_type?)
+        name = string_or_symbol_value(send_node.arguments.first)
+        return nil unless name
 
-        name = first_arg.value.to_s
         send_node.method_name == :resource ? pluralize(name) : name
       end
 
@@ -119,13 +120,17 @@ module GLRubocop
       end
 
       def namespace_segment_from_arg(send_node)
-        first_arg = send_node.arguments.first
-        first_arg.value.to_s if first_arg && (first_arg.sym_type? || first_arg.str_type?)
+        string_or_symbol_value(send_node.arguments.first)
       end
 
       def namespace_segment_from_module_option(send_node)
-        module_value = keyword_value(send_node, :module)
-        module_value.value.to_s if module_value&.str_type?
+        string_or_symbol_value(keyword_value(send_node, :module))
+      end
+
+      def string_or_symbol_value(node)
+        return nil unless node && (node.str_type? || node.sym_type?)
+
+        node.value.to_s
       end
 
       def keyword_value(send_node, key)

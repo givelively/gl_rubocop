@@ -62,6 +62,24 @@ RSpec.describe GLRubocop::GLCops::NoRoutesOutsidePacks do
         end
       RUBY
     end
+
+    it 'registers an offense for a `resources` call with a symbol `controller:` option' do
+      expect_offense(<<~RUBY, 'config/routes.rb')
+        namespace :tracking do
+          resources :things, controller: :events
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ #{message('tracking/events', 'tracking')}
+        end
+      RUBY
+    end
+
+    it 'registers an offense for a `scope` call with a symbol `module:` option' do
+      expect_offense(<<~RUBY, 'config/routes.rb')
+        scope module: :tracking do
+          resources :events, only: :create
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ #{message('tracking/events', 'tracking')}
+        end
+      RUBY
+    end
   end
 
   context 'when the route is defined within the owning pack routes file' do
