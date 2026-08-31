@@ -7,14 +7,17 @@ module GLRubocop
     # directory, so related functionality stays grouped together as we migrate the
     # codebase to packs.
     #
-    # This cop is scoped (via `Include`) to app/controllers, since controllers already
-    # living within packs/**/app/controllers are never checked. Existing controllers
-    # that predate this rule should be grandfathered in via an `Exclude` list in the
-    # consuming project's RuboCop config, so only newly added controllers are flagged.
+    # The offense is determined by the file's own location (not just the `Include`
+    # config), so this cop only flags controllers whose file path does not contain a
+    # `packs/` segment. Existing controllers that predate this rule should be
+    # grandfathered in via an `Exclude` list in the consuming project's RuboCop config,
+    # so only newly added controllers are flagged.
     #
     # Good:
     #   # packs/donations/app/controllers/donations_controller.rb
-    #   class DonationsController < ApplicationController
+    #   module Donations
+    #     class DonationsController < ApplicationController
+    #     end
     #   end
     #
     # Bad:
@@ -25,10 +28,19 @@ module GLRubocop
       MSG = 'New controllers must be placed within a pack ' \
             '(e.g. packs/my_pack/app/controllers), not app/controllers.'.freeze
 
+      PACK_PATH_SEGMENT = %r{(^|/)packs/}
+
       def on_class(node)
         return unless node.identifier.short_name.to_s.end_with?('Controller')
+        return if within_pack?
 
         add_offense(node)
+      end
+
+      private
+
+      def within_pack?
+        PACK_PATH_SEGMENT.match?(processed_source.buffer.name.to_s)
       end
     end
   end

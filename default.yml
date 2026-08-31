@@ -73,6 +73,7 @@ GLCops/NoControllersOutsidePacks:
   Enabled: true
   Include:
     - "app/controllers/**/*"
+    - "packs/**/app/controllers/**/*"
 
 GLCops/NoHardcodedStringAssignmentToTextOrContentVariable:
   Enabled: true

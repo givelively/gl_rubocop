@@ -14,8 +14,8 @@ RSpec.describe GLRubocop::GLCops::NoControllersOutsidePacks do
       '(e.g. packs/my_pack/app/controllers), not app/controllers.'
   end
 
-  it 'registers an offense for a controller inheriting from ApplicationController' do
-    expect_offense(<<~RUBY)
+  it 'registers an offense for a controller defined outside app/controllers' do
+    expect_offense(<<~RUBY, 'app/controllers/donations_controller.rb')
       class DonationsController < ApplicationController
       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ #{message}
         def index
@@ -24,8 +24,8 @@ RSpec.describe GLRubocop::GLCops::NoControllersOutsidePacks do
     RUBY
   end
 
-  it 'registers an offense for a namespaced controller' do
-    expect_offense(<<~RUBY)
+  it 'registers an offense for a namespaced controller outside a pack' do
+    expect_offense(<<~RUBY, 'app/controllers/nonprofit/donations_controller.rb')
       class Nonprofit::DonationsController < ApplicationController
       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ #{message}
         def index
@@ -34,23 +34,41 @@ RSpec.describe GLRubocop::GLCops::NoControllersOutsidePacks do
     RUBY
   end
 
-  it 'registers an offense for a controller with no explicit superclass' do
-    expect_offense(<<~RUBY)
+  it 'registers an offense for a controller with no explicit superclass outside a pack' do
+    expect_offense(<<~RUBY, 'app/controllers/donations_controller.rb')
       class DonationsController
       ^^^^^^^^^^^^^^^^^^^^^^^^^ #{message}
       end
     RUBY
   end
 
-  it 'does not register an offense for a non-controller class' do
-    expect_no_offenses(<<~RUBY)
+  it 'does not register an offense for a controller defined within a pack' do
+    expect_no_offenses(<<~RUBY, 'packs/donations/app/controllers/donations_controller.rb')
+      module Donations
+        class DonationsController < ApplicationController
+        end
+      end
+    RUBY
+  end
+
+  it 'does not register an offense for a nested pack path' do
+    expect_no_offenses(<<~RUBY, 'packs/donations/app/public/controllers/donations_controller.rb')
+      module Donations
+        class DonationsController < ApplicationController
+        end
+      end
+    RUBY
+  end
+
+  it 'does not register an offense for a non-controller class outside a pack' do
+    expect_no_offenses(<<~RUBY, 'app/models/donation.rb')
       class Donation < ApplicationRecord
       end
     RUBY
   end
 
-  it 'does not register an offense for a concern module' do
-    expect_no_offenses(<<~RUBY)
+  it 'does not register an offense for a concern module outside a pack' do
+    expect_no_offenses(<<~RUBY, 'app/controllers/concerns/donations_controller_concern.rb')
       module DonationsControllerConcern
         extend ActiveSupport::Concern
       end

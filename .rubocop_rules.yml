@@ -74,6 +74,7 @@ GLCops/LimitFlashOptions: {}
 GLCops/NoControllersOutsidePacks:
   Include:
   - app/controllers/**/*
+  - packs/**/app/controllers/**/*
 GLCops/NoHardcodedStringAssignmentToTextOrContentVariable:
   Include:
   - app/components/**/*.rb
