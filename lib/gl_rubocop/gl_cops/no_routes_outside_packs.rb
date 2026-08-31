@@ -36,6 +36,7 @@ module GLRubocop
       MEMBER_ROUTE_METHODS = %i[get post put patch delete match].freeze
 
       DEFAULT_ROUTES_PATH_TEMPLATE = 'packs/%<pack>s/public/config/routes.rb'.freeze
+      NON_PLURALIZING_Y_SUFFIXES = %w[ay ey iy oy uy].freeze
 
       def on_new_investigation
         walk(processed_source.ast, [])
@@ -83,7 +84,7 @@ module GLRubocop
         return unless to_value&.str_type?
 
         controller_part = to_value.value.to_s.split('#').first
-        return if controller_part.nil? || controller_part.empty?
+        return if controller_part.blank?
 
         check_controller_path(send_node, build_controller_path(namespace, controller_part))
       end
@@ -111,18 +112,24 @@ module GLRubocop
       def namespace_segment_for(send_node)
         return nil unless send_node&.send_type?
 
-        case send_node.method_name
-        when :namespace
-          first_arg = send_node.arguments.first
-          first_arg.value.to_s if first_arg && (first_arg.sym_type? || first_arg.str_type?)
-        when :scope
-          module_value = keyword_value(send_node, :module)
-          module_value.value.to_s if module_value&.str_type?
-        end
+        return namespace_segment_from_arg(send_node) if send_node.method_name == :namespace
+        return namespace_segment_from_module_option(send_node) if send_node.method_name == :scope
+
+        nil
+      end
+
+      def namespace_segment_from_arg(send_node)
+        first_arg = send_node.arguments.first
+        first_arg.value.to_s if first_arg && (first_arg.sym_type? || first_arg.str_type?)
+      end
+
+      def namespace_segment_from_module_option(send_node)
+        module_value = keyword_value(send_node, :module)
+        module_value.value.to_s if module_value&.str_type?
       end
 
       def keyword_value(send_node, key)
-        hash_arg = send_node.arguments.find { |arg| arg.hash_type? }
+        hash_arg = send_node.arguments.find(&:hash_type?)
         return nil unless hash_arg
 
         pair = hash_arg.pairs.find { |p| p.key.sym_type? && p.key.value == key }
@@ -142,9 +149,10 @@ module GLRubocop
         return if defined_in_owning_pack_routes_file?(pack_name)
 
         add_offense(node, message: format(MSG,
-                                           controller: controller_path,
-                                           pack: pack_name,
-                                           expected_path: format(routes_path_template, pack: pack_name)))
+                                          controller: controller_path,
+                                          pack: pack_name,
+                                          expected_path: format(routes_path_template,
+                                                                pack: pack_name)))
       end
 
       def defined_in_owning_pack_routes_file?(pack_name)
@@ -153,10 +161,14 @@ module GLRubocop
       end
 
       def pluralize(word)
-        return "#{word.delete_suffix('y')}ies" if word.end_with?('y') && !word.end_with?(*%w[ay ey iy oy uy])
+        return "#{word.delete_suffix('y')}ies" if pluralizes_to_ies?(word)
         return "#{word}es" if word.end_with?('s', 'x', 'z', 'ch', 'sh')
 
         "#{word}s"
+      end
+
+      def pluralizes_to_ies?(word)
+        word.end_with?('y') && NON_PLURALIZING_Y_SUFFIXES.none? { |suffix| word.end_with?(suffix) }
       end
 
       def controller_packs
@@ -168,7 +180,8 @@ module GLRubocop
       end
 
       def controller_globs
-        cop_config.fetch('ControllerGlobs', GLRubocop::Helpers::PackControllerRegistry::DEFAULT_GLOBS)
+        cop_config.fetch('ControllerGlobs',
+                         GLRubocop::Helpers::PackControllerRegistry::DEFAULT_GLOBS)
       end
 
       def routes_path_template

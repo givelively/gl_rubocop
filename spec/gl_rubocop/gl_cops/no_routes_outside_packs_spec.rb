@@ -84,9 +84,11 @@ RSpec.describe GLRubocop::GLCops::NoRoutesOutsidePacks do
   end
 
   context 'when a controller path is grandfathered' do
-    before do
-      allow(cop).to receive(:cop_config).and_return(
-        'Grandfathered' => ['receipt_copy/receipts']
+    subject(:cop) { described_class.new(config) }
+
+    let(:config) do
+      RuboCop::Config.new(
+        { 'GLCops/NoRoutesOutsidePacks' => { 'Grandfathered' => ['receipt_copy/receipts'] } }
       )
     end
 

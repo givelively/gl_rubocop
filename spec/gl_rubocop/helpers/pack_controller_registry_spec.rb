@@ -33,7 +33,9 @@ RSpec.describe GLRubocop::Helpers::PackControllerRegistry do
   end
 
   it 'maps a controller under app/public to its pack' do
-    write_file('packs/payment_gateway/app/public/payment_gateway/chariot_integrations_controller.rb', <<~RUBY)
+    controller_path = 'packs/payment_gateway/app/public/payment_gateway/' \
+                      'chariot_integrations_controller.rb'
+    write_file(controller_path, <<~RUBY)
       module PaymentGateway
         class ChariotIntegrationsController
         end
