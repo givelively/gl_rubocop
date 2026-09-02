@@ -85,6 +85,13 @@ GLCops/NoModelUsageInControllers:
   Include:
   - app/controllers/**/*
   - packs/**/app/controllers/**/*
+GLCops/NoRoutesOutsidePacks:
+  Include:
+  - config/routes.rb
+  - config/routes/**/*.rb
+  - packs/*/config/routes.rb
+  - packs/*/config/routes/**/*.rb
+  - packs/*/public/config/routes.rb
 GLCops/NoStubbingEnv:
   Include:
   - "**/*spec.rb"
