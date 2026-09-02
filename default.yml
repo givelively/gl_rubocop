@@ -37,7 +37,14 @@ AllCops:
   SuggestExtensions: false
   NewCops: enable
   Exclude:
-    - "config/**/*"
+    - "config/application.rb"
+    - "config/boot.rb"
+    - "config/environment.rb"
+    - "config/environments/**/*"
+    - "config/initializers/**/*"
+    - "config/locales/**/*"
+    - "config/puma.rb"
+    - "config/spring.rb"
     - "db/**/*"
     - "log/**/*"
     - "public/**/*"
