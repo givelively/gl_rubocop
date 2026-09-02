@@ -14,7 +14,8 @@ RSpec.describe GLRubocop::GLCops::NoRoutesOutsidePacks do
       'tracking/events' => 'tracking',
       'receipt_copy/receipts' => 'receipt_copy',
       'nonprofit_admin/registrations' => 'nonprofit_admin',
-      'payment_gateway/chariot_integrations' => 'payment_gateway'
+      'payment_gateway/chariot_integrations' => 'payment_gateway',
+      'carts/checkouts' => 'carts'
     )
   end
 
@@ -77,6 +78,15 @@ RSpec.describe GLRubocop::GLCops::NoRoutesOutsidePacks do
         scope module: :tracking do
           resources :events, only: :create
           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ #{message('tracking/events', 'tracking')}
+        end
+      RUBY
+    end
+
+    it 'registers an offense for a `resource` call whose name is already plural' do
+      expect_offense(<<~RUBY, 'config/routes.rb')
+        namespace :carts do
+          resource :checkouts, only: %i[create]
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ #{message('carts/checkouts', 'carts')}
         end
       RUBY
     end

@@ -93,7 +93,8 @@ module GLRubocop
       end
 
       def check_resource(send_node, namespace)
-        controller_part = explicit_controller_option(send_node) || resource_name_for(send_node)
+        controller_part = explicit_controller_option(send_node) || resource_name_for(send_node,
+                                                                                     namespace)
         return unless controller_part
 
         check_controller_path(send_node, build_controller_path(namespace, controller_part))
@@ -103,11 +104,20 @@ module GLRubocop
         string_or_symbol_value(keyword_value(send_node, :controller))
       end
 
-      def resource_name_for(send_node)
+      def resource_name_for(send_node, namespace)
         name = string_or_symbol_value(send_node.arguments.first)
         return nil unless name
+        return name unless send_node.method_name == :resource
 
-        send_node.method_name == :resource ? pluralize(name) : name
+        # `resource :checkout` conventionally maps to a pluralized controller
+        # (CheckoutsController), but some routes already pass the plural form
+        # directly (`resource :checkouts`) — prefer the name as-given when it
+        # already resolves to a known pack controller, to avoid double-pluralizing
+        # it (e.g. "checkouts" -> "checkoutses").
+        as_given_path = build_controller_path(namespace, name)
+        return name if controller_packs.key?(as_given_path)
+
+        pluralize(name)
       end
 
       def namespace_segment_for(send_node)
