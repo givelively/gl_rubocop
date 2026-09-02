@@ -12,6 +12,7 @@ require:
   - ./lib/gl_rubocop/gl_cops/consolidate_request_system_specs.rb
   - ./lib/gl_rubocop/gl_cops/interactor_inherits_from_interactor_base.rb
   - ./lib/gl_rubocop/gl_cops/limit_flash_options.rb
+  - ./lib/gl_rubocop/gl_cops/no_controllers_outside_packs.rb
   - ./lib/gl_rubocop/gl_cops/no_model_usage_in_controllers.rb
   - ./lib/gl_rubocop/gl_cops/no_routes_outside_packs.rb
   - ./lib/gl_rubocop/gl_cops/no_stubbing_env.rb
@@ -68,6 +69,12 @@ GLCops/InteractorInheritsFromInteractorBase:
 
 GLCops/LimitFlashOptions:
   Enabled: true
+
+GLCops/NoControllersOutsidePacks:
+  Enabled: true
+  Include:
+    - "app/controllers/**/*"
+    - "packs/**/app/controllers/**/*"
 
 GLCops/NoHardcodedStringAssignmentToTextOrContentVariable:
   Enabled: true
