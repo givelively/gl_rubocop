@@ -14,6 +14,7 @@ require:
   - ./lib/gl_rubocop/gl_cops/limit_flash_options.rb
   - ./lib/gl_rubocop/gl_cops/no_controllers_outside_packs.rb
   - ./lib/gl_rubocop/gl_cops/no_model_usage_in_controllers.rb
+  - ./lib/gl_rubocop/gl_cops/no_routes_outside_packs.rb
   - ./lib/gl_rubocop/gl_cops/no_stubbing_env.rb
   - ./lib/gl_rubocop/gl_cops/no_stubbing_perform_async.rb
   - ./lib/gl_rubocop/gl_cops/no_transaction_in_controllers.rb
@@ -36,7 +37,14 @@ AllCops:
   SuggestExtensions: false
   NewCops: enable
   Exclude:
-    - "config/**/*"
+    - "config/application.rb"
+    - "config/boot.rb"
+    - "config/environment.rb"
+    - "config/environments/**/*"
+    - "config/initializers/**/*"
+    - "config/locales/**/*"
+    - "config/puma.rb"
+    - "config/spring.rb"
     - "db/**/*"
     - "log/**/*"
     - "public/**/*"
@@ -90,6 +98,15 @@ GLCops/NoModelUsageInControllers:
   Include:
     - "app/controllers/**/*"
     - "packs/**/app/controllers/**/*"
+
+GLCops/NoRoutesOutsidePacks:
+  Enabled: true
+  Include:
+    - "config/routes.rb"
+    - "config/routes/**/*.rb"
+    - "packs/*/config/routes.rb"
+    - "packs/*/config/routes/**/*.rb"
+    - "packs/*/public/config/routes.rb"
 
 GLCops/NoStubbingEnv:
   Enabled: true
