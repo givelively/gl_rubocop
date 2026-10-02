@@ -50,7 +50,7 @@ module GLRubocop
       end
 
       def valid_method_name?(node)
-        node.method_name == :render || node.method_name == :template
+        %i[render template].include?(node.method_name)
       end
     end
   end

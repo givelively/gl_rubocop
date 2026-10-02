@@ -6,6 +6,7 @@ require 'gl_rubocop/gl_cops/prevent_haml_files'
 
 RSpec.describe GLRubocop::GLCops::PreventHamlFiles do
   include RuboCop::RSpec::ExpectOffense
+
   let(:config) { RuboCop::Config.new }
   let(:cop) { described_class.new(config) }
   let(:commissioner) { RuboCop::Cop::Commissioner.new([cop]) }

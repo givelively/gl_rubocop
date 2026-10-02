@@ -23,16 +23,18 @@ Gem::Specification.new do |spec|
   spec.executables = spec.files.grep(%r{\Aexe/}) { |f| File.basename(f) }
   spec.require_paths = ['lib']
 
-  spec.add_dependency 'rubocop', '~> 1.62.1'
-  spec.add_dependency 'rubocop-erb'
-  spec.add_dependency 'rubocop-haml'
-  spec.add_dependency 'rubocop-i18n'
+  spec.add_dependency 'rubocop', '~> 1.82'
+  spec.add_dependency 'rubocop-capybara', '>= 2.22'
+  spec.add_dependency 'rubocop-erb', '>= 0.6'
+  spec.add_dependency 'rubocop-haml', '>= 0.3'
+  spec.add_dependency 'rubocop-i18n', '>= 3.2'
   spec.add_dependency 'rubocop-magic_numbers'
-  spec.add_dependency 'rubocop-performance'
-  spec.add_dependency 'rubocop-rails'
-  spec.add_dependency 'rubocop-rake'
-  spec.add_dependency 'rubocop-rspec', '~> 2.25'
-  spec.add_dependency 'rubocop-sorbet'
+  spec.add_dependency 'rubocop-performance', '>= 1.24'
+  spec.add_dependency 'rubocop-rails', '>= 2.30'
+  spec.add_dependency 'rubocop-rake', '>= 0.7'
+  spec.add_dependency 'rubocop-rspec', '~> 3.5'
+  spec.add_dependency 'rubocop-rspec_rails', '>= 2.31'
+  spec.add_dependency 'rubocop-sorbet', '>= 0.9'
 
   spec.metadata['rubygems_mfa_required'] = 'true'
 end
