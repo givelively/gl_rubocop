@@ -19,7 +19,7 @@ module GLRubocop
     #   tw:h-5
     #   %button.tw:m-4.tw:p-8
 
-    # rubocop:disable Metrics/ClassLength
+    # rubocop:disable-next Metrics/ClassLength
     class TailwindNoContradictingClassName < RuboCop::Cop::Cop
       include GLRubocop::HamlContentHelper
       include GLRubocop::ErbContentHelper
@@ -240,7 +240,7 @@ module GLRubocop
         class_name.start_with?(GIVELIVELY_TAILWIND_CLASS_PREFIX)
       end
 
-      # rubocop:disable Metrics/AbcSize, Metrics/MethodLength
+      # rubocop:disable-next Metrics/AbcSize, Metrics/MethodLength
       def find_contradicting_classes(classes)
         # Remove the 'tw:' prefix for property matching
         normalized_classes = classes.map { |class_name| class_name.sub(matcher, '') }
@@ -267,7 +267,6 @@ module GLRubocop
 
         contradictions
       end
-      # rubocop:enable Metrics/AbcSize, Metrics/MethodLength
 
       def contradiction_found?(first_class_data, second_class_data)
         breakpoint_ranges_overlap?(first_class_data[:breakpoint_range],
@@ -310,7 +309,7 @@ module GLRubocop
         property && CONTRADICTION_GROUPS.any? { |_, group| group.include?(property) }
       end
 
-      # rubocop:disable Metrics/MethodLength
+      # rubocop:disable-next Metrics/MethodLength
       def extract_css_property(class_name)
         # Remove container query prefix (e.g., @md:)
         class_without_container = class_name.sub(/^@([a-zA-Z0-9_-]+):/, '')
@@ -363,7 +362,6 @@ module GLRubocop
 
         nil
       end
-      # rubocop:enable Metrics/MethodLength
 
       def extract_breakpoint_range(class_name)
         # Extract breakpoint range (e.g., 'md', 'lg:max-xl', 'sm:max-md')
@@ -418,6 +416,5 @@ module GLRubocop
         first_prop_group.intersect?(second_prop_group)
       end
     end
-    # rubocop:enable Metrics/ClassLength
   end
 end
