@@ -87,6 +87,23 @@ Capybara/RSpec/SpecificMatcher:
 Capybara/RSpec/VisibilityMatcher:
   VersionAdded: '1.39'
   VersionChanged: '3.0'
+FactoryBot/AttributeDefinedStatically:
+  VersionAdded: '1.28'
+  VersionChanged: '2.24'
+FactoryBot/CreateList:
+  AutoCorrect: contextual
+  Include:
+  - "**/*_spec.rb"
+  - "**/spec/**/*"
+  - "**/test/**/*"
+  - "**/features/support/factories/**/*.rb"
+  EnforcedStyle: create_list
+  ExplicitOnly: false
+  VersionAdded: '1.25'
+  VersionChanged: '2.26'
+FactoryBot/FactoryClassName:
+  VersionAdded: '1.37'
+  VersionChanged: '2.24'
 GLCops/CallbackMethodNames: {}
 GLCops/ConsolidateRequestSystemSpecs:
   Include:
