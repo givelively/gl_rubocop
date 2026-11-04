@@ -431,6 +431,9 @@ Sorbet/AllowIncompatibleOverride:
 Sorbet/BindingConstantWithoutTypeAlias:
   Enabled: false
 
+Sorbet/BlockMethodDefinition:
+  Enabled: false
+
 Sorbet/BuggyObsoleteStrictMemoization:
   Enabled: false
 
