@@ -85,8 +85,9 @@ Capybara/RSpec/SpecificMatcher:
   VersionAdded: '2.12'
   VersionChanged: '3.0'
 Capybara/RSpec/VisibilityMatcher:
+  DefaultSelector: css
   VersionAdded: '1.39'
-  VersionChanged: '3.0'
+  VersionChanged: "<<next>>"
 FactoryBot/AttributeDefinedStatically:
   VersionAdded: '1.28'
   VersionChanged: '2.24'
@@ -297,6 +298,8 @@ Layout/DotPosition:
   EnforcedStyle: leading
 Layout/ElseAlignment:
   VersionAdded: '0.49'
+  Exclude:
+  - "/**/*.erb"
 Layout/EmptyComment:
   AutoCorrect: contextual
   VersionAdded: '0.53'
@@ -324,6 +327,8 @@ Layout/EmptyLineBetweenDefs:
   NumberOfEmptyLines: 1
 Layout/EmptyLines:
   VersionAdded: '0.49'
+  Exclude:
+  - "/**/*.erb"
 Layout/EmptyLinesAroundAccessModifier:
   VersionAdded: '0.49'
   EnforcedStyle: around
@@ -345,6 +350,8 @@ Layout/EmptyLinesAroundBeginBody:
 Layout/EmptyLinesAroundBlockBody:
   VersionAdded: '0.49'
   EnforcedStyle: no_empty_lines
+  Exclude:
+  - "/**/*.erb"
 Layout/EmptyLinesAroundClassBody:
   VersionAdded: '0.49'
   VersionChanged: '0.53'
@@ -375,6 +382,8 @@ Layout/ExtraSpacing:
   AllowForAlignment: true
   AllowBeforeTrailingComments: false
   ForceEqualSignAlignment: false
+  Exclude:
+  - "/**/*.erb"
 Layout/FirstArgumentIndentation:
   VersionAdded: '0.68'
   VersionChanged: '0.77'
@@ -501,6 +510,8 @@ Layout/MultilineArrayBraceLayout:
   - "/**/*.haml"
 Layout/MultilineBlockLayout:
   VersionAdded: '0.49'
+  Exclude:
+  - "/**/*.erb"
 Layout/MultilineHashBraceLayout:
   VersionAdded: '0.49'
   EnforcedStyle: symmetrical
@@ -595,6 +606,8 @@ Layout/SpaceBeforeFirstArg:
   AllowForAlignment: true
 Layout/SpaceBeforeSemicolon:
   VersionAdded: '0.49'
+  Exclude:
+  - "/**/*.erb"
 Layout/SpaceInLambdaLiteral:
   VersionAdded: '0.49'
   EnforcedStyle: require_no_space
@@ -769,6 +782,8 @@ Lint/EmptyConditionalBody:
   VersionAdded: '0.89'
   VersionChanged: '1.73'
   AllowComments: true
+  Exclude:
+  - "/**/*.erb"
 Lint/EmptyEnsure:
   AutoCorrect: contextual
   VersionAdded: '0.10'
@@ -789,6 +804,8 @@ Lint/EmptyWhen:
   VersionAdded: '0.45'
   VersionChanged: '0.83'
   AllowComments: true
+  Exclude:
+  - "/**/*.erb"
 Lint/EnsureReturn:
   VersionAdded: '0.9'
   VersionChanged: '0.83'
@@ -858,8 +875,6 @@ Lint/OrderedMagicComments:
   VersionChanged: '1.91'
 Lint/OutOfRangeRegexpRef:
   VersionAdded: '0.89'
-  Exclude:
-  - "/**/*.erb"
 Lint/ParenthesesAsGroupedExpression:
   VersionAdded: '0.12'
   VersionChanged: '0.83'
@@ -970,7 +985,6 @@ Lint/SuppressedException:
 Lint/Syntax:
   VersionAdded: '0.9'
   Exclude:
-  - "/**/*.erb"
   - "/**/*.haml"
 Lint/ToJSON:
   VersionAdded: '0.66'
@@ -1032,7 +1046,6 @@ Lint/UselessAssignment:
   VersionAdded: '0.11'
   VersionChanged: '1.66'
   Exclude:
-  - "/**/*.erb"
   - "/**/*.haml"
 Lint/UselessElseWithoutRescue:
   VersionAdded: '0.17'
@@ -1109,7 +1122,6 @@ Metrics/BlockLength:
   - "/**/*.gemspec"
   - "/**/*_spec.rb"
   - "/**/spec/**/*"
-  - "/**/*.erb"
   - "/**/*.haml"
   - "/app/admin/**/*"
   - "/db/**/*"
@@ -1126,7 +1138,6 @@ Metrics/BlockNesting:
   CountModifierForms: false
   Max: 3
   Exclude:
-  - "/**/*.erb"
   - "/**/*.haml"
 Metrics/ClassLength:
   VersionAdded: '0.25'
@@ -1211,7 +1222,6 @@ Naming/FileName:
   VersionChanged: '1.23'
   Exclude:
   - "/Rakefile.rb"
-  - "/**/*.erb"
   - "/**/*.haml"
   ExpectMatchingDefinition: false
   CheckDefinitionPathHierarchy: true
@@ -1955,6 +1965,8 @@ Rails/PluralizationGrammar:
 Rails/Presence:
   VersionAdded: '0.52'
   VersionChanged: '2.34'
+  Exclude:
+  - "/**/*.erb"
 Rails/Present:
   VersionAdded: '0.48'
   VersionChanged: '0.67'
@@ -2258,6 +2270,8 @@ Style/EmptyElse:
   VersionChanged: '1.61'
   EnforcedStyle: both
   AllowComments: false
+  Exclude:
+  - "/**/*.erb"
 Style/EmptyLambdaParameter:
   VersionAdded: '0.52'
 Style/EmptyLiteral:
@@ -2361,6 +2375,8 @@ Style/IfInsideElse:
   VersionAdded: '0.36'
   VersionChanged: '1.3'
   AllowIfModifier: false
+  Exclude:
+  - "/**/*.erb"
 Style/IfUnlessModifier:
   VersionAdded: '0.9'
   VersionChanged: '0.30'
@@ -2373,6 +2389,8 @@ Style/IfUnlessModifierOfIfUnless:
 Style/IfWithSemicolon:
   VersionAdded: '0.9'
   VersionChanged: '0.83'
+  Exclude:
+  - "/**/*.erb"
 Style/InfiniteLoop:
   VersionAdded: '0.26'
   VersionChanged: '0.61'
@@ -2599,6 +2617,8 @@ Style/RedundantCondition:
   AllowedMethods:
   - infinite?
   - nonzero?
+  Exclude:
+  - "/**/*.erb"
 Style/RedundantConditional:
   VersionAdded: '0.50'
 Style/RedundantException:
@@ -2664,6 +2684,8 @@ Style/SafeNavigation:
   - try
   - try!
   MaxChainLength: 2
+  Exclude:
+  - "/**/*.erb"
 Style/Sample:
   References:
   - https://github.com/fastruby/fast-ruby#arrayshufflefirst-vs-arraysample-code
@@ -2694,6 +2716,8 @@ Style/SoleNestedConditional:
   VersionAdded: '0.89'
   VersionChanged: '1.5'
   AllowModifier: false
+  Exclude:
+  - "/**/*.erb"
 Style/SpecialGlobalVars:
   VersionAdded: '0.13'
   VersionChanged: '0.36'
@@ -2738,6 +2762,8 @@ Style/SymbolProc:
   - respond_to
   AllowedPatterns: []
   AllowComments: false
+  Exclude:
+  - "/**/*.erb"
 Style/TernaryParentheses:
   VersionAdded: '0.42'
   VersionChanged: '0.46'
