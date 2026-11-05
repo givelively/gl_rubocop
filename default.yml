@@ -1,13 +1,18 @@
-require:
+plugins:
   - rubocop-performance
   - rubocop-rails
   - rubocop-rspec
-  - rubocop-magic_numbers
+  - rubocop-capybara
+  - rubocop-rspec_rails
+  - rubocop-factory_bot
   - rubocop-erb
   - rubocop-haml
   - rubocop-i18n
   - rubocop-rake
   - rubocop-sorbet
+
+require:
+  - rubocop-magic_numbers
   - ./lib/gl_rubocop/gl_cops/callback_method_names.rb
   - ./lib/gl_rubocop/gl_cops/consolidate_request_system_specs.rb
   - ./lib/gl_rubocop/gl_cops/interactor_inherits_from_interactor_base.rb
@@ -55,10 +60,7 @@ AllCops:
     - "vendor/**/*"
     - "bin/**/*"
 
-Capybara/ClickLinkOrButtonStyle:
-  EnforcedStyle: link_or_button
-
-Capybara/NegationMatcher:
+Capybara/RSpec/NegationMatcher:
   EnforcedStyle: not_to
 
 GLCops/CallbackMethodNames:
@@ -324,11 +326,6 @@ RSpec/ExampleLength:
     - "spec/system/**/*"
     - "spec/serializers/**/*"
   Max: 30
-
-RSpec/FilePath:
-  Enabled: true
-  Exclude:
-    - "packs/*/spec/**/*" # Because of automatic namespacing
 
 RSpec/HookArgument:
   Exclude:
