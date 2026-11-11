@@ -21,7 +21,7 @@ module GLRubocop
     # Bad:
     #   <p><%= @message %></p>
     #   <span><%= @title %></span>
-    class TextAndContentVariableNaming < RuboCop::Cop::Cop
+    class TextAndContentVariableNaming < RuboCop::Cop::Base
       include GLRubocop::ErbContentHelper
 
       MSG = '`%<name>s` (line %<line>d) is rendered inside a text element. ' \
@@ -38,7 +38,7 @@ module GLRubocop
       # Does NOT match method calls with arguments (t('key'), helper.method, etc.)
       BARE_VAR_PATTERN = /<%=\s*@?(\w+)\s*%>/
 
-      def investigate(processed_source)
+      def on_new_investigation
         return unless erb_file?
 
         content = read_erb_file
@@ -67,7 +67,7 @@ module GLRubocop
           absolute_offset = body_start + Regexp.last_match.begin(0)
           line_number = content[0...absolute_offset].count("\n") + 1
           msg = format(MSG, name: var_name, line: line_number)
-          add_offense(nil, location: processed_source.buffer.source_range, message: msg)
+          add_offense(processed_source.buffer.source_range, message: msg)
         end
       end
 

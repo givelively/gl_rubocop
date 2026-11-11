@@ -1,6 +1,6 @@
 module GLRubocop
   module GLCops
-    class SidekiqInheritsFromSidekiqJob < RuboCop::Cop::Cop
+    class SidekiqInheritsFromSidekiqJob < RuboCop::Cop::Base
       MSG = 'All Sidekiq workers and jobs should inherit from SidekiqJob'.freeze
 
       def on_class(klass)

@@ -5,7 +5,7 @@ require_relative '../helpers/erb_content_helper'
 
 module GLRubocop
   module GLCops
-    class ValidDataTestId < RuboCop::Cop::Cop
+    class ValidDataTestId < RuboCop::Cop::Base
       include GLRubocop::HamlContentHelper
       include GLRubocop::ErbContentHelper
 
@@ -16,7 +16,7 @@ module GLRubocop
       # Does NOT match: data-test-id (the valid format)
       INVALID_PATTERN = /\bdata(?!-test-id\b)[-_]?test[-_]?id\b/i
 
-      def investigate(processed_source)
+      def on_new_investigation
         return unless haml_file? || erb_file?
 
         content = haml_file? ? read_haml_file : read_erb_file
@@ -39,11 +39,7 @@ module GLRubocop
         match = content.match(INVALID_PATTERN)
         invalid_attr = match[0].split(/[=:]/).first.gsub(/["']/, '')
         range = processed_source.buffer.source_range
-        add_offense(
-          nil,
-          location: range,
-          message: format(MSG, invalid: invalid_attr)
-        )
+        add_offense(range, message: format(MSG, invalid: invalid_attr))
       end
 
       def check_string_content(content, node)

@@ -23,6 +23,7 @@ Gem::Specification.new do |spec|
   spec.executables = spec.files.grep(%r{\Aexe/}) { |f| File.basename(f) }
   spec.require_paths = ['lib']
 
+  spec.add_dependency 'prism', '>= 1.5'
   spec.add_dependency 'rubocop', '~> 1.90'
   spec.add_dependency 'rubocop-capybara', '>= 2.23'
   spec.add_dependency 'rubocop-erb', '>= 0.6'

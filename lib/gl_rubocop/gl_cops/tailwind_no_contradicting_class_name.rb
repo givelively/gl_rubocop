@@ -20,7 +20,7 @@ module GLRubocop
     #   %button.tw:m-4.tw:p-8
 
     # rubocop:disable-next Metrics/ClassLength
-    class TailwindNoContradictingClassName < RuboCop::Cop::Cop
+    class TailwindNoContradictingClassName < RuboCop::Cop::Base
       include GLRubocop::HamlContentHelper
       include GLRubocop::ErbContentHelper
 
