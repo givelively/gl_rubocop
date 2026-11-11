@@ -17,7 +17,7 @@ module GLRubocop
     #   title_text = 'Hello'
     #   @label_text = 'Click here'
     #   def initialize(button_text: 'Submit')
-    class NoHardcodedStringAssignmentToTextOrContentVariable < RuboCop::Cop::Cop
+    class NoHardcodedStringAssignmentToTextOrContentVariable < RuboCop::Cop::Base
       MSG = '`%<name>s` must not be assigned a hardcoded string. ' \
             'Create an i18n entry and use t() instead.'
 

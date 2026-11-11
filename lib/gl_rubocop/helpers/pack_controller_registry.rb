@@ -1,4 +1,4 @@
-require 'parser/current'
+require_relative 'ruby_parser'
 
 module GLRubocop
   module Helpers
@@ -68,9 +68,7 @@ module GLRubocop
       end
 
       def parse(path)
-        Parser::CurrentRuby.parse(File.read(path))
-      rescue Parser::SyntaxError, EncodingError
-        nil
+        RubyParser.parse_file(path)
       end
 
       def walk_classes(node, namespace, paths)

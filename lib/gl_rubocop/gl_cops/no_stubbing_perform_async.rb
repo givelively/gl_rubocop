@@ -12,7 +12,7 @@ module GLRubocop
     #   allow(ExampleWorker).to receive(:perform_async)
     #   expect(ExampleWorker).to receive(:perform_async)
     #   expect(SomeWorker).not_to have_received(:perform_in)
-    class NoStubbingPerformAsync < RuboCop::Cop::Cop
+    class NoStubbingPerformAsync < RuboCop::Cop::Base
       MSG = "Don't stub perform async. Use the rspec-sidekick matchers instead: " \
             'expect(JobClass).to have_enqueued_sidekiq_job'.freeze
 

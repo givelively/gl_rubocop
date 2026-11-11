@@ -18,7 +18,7 @@ module GLRubocop
     #   <p>Hello World</p>
     #   <span>Click here</span>
     #   <h1>Page Title</h1>
-    class NoHardcodedStringsInErbTextElements < RuboCop::Cop::Cop
+    class NoHardcodedStringsInErbTextElements < RuboCop::Cop::Base
       include GLRubocop::ErbContentHelper
 
       MSG = 'Hardcoded string in <%<tag>s> on line %<line>d. ' \
@@ -31,7 +31,7 @@ module GLRubocop
         label button dt dd caption
       ].freeze
 
-      def investigate(processed_source)
+      def on_new_investigation
         return unless erb_file?
 
         content = read_erb_file
@@ -52,7 +52,7 @@ module GLRubocop
             match_start = Regexp.last_match.begin(0)
             line_number = content[0...match_start].count("\n") + 1
             range = processed_source.buffer.source_range
-            add_offense(nil, location: range, message: format(MSG, tag:, line: line_number))
+            add_offense(range, message: format(MSG, tag:, line: line_number))
           end
         end
       end

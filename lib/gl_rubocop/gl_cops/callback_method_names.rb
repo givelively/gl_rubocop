@@ -8,7 +8,7 @@ module GLRubocop
     # Bad:
     #   before_action { do_something }
     #   before_action -> { do_something }
-    class CallbackMethodNames < RuboCop::Cop::Cop
+    class CallbackMethodNames < RuboCop::Cop::Base
       CALLBACKS = %i[before_action after_action around_action].freeze
 
       def on_send(node)

@@ -1,6 +1,6 @@
 module GLRubocop
   module GLCops
-    class InteractorInheritsFromInteractorBase < RuboCop::Cop::Cop
+    class InteractorInheritsFromInteractorBase < RuboCop::Cop::Base
       MSG = 'Interactor should inherit from InteractorBase'.freeze
 
       def on_class(klass)
