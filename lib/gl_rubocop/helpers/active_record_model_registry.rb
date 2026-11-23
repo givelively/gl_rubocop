@@ -46,8 +46,7 @@ module GLRubocop
       end
 
       def model_names
-        parents = collect_class_parents
-        Set.new(parents.keys.select { |name| ar_derived?(name, parents) })
+        Set.new(database_groups.keys)
       end
 
       def database_groups(non_primary_base_classes: {}, non_primary_models: {})
@@ -101,9 +100,18 @@ module GLRubocop
 
       def walk_class(node, namespace, parents)
         name = namespace + [const_name(node.children[0])]
-        parent = node.children[1] && const_name(node.children[1])
-        parents[name.join('::')] = { parent:, namespace: }
+        record_class_parent(name.join('::'), node.children[1], namespace, parents)
         walk_body(node.children[2], name, parents)
+      end
+
+      def record_class_parent(full_name, super_node, namespace, parents)
+        return unless super_node || !parents.key?(full_name)
+
+        parents[full_name] = {
+          parent: super_node && const_name(super_node),
+          namespace:,
+          parent_anchored: anchored_at_cbase?(super_node)
+        }
       end
 
       def walk_children(node, namespace, parents)
@@ -134,21 +142,10 @@ module GLRubocop
         parts.join('::')
       end
 
-      def ar_derived?(name, parents, seen = {})
-        return seen[name] if seen.key?(name)
-        return true if AR_BASE_CLASSES.include?(name)
-
-        info = parents[name]
-        return false unless info
-
-        seen[name] = false
-        parent = info[:parent]
-        return false unless parent
-
-        resolved_parent = resolve_const(parent, info[:namespace], parents)
-        result = ar_derived?(resolved_parent, parents, seen)
-        seen[name] = result
-        result
+      def anchored_at_cbase?(node)
+        current = node
+        current = current.children[0] while current&.type == :const
+        current&.type == :cbase
       end
 
       def build_explicit_db(non_primary_base_classes, non_primary_models)
@@ -173,12 +170,13 @@ module GLRubocop
         parent = info[:parent]
         return nil unless parent
 
-        resolved_parent = resolve_const(parent, info[:namespace], parents)
+        resolved_parent = resolve_const(parent, info[:namespace], parents,
+                                        anchored: info[:parent_anchored])
         seen[name] = resolve_db_group(resolved_parent, parents, explicit_db, seen)
       end
 
-      def resolve_const(name, namespace, parents)
-        return name if parents.key?(name)
+      def resolve_const(name, namespace, parents, anchored: false)
+        return name if anchored
 
         namespace.size.downto(0) do |i|
           candidate = (namespace[0...i] + [name]).join('::')

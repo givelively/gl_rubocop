@@ -144,5 +144,26 @@ RSpec.describe GLRubocop::Helpers::ActiveRecordModelRegistry do
       )
       expect(db_groups).not_to have_key('PlainObject')
     end
+
+    it 'resolves lexical superclass collisions and preserves reopened parent classes' do
+      write_model('app/models/base_record.rb', 'class BaseRecord < ApplicationRecord; end')
+      write_model('app/models/datawarehouse/reopened.rb', <<~RUBY)
+        module Datawarehouse
+          class LineItem
+          end
+        end
+      RUBY
+      write_model('app/models/root_child.rb', <<~RUBY)
+        module Datawarehouse
+          class RootChild < ::BaseRecord; end
+        end
+      RUBY
+
+      expect(db_groups).to include(
+        'BaseRecord' => :primary,
+        'Datawarehouse::LineItem' => :datawarehouse,
+        'Datawarehouse::RootChild' => :primary
+      )
+    end
   end
 end

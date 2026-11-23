@@ -87,7 +87,42 @@ RSpec.describe GLRubocop::GLCops::NoCrossDatabaseQueries do
     it 'registers an offense for interpolated table_name join on SalesforceSync' do
       expect_offense(<<~RUBY)
         Campaign.joins("LEFT JOIN \#{SalesforceSync.table_name} ON true")
-                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ GLCops/NoCrossDatabaseQueries: Do not reference `salesforce_syncs` (versions) in a primary SQL query. Fetch IDs separately and query in two steps.
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ GLCops/NoCrossDatabaseQueries: Do not reference `SalesforceSync` (versions) in a primary SQL query. Fetch IDs separately and query in two steps.
+      RUBY
+    end
+
+    it 'registers an offense for interpolated table_name join on Datawarehouse::LineItem' do
+      expect_offense(<<~RUBY)
+        Campaign.joins("LEFT JOIN \#{Datawarehouse::LineItem.table_name} ON true")
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ GLCops/NoCrossDatabaseQueries: Do not reference `Datawarehouse::LineItem` (datawarehouse) in a primary SQL query. Fetch IDs separately and query in two steps.
+      RUBY
+    end
+
+    it 'registers an offense for bare table name passed to from' do
+      expect_offense(<<~RUBY)
+        Campaign.from('salesforce_syncs')
+                      ^^^^^^^^^^^^^^^^^^ GLCops/NoCrossDatabaseQueries: Do not reference `salesforce_syncs` (versions) in a primary SQL query. Fetch IDs separately and query in two steps.
+      RUBY
+    end
+
+    it 'registers an offense for interpolated table name passed to from with alias' do
+      expect_offense(<<~RUBY)
+        Campaign.from("\#{SalesforceSync.table_name} AS ss")
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ GLCops/NoCrossDatabaseQueries: Do not reference `SalesforceSync` (versions) in a primary SQL query. Fetch IDs separately and query in two steps.
+      RUBY
+    end
+
+    it 'allows EXTRACT(... FROM column) and JOIN LATERAL on non-primary queries' do
+      expect_no_offenses(<<~RUBY)
+        AdminSalesforceSync.where('EXTRACT(EPOCH FROM created_at) > 0')
+        Datawarehouse::LineItem.joins('JOIN LATERAL (SELECT 1) t ON true')
+      RUBY
+    end
+
+    it 'allows same-database datawarehouse SQL joins' do
+      expect_no_offenses(<<~RUBY)
+        Datawarehouse::LineItem.joins('JOIN nonprofits ON nonprofits.id = line_items.nonprofit_id')
+        Datawarehouse::LineItem.joins('JOIN unconfigured_dw_table ON unconfigured_dw_table.id = line_items.id')
       RUBY
     end
 
@@ -182,6 +217,43 @@ RSpec.describe GLRubocop::GLCops::NoCrossDatabaseQueries do
     it 'allows Datawarehouse::LineItem.arel_table on its own model' do
       expect_no_offenses(<<~RUBY)
         Datawarehouse::LineItem.order(Datawarehouse::LineItem.arel_table[:date].desc)
+      RUBY
+    end
+
+    it 'allows scalar metadata and record creation methods across databases' do
+      expect_no_offenses(<<~RUBY)
+        Campaign.where(source_type: SalesforceSync.name)
+        SalesforceSync.where(salesforce_syncable_type: Campaign.name)
+        Campaign.where(id: SalesforceSync.find_or_create_by!(id: 1).salesforce_syncable_id)
+      RUBY
+    end
+
+    it 'restores outer variable database group after shadowed block parameter' do
+      expect_no_offenses(<<~RUBY)
+        def run
+          relation = SalesforceSync.all
+          [Campaign.all].each do |relation|
+            relation.where(id: Campaign.select(:id))
+          end
+          relation.where(id: SalesforceSync.select(:id))
+        end
+      RUBY
+    end
+
+    it 'resolves lexical namespace before top-level model names' do
+      expect_offense(<<~RUBY)
+        module Datawarehouse
+          LineItem.where(Campaign.arel_table[:id].eq(1))
+                         ^^^^^^^^^^^^^^^^^^^ GLCops/NoCrossDatabaseQueries: Do not mix `Campaign` (primary) into a datawarehouse query. Fetch IDs separately with pluck before querying.
+        end
+      RUBY
+    end
+
+    it 'respects explicit top-level ::Const qualification inside a namespace' do
+      expect_no_offenses(<<~RUBY)
+        module Datawarehouse
+          ::LineItem.where(Campaign.arel_table[:id].eq(1))
+        end
       RUBY
     end
   end

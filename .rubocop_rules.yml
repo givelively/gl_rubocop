@@ -142,6 +142,15 @@ GLCops/NoCrossDatabaseQueries:
     - workflow_events
     - workflow_steps
     - workflow_transactions
+    datawarehouse:
+    - custom_question_answers
+    - disbursements
+    - line_item_order_rollups
+    - line_items
+    - nonprofit_category_reports
+    - nonprofit_statuses
+    - nonprofit_users
+    - nonprofits
 GLCops/NoHardcodedStringAssignmentToTextOrContentVariable:
   Include:
   - app/components/**/*.rb
