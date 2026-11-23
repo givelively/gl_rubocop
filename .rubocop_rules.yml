@@ -117,6 +117,31 @@ GLCops/NoControllersOutsidePacks:
   Include:
   - app/controllers/**/*
   - packs/**/app/controllers/**/*
+GLCops/NoCrossDatabaseQueries:
+  NonPrimaryBaseClasses:
+    versions:
+    - VersionRecord
+    - ShadowRecord
+    datawarehouse:
+    - Datawarehouse::BaseRecord
+  NonPrimaryModels:
+    versions:
+    - SalesforceSync
+    - AdminSalesforceSync
+  NonPrimaryAssociations:
+    versions:
+    - salesforce_syncs
+    - versions
+    - tracked_workflows
+    - workflow_events
+  NonPrimaryTables:
+    versions:
+    - salesforce_syncs
+    - versions
+    - tracked_workflows
+    - workflow_events
+    - workflow_steps
+    - workflow_transactions
 GLCops/NoHardcodedStringAssignmentToTextOrContentVariable:
   Include:
   - app/components/**/*.rb

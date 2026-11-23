@@ -92,4 +92,57 @@ RSpec.describe GLRubocop::Helpers::ActiveRecordModelRegistry do
 
     expect(first_call).to eq(second_call)
   end
+
+  describe '.database_groups_for' do
+    define_method(:db_groups) do
+      described_class.database_groups_for(
+        project_root:,
+        non_primary_base_classes: {
+          'versions' => %w[VersionRecord ShadowRecord],
+          'datawarehouse' => %w[Datawarehouse::BaseRecord]
+        },
+        non_primary_models: {
+          'versions' => %w[SalesforceSync AdminSalesforceSync]
+        }
+      )
+    end
+
+    before do
+      write_model('app/models/campaign.rb', 'class Campaign < ApplicationRecord; end')
+      write_model('app/models/salesforce_sync.rb', 'class SalesforceSync < ApplicationRecord; end')
+      write_model('app/models/admin_salesforce_sync.rb',
+                  'class AdminSalesforceSync < SalesforceSync; end')
+      write_model('app/models/salesforce_sync_new.rb',
+                  'class SalesforceSyncNew < ShadowRecord; end')
+      write_model('packs/application_record/app/public/version_record.rb',
+                  'class VersionRecord < ApplicationRecord; end')
+      write_model('packs/application_record/app/public/version.rb',
+                  'class Version < VersionRecord; end')
+      write_model('app/models/datawarehouse/base_record.rb', <<~RUBY)
+        module Datawarehouse
+          class BaseRecord < ApplicationRecord; end
+        end
+      RUBY
+      write_model('app/models/datawarehouse/line_item.rb', <<~RUBY)
+        module Datawarehouse
+          class LineItem < BaseRecord; end
+        end
+      RUBY
+      write_model('app/models/plain_object.rb', 'class PlainObject; end')
+    end
+
+    it 'classifies primary, versions, and datawarehouse models across app and packs' do
+      expect(db_groups).to include(
+        'Campaign' => :primary,
+        'SalesforceSync' => :versions,
+        'AdminSalesforceSync' => :versions,
+        'SalesforceSyncNew' => :versions,
+        'VersionRecord' => :versions,
+        'Version' => :versions,
+        'Datawarehouse::BaseRecord' => :datawarehouse,
+        'Datawarehouse::LineItem' => :datawarehouse
+      )
+      expect(db_groups).not_to have_key('PlainObject')
+    end
+  end
 end

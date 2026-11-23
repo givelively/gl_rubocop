@@ -9,6 +9,12 @@ module GLRubocop
         'packs/*/app/models/**/*.rb'
       ].freeze
 
+      ALL_MODEL_GLOBS = [
+        'app/models/**/*.rb',
+        'packs/*/app/models/**/*.rb',
+        'packs/*/app/public/**/*.rb'
+      ].freeze
+
       AR_BASE_CLASSES = ['ApplicationRecord', 'ActiveRecord::Base'].freeze
 
       class << self
@@ -18,8 +24,19 @@ module GLRubocop
                   globs]] ||= new(project_root:, globs:).model_names
         end
 
+        def database_groups_for(project_root:, globs: ALL_MODEL_GLOBS,
+                                non_primary_base_classes: {}, non_primary_models: {})
+          @db_cache ||= {}
+          key = [project_root, globs, non_primary_base_classes, non_primary_models]
+          @db_cache[key] ||= new(project_root:, globs:).database_groups(
+            non_primary_base_classes:,
+            non_primary_models:
+          )
+        end
+
         def reset_cache!
           @cache = {}
+          @db_cache = {}
         end
       end
 
@@ -31,6 +48,16 @@ module GLRubocop
       def model_names
         parents = collect_class_parents
         Set.new(parents.keys.select { |name| ar_derived?(name, parents) })
+      end
+
+      def database_groups(non_primary_base_classes: {}, non_primary_models: {})
+        parents = collect_class_parents
+        explicit_db = build_explicit_db(non_primary_base_classes, non_primary_models)
+        seen = {}
+        (parents.keys | explicit_db.keys).each_with_object({}) do |name, result|
+          db = resolve_db_group(name, parents, explicit_db, seen)
+          result[name] = db if db
+        end
       end
 
       private
@@ -122,6 +149,32 @@ module GLRubocop
         result = ar_derived?(resolved_parent, parents, seen)
         seen[name] = result
         result
+      end
+
+      def build_explicit_db(non_primary_base_classes, non_primary_models)
+        explicit_db = {}
+        [non_primary_base_classes, non_primary_models].each do |mapping|
+          mapping.each do |db, klasses|
+            Array(klasses).each { |klass| explicit_db[klass.to_s] = db.to_sym }
+          end
+        end
+        explicit_db
+      end
+
+      def resolve_db_group(name, parents, explicit_db, seen)
+        return seen[name] if seen.key?(name)
+        return explicit_db[name] if explicit_db.key?(name)
+        return :primary if AR_BASE_CLASSES.include?(name)
+
+        info = parents[name]
+        return nil unless info
+
+        seen[name] = nil
+        parent = info[:parent]
+        return nil unless parent
+
+        resolved_parent = resolve_const(parent, info[:namespace], parents)
+        seen[name] = resolve_db_group(resolved_parent, parents, explicit_db, seen)
       end
 
       def resolve_const(name, namespace, parents)

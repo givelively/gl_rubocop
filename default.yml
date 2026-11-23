@@ -18,6 +18,7 @@ require:
   - ./lib/gl_rubocop/gl_cops/interactor_inherits_from_interactor_base.rb
   - ./lib/gl_rubocop/gl_cops/limit_flash_options.rb
   - ./lib/gl_rubocop/gl_cops/no_controllers_outside_packs.rb
+  - ./lib/gl_rubocop/gl_cops/no_cross_database_queries.rb
   - ./lib/gl_rubocop/gl_cops/no_model_usage_in_controllers.rb
   - ./lib/gl_rubocop/gl_cops/no_routes_outside_packs.rb
   - ./lib/gl_rubocop/gl_cops/no_stubbing_env.rb
@@ -84,6 +85,33 @@ GLCops/NoControllersOutsidePacks:
   Include:
     - "app/controllers/**/*"
     - "packs/**/app/controllers/**/*"
+
+GLCops/NoCrossDatabaseQueries:
+  Enabled: true
+  NonPrimaryBaseClasses:
+    versions:
+      - VersionRecord
+      - ShadowRecord
+    datawarehouse:
+      - Datawarehouse::BaseRecord
+  NonPrimaryModels:
+    versions:
+      - SalesforceSync
+      - AdminSalesforceSync
+  NonPrimaryAssociations:
+    versions:
+      - salesforce_syncs
+      - versions
+      - tracked_workflows
+      - workflow_events
+  NonPrimaryTables:
+    versions:
+      - salesforce_syncs
+      - versions
+      - tracked_workflows
+      - workflow_events
+      - workflow_steps
+      - workflow_transactions
 
 GLCops/NoHardcodedStringAssignmentToTextOrContentVariable:
   Enabled: true
