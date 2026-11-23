@@ -131,7 +131,8 @@ RSpec.describe GLRubocop::Helpers::ActiveRecordModelRegistry do
       write_model('app/models/plain_object.rb', 'class PlainObject; end')
     end
 
-    it 'classifies primary, versions, and datawarehouse models across app and packs' do
+    it 'classifies primary, versions, and datawarehouse models across app and packs',
+       :aggregate_failures do
       expect(db_groups).to include(
         'Campaign' => :primary,
         'SalesforceSync' => :versions,

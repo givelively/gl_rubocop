@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+require 'yaml'
 require 'rubocop'
 require 'rubocop/rspec/support'
 require 'gl_rubocop/gl_cops/no_cross_database_queries'
@@ -7,13 +8,22 @@ require 'gl_rubocop/gl_cops/no_cross_database_queries'
 RSpec.describe GLRubocop::GLCops::NoCrossDatabaseQueries do
   include RuboCop::RSpec::ExpectOffense
 
-  subject(:cop) { described_class.new }
+  subject(:cop) { described_class.new(config) }
+
+  let(:config) do
+    defaults = YAML.safe_load_file(File.expand_path('../../../default.yml', __dir__))
+    RuboCop::Config.new(
+      'AllCops' => { 'DisplayCopNames' => true },
+      'GLCops/NoCrossDatabaseQueries' => defaults['GLCops/NoCrossDatabaseQueries']
+    )
+  end
 
   before do
     db_groups = {
       'Campaign' => :primary,
       'Nonprofit' => :primary,
       'LineItem' => :primary,
+      'Foo::Version' => :primary,
       'SalesforceSync' => :versions,
       'AdminSalesforceSync' => :versions,
       'Version' => :versions,
@@ -72,6 +82,45 @@ RSpec.describe GLRubocop::GLCops::NoCrossDatabaseQueries do
     it 'does not register an offense for same-database joins within versions' do
       expect_no_offenses(<<~RUBY)
         TrackedWorkflow.joins(:workflow_events)
+      RUBY
+    end
+
+    it 'flags includes chained with where referencing the cross-database association table' do
+      expect_offense(<<~RUBY)
+        Campaign.includes(:salesforce_syncs).where(salesforce_syncs: { success: true })
+                                                   ^^^^^^^^^^^^^^^^ GLCops/NoCrossDatabaseQueries: Do not join cross-database association `salesforce_syncs` (versions) from a primary query. Fetch IDs separately and query in two steps.
+      RUBY
+    end
+
+    it 'flags includes chained with SQL condition referencing the association table' do
+      expect_offense(<<~RUBY)
+        Campaign.includes(:salesforce_syncs).where('salesforce_syncs.success = true')
+                                                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ GLCops/NoCrossDatabaseQueries: Do not join cross-database association `salesforce_syncs` (versions) from a primary query. Fetch IDs separately and query in two steps.
+      RUBY
+    end
+
+    it 'flags where referencing association table followed by includes' do
+      expect_offense(<<~RUBY)
+        Campaign.where(salesforce_syncs: { success: true }).includes(:salesforce_syncs)
+                       ^^^^^^^^^^^^^^^^ GLCops/NoCrossDatabaseQueries: Do not join cross-database association `salesforce_syncs` (versions) from a primary query. Fetch IDs separately and query in two steps.
+      RUBY
+    end
+
+    it 'flags safe-navigation cross-database joins' do
+      expect_offense(<<~RUBY)
+        def run
+          relation = Campaign.all
+          relation&.joins(:salesforce_syncs)
+                          ^^^^^^^^^^^^^^^^^ GLCops/NoCrossDatabaseQueries: Do not join cross-database association `salesforce_syncs` (versions) from a primary query. Fetch IDs separately and query in two steps.
+        end
+      RUBY
+    end
+
+    it 'resolves receiverless association joins inside non-primary models' do
+      expect_no_offenses(<<~RUBY)
+        class TrackedWorkflow
+          scope :with_events, -> { joins(:workflow_events) }
+        end
       RUBY
     end
   end
@@ -143,6 +192,37 @@ RSpec.describe GLRubocop::GLCops::NoCrossDatabaseQueries do
     it 'does not register an offense for plain string values mentioning versions' do
       expect_no_offenses(<<~RUBY)
         Campaign.where(description: 'versions')
+        Campaign.where("source_table = '\#{SalesforceSync.table_name}'")
+      RUBY
+    end
+
+    it 'registers an offense for schema-qualified SQL table references' do
+      expect_offense(<<~RUBY)
+        Campaign.joins('JOIN public.salesforce_syncs ON true')
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ GLCops/NoCrossDatabaseQueries: Do not reference `salesforce_syncs` (versions) in a primary SQL query. Fetch IDs separately and query in two steps.
+      RUBY
+    end
+
+    it 'registers offenses for find_by_sql and SQL subqueries in select/order/group/having' do
+      expect_offense(<<~RUBY)
+        Campaign.find_by_sql('SELECT * FROM salesforce_syncs')
+                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ GLCops/NoCrossDatabaseQueries: Do not reference `salesforce_syncs` (versions) in a primary SQL query. Fetch IDs separately and query in two steps.
+        Campaign.select('(SELECT count(*) FROM salesforce_syncs) AS n')
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ GLCops/NoCrossDatabaseQueries: Do not reference `salesforce_syncs` (versions) in a primary SQL query. Fetch IDs separately and query in two steps.
+      RUBY
+    end
+
+    it 'preserves NonPrimaryTables precedence over colliding primary model names' do
+      expect_offense(<<~RUBY)
+        Campaign.joins('JOIN versions ON versions.item_id = campaigns.id')
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ GLCops/NoCrossDatabaseQueries: Do not reference `versions` (versions) in a primary SQL query. Fetch IDs separately and query in two steps.
+      RUBY
+    end
+
+    it 'reports shared primary/datawarehouse tables as primary when queried from versions' do
+      expect_offense(<<~RUBY)
+        SalesforceSync.joins('JOIN nonprofits ON nonprofits.id = salesforce_syncs.salesforce_syncable_id')
+                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ GLCops/NoCrossDatabaseQueries: Do not reference `nonprofits` (primary) in a versions SQL query. Fetch IDs separately and query in two steps.
       RUBY
     end
   end
@@ -175,7 +255,7 @@ RSpec.describe GLRubocop::GLCops::NoCrossDatabaseQueries do
     it 'flags an unmaterialized SalesforceSync relation inside primary where' do
       expect_offense(<<~RUBY)
         Campaign.where(id: SalesforceSync.where(success: true).select(:salesforce_syncable_id))
-                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ GLCops/NoCrossDatabaseQueries: Do not mix `SalesforceSync` (versions) into a primary query. Fetch IDs separately with pluck before querying.
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ GLCops/NoCrossDatabaseQueries: Do not mix `SalesforceSync` (versions) into a primary query. Fetch IDs separately with pluck before querying.
       RUBY
     end
 
@@ -225,6 +305,40 @@ RSpec.describe GLRubocop::GLCops::NoCrossDatabaseQueries do
         Campaign.where(source_type: SalesforceSync.name)
         SalesforceSync.where(salesforce_syncable_type: Campaign.name)
         Campaign.where(id: SalesforceSync.find_or_create_by!(id: 1).salesforce_syncable_id)
+        Campaign.where(sync_status: SalesforceSync.statuses[:success])
+        Campaign.where(sync_id: SalesforceSync.new(a: 1).salesforce_syncable_id)
+        sync = SalesforceSync.new(a: 1)
+        Campaign.where(id: sync.salesforce_syncable_id)
+      RUBY
+    end
+
+    it 'flags receiverless cross-database queries inside an ActiveRecord model class' do
+      expect_offense(<<~RUBY)
+        class Campaign
+          scope :s1, -> { where(SalesforceSync.arel_table[:success].eq(true)) }
+                                ^^^^^^^^^^^^^^^^^^^^^^^^^ GLCops/NoCrossDatabaseQueries: Do not mix `SalesforceSync` (versions) into a primary query. Fetch IDs separately with pluck before querying.
+          scope :s2, -> { where('EXISTS (SELECT 1 FROM salesforce_syncs)') }
+                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ GLCops/NoCrossDatabaseQueries: Do not reference `salesforce_syncs` (versions) in a primary SQL query. Fetch IDs separately and query in two steps.
+          def self.s3
+            where(id: SalesforceSync.select(:salesforce_syncable_id))
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ GLCops/NoCrossDatabaseQueries: Do not mix `SalesforceSync` (versions) into a primary query. Fetch IDs separately with pluck before querying.
+          end
+        end
+      RUBY
+    end
+
+    it 'drops block-local assignments after block exit and handles numblock shadowing' do
+      expect_no_offenses(<<~RUBY)
+        def run(items)
+          items.each do
+            inner = SalesforceSync.where(success: true)
+            inner.pluck(:id)
+          end
+          Campaign.where(id: inner)
+
+          _1_outer = SalesforceSync.all
+          items.each { _1.where(id: Campaign.select(:id)) }
+        end
       RUBY
     end
 

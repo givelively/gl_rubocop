@@ -28,79 +28,108 @@ module GLRubocop
 
       JOIN_METHODS = %i[joins left_joins left_outer_joins eager_load references].freeze
       SQL_JOIN_METHODS = %i[joins left_joins left_outer_joins from].freeze
-      SQL_QUERY_METHODS = %i[where not from].freeze
+      SQL_QUERY_METHODS = %i[
+        where not select reselect order reorder group having from find_by_sql
+      ].freeze
+      INCLUDES_CONFLICT_METHODS = %i[
+        where not select reselect order reorder group having
+      ].freeze
       QUERY_METHODS = %i[
         where not or and merge joins left_joins left_outer_joins
-        from order group having select reselect
+        from order reorder group having select reselect find_by_sql
       ].freeze
+      RELATION_METHODS = %i[
+        all where not rewhere select reselect from joins left_joins left_outer_joins
+        eager_load includes preload references order reorder group having limit offset
+        distinct unscoped default_scoped merge or and none readonly lock scoping
+        only except reverse_order extending invert_where excluding without
+        associated missing
+      ].freeze
+      AREL_METHODS = %i[arel_table arel].freeze
       MATERIALIZING_METHODS = %i[
         pluck ids pick to_a map collect first last take find find_by find_by!
-        find_or_create_by find_or_create_by! find_or_initialize_by create create!
+        find_or_create_by find_or_create_by! find_or_initialize_by find_or_initialize_by!
+        create create! new build sole find_sole_by
         count size length exists? empty? any? none? maximum minimum sum average
         table_name name polymorphic_name base_class model_name primary_key column_names
+        connection defined_enums sanitize_sql sanitize_sql_array
+        sanitize_sql_for_conditions sanitize_sql_for_assignment sanitize_sql_like
       ].freeze
       ASSOC_CONTAINER_TYPES = %i[array hash pair].freeze
       BLOCK_ARG_TYPES = %i[arg optarg restarg kwarg kwoptarg kwrestarg blockarg shadowarg].freeze
-      SQL_TABLE_PATTERN = /\b(?:JOIN|FROM)\s+"?([a-z_][a-z0-9_]*)"?/i
-      FROM_LEADING_TABLE_PATTERN = /\A\s*"?([a-z_][a-z0-9_]*)"?/i
+      SQL_TABLE_PATTERN =
+        /\b(?:JOIN|FROM)\s+(?:"?[a-z_][a-z0-9_]*"?\.)?"?([a-z_][a-z0-9_]*)"?/i
+      FROM_LEADING_TABLE_PATTERN =
+        /\A\s*(?:"?[a-z_][a-z0-9_]*"?\.)?"?([a-z_][a-z0-9_]*)"?/i
       EXTRACT_PATTERN = /\bEXTRACT\s*\([^)]*\)/i
-      INTERPOLATED_PLACEHOLDER = '__interpolated__'
-      SQL_KEYWORDS = %W[
-        lateral only values unnest generate_series select null #{INTERPOLATED_PLACEHOLDER}
+      QUOTED_LITERAL_PATTERN = /'(?:''|[^'])*'/
+      INTERPOLATED_PREFIX = '__gl_interp_'
+      SQL_KEYWORDS = %w[
+        lateral only values unnest generate_series select null
       ].freeze
-
-      DEFAULT_BASE_CLASSES = {
-        'versions' => %w[VersionRecord ShadowRecord],
-        'datawarehouse' => %w[Datawarehouse::BaseRecord]
-      }.freeze
-      DEFAULT_MODELS = {
-        'versions' => %w[SalesforceSync AdminSalesforceSync]
-      }.freeze
-      DEFAULT_ASSOCIATIONS = {
-        'versions' => %w[salesforce_syncs versions tracked_workflows workflow_events]
-      }.freeze
-      DEFAULT_TABLES = {
-        'versions' => %w[
-          salesforce_syncs versions tracked_workflows workflow_events
-          workflow_steps workflow_transactions
-        ],
-        'datawarehouse' => %w[
-          custom_question_answers disbursements line_item_order_rollups line_items
-          nonprofit_category_reports nonprofit_statuses nonprofit_users nonprofits
-        ]
-      }.freeze
+      UNSET = Object.new.freeze
 
       def on_send(node)
         check_join_or_reference(node) if JOIN_METHODS.include?(node.method_name)
         check_query_arguments(node) if QUERY_METHODS.include?(node.method_name)
+        check_includes_with_conditions(node)
       end
+      alias_method :on_csend, :on_send
 
       def on_lvasgn(node)
         var_name, value = *node
-        db = db_group_for_expr(value)
+        record_block_assignment(var_name)
+        db = relation_db_group(value)
         db ? var_db_groups[var_name] = db : var_db_groups.delete(var_name)
       end
 
       def on_block(node)
-        shadowed = {}
-        block_param_names(node.arguments).each do |param|
-          shadowed[param] = var_db_groups.delete(param) if var_db_groups.key?(param)
-        end
-        shadowed_stack << shadowed
+        push_block_scope(block_param_names(node.arguments))
+      end
+
+      def on_numblock(_node)
+        params = (1..9).map { |i| :"_#{i}" } << :it
+        push_block_scope(params)
+      end
+
+      def on_itblock(_node)
+        push_block_scope([:it])
       end
 
       def after_block(_node)
-        shadowed = shadowed_stack.pop || {}
-        shadowed.each { |param, db| var_db_groups[param] = db }
+        saved = block_scope_stack.pop || {}
+        saved.each do |var, prev|
+          prev.equal?(UNSET) ? var_db_groups.delete(var) : var_db_groups[var] = prev
+        end
       end
+      alias_method :after_numblock, :after_block
+      alias_method :after_itblock, :after_block
 
       def on_def(_node)
         var_db_groups.clear
-        shadowed_stack.clear
+        block_scope_stack.clear
       end
       alias_method :on_defs, :on_def
 
       private
+
+      def push_block_scope(params)
+        saved = {}
+        params.each do |param|
+          next unless var_db_groups.key?(param)
+
+          saved[param] = var_db_groups[param]
+          var_db_groups.delete(param)
+        end
+        block_scope_stack << saved
+      end
+
+      def record_block_assignment(var_name)
+        return if block_scope_stack.empty? || block_scope_stack.last.key?(var_name)
+
+        block_scope_stack.last[var_name] =
+          var_db_groups.key?(var_name) ? var_db_groups[var_name] : UNSET
+      end
 
       def block_param_names(args_node)
         return [] unless args_node
@@ -110,10 +139,14 @@ module GLRubocop
         end
       end
 
+      def source_db_for_call(node)
+        node.receiver ? chain_root_db_group(node.receiver) : enclosing_model_db(node)
+      end
+
       def check_join_or_reference(node)
-        source_db = db_group_for_expr(node.receiver)
+        source_db = source_db_for_call(node)
         node.arguments.each do |arg|
-          check_assoc_arg(arg, source_db)
+          check_assoc_arg(arg, source_db) if source_db || node.receiver
           if SQL_JOIN_METHODS.include?(node.method_name)
             check_sql_arg(arg, source_db, from_clause: node.method_name == :from)
           end
@@ -121,15 +154,131 @@ module GLRubocop
       end
 
       def check_assoc_arg(node, source_db)
+        effective_source = source_db || :primary
         each_assoc_symbol(node) do |sym_node, name|
           target_db = non_primary_associations[name]
-          next unless target_db && source_db != target_db
+          next unless target_db && effective_source != target_db
 
           add_offense(
             sym_node,
-            message: format(MSG_ASSOC, target: name, target_db:,
-                                       source_db: source_db || :primary)
+            message: format(MSG_ASSOC, target: name, target_db:, source_db: effective_source)
           )
+        end
+      end
+
+      def check_includes_with_conditions(node)
+        if INCLUDES_CONFLICT_METHODS.include?(node.method_name)
+          check_conditions_against_prior_includes(node)
+        elsif node.method_name == :includes
+          check_includes_against_prior_conditions(node)
+        end
+      end
+
+      def check_conditions_against_prior_includes(node)
+        included = chained_included_assocs(node.receiver)
+        return if included.empty?
+
+        source_db = chain_source_db(node)
+        cross_db = included.reject { |_, db| db == source_db }
+        return if cross_db.empty?
+
+        node.arguments.each { |arg| check_condition_against_included(arg, cross_db, source_db) }
+      end
+
+      def check_includes_against_prior_conditions(node)
+        source_db = chain_source_db(node)
+        cross_db = extract_cross_db_assocs(node.arguments, source_db)
+        return if cross_db.empty?
+
+        prior_condition_nodes(node.receiver).each do |cond_node|
+          cond_node.arguments.each do |arg|
+            check_condition_against_included(arg, cross_db, source_db)
+          end
+        end
+      end
+
+      def chain_source_db(node)
+        chain_root_db_group(node.receiver) || enclosing_model_db(node) || :primary
+      end
+
+      def extract_cross_db_assocs(args, source_db)
+        args.each_with_object({}) do |arg, acc|
+          each_assoc_symbol(arg) do |_, name|
+            target_db = non_primary_associations[name]
+            acc[name] = target_db if target_db && target_db != source_db
+          end
+        end
+      end
+
+      def chained_included_assocs(node)
+        assocs = {}
+        current = node
+        while current&.send_type? || current&.csend_type?
+          if current.method_name == :includes
+            current.arguments.each do |arg|
+              each_assoc_symbol(arg) do |_, name|
+                target_db = non_primary_associations[name]
+                assocs[name] = target_db if target_db
+              end
+            end
+          end
+          current = current.receiver
+        end
+        assocs
+      end
+
+      def prior_condition_nodes(node)
+        nodes = []
+        current = node
+        while current&.send_type? || current&.csend_type?
+          nodes << current if INCLUDES_CONFLICT_METHODS.include?(current.method_name)
+          current = current.receiver
+        end
+        nodes
+      end
+
+      def check_condition_against_included(arg, cross_db_assocs, source_db)
+        if arg.hash_type?
+          check_hash_condition_against_included(arg, cross_db_assocs, source_db)
+        elsif arg.str_type? || arg.dstr_type?
+          check_sql_condition_against_included(arg, cross_db_assocs, source_db)
+        elsif arg.array_type? && arg.children.first
+          check_condition_against_included(arg.children.first, cross_db_assocs, source_db)
+        end
+      end
+
+      def check_hash_condition_against_included(hash_node, cross_db_assocs, source_db)
+        hash_node.pairs.each do |pair|
+          next unless pair.key.sym_type? || pair.key.str_type?
+
+          match = matching_included_assoc(pair.key.value.to_s, cross_db_assocs)
+          next unless match
+
+          assoc_name, target_db = match
+          add_offense(
+            pair.key,
+            message: format(MSG_ASSOC, target: assoc_name, target_db:, source_db:)
+          )
+        end
+      end
+
+      def check_sql_condition_against_included(sql_node, cross_db_assocs, source_db)
+        text = strip_sql_literals(sql_node.str_type? ? sql_node.value : dstr_text(sql_node))
+        cross_db_assocs.each do |assoc_name, target_db|
+          tables = [assoc_name, pluralize_table_segment(assoc_name)].uniq
+          next unless tables.any? { |tbl| text.match?(/\b#{Regexp.escape(tbl)}\./i) }
+
+          add_offense(
+            sql_node,
+            message: format(MSG_ASSOC, target: assoc_name, target_db:, source_db:)
+          )
+          break
+        end
+      end
+
+      def matching_included_assoc(key_name, cross_db_assocs)
+        cross_db_assocs.find do |assoc_name, _|
+          key_name == assoc_name || key_name == pluralize_table_segment(assoc_name)
         end
       end
 
@@ -144,20 +293,26 @@ module GLRubocop
       end
 
       def check_sql_arg(node, source_db, from_clause: false)
-        return unless node.str_type? || node.dstr_type?
+        sql_node = unwrap_sql_node(node)
+        return unless sql_node
 
         effective_source = source_db || :primary
-        check_interpolated_models(node, effective_source) if node.dstr_type?
-        sql_tables_in(node, from_clause:).each do |table|
-          check_sql_table(node, table, effective_source)
+        tables, interp_sends = extract_sql_tables_and_interps(sql_node, from_clause:)
+        check_interpolated_models(sql_node, interp_sends, effective_source) if sql_node.dstr_type?
+        tables.each do |table|
+          next if table.start_with?(INTERPOLATED_PREFIX)
+
+          check_sql_table(sql_node, table, effective_source)
         end
       end
 
-      def check_interpolated_models(node, source_db)
-        node.children.each do |child|
-          send_node = interpolated_table_name_send(child)
-          next unless send_node
+      def unwrap_sql_node(node)
+        target = node.array_type? ? node.children.first : node
+        target if target&.str_type? || target&.dstr_type?
+      end
 
+      def check_interpolated_models(node, interp_sends, source_db)
+        interp_sends.each do |send_node|
           target_db = const_db_group(send_node.receiver)
           next unless target_db && target_db != source_db
 
@@ -169,59 +324,52 @@ module GLRubocop
       def check_sql_table(node, table, source_db)
         return if SQL_KEYWORDS.include?(table.downcase)
 
-        dbs = table_dbs(table)
+        dbs = table_ownership[table]
         return unless dbs&.none?(source_db)
 
-        report_sql(node, table, dbs.first, source_db)
+        target_db = dbs.include?(:primary) ? :primary : dbs.first
+        report_sql(node, table, target_db, source_db)
       end
 
-      def table_dbs(table)
-        table_ownership[table]
-      end
-
-      def table_ownership
-        @table_ownership ||= begin
-          ownership = non_primary_tables.transform_values do |dbs|
-            dbs.include?(:datawarehouse) ? dbs | Set[:primary] : dbs.dup
-          end
-          model_db_groups.each do |model_name, db|
-            table = model_to_table_name(model_name)
-            ownership[table] ||= Set.new
-            ownership[table] << db
-          end
-          ownership
+      def extract_sql_tables_and_interps(node, from_clause:)
+        if node.str_type?
+          [scan_tables(node.value, from_clause:), []]
+        else
+          text, placeholders = dstr_sql_with_placeholders(node)
+          tables = scan_tables(text, from_clause:)
+          interps = tables.filter_map { |tbl| placeholders[tbl] }
+          [tables, interps]
         end
       end
 
-      def model_to_table_name(model_name)
-        snake = model_name.split('::').last
-                          .gsub(/([A-Z\d]+)([A-Z][a-z])/, '\1_\2')
-                          .gsub(/([a-z\d])([A-Z])/, '\1_\2')
-                          .downcase
-        pluralize_table_segment(snake)
-      end
-
-      def pluralize_table_segment(word)
-        return word if word.end_with?('s') && !word.end_with?('ss', 'us')
-        return "#{word[0..-2]}ies" if word.match?(/[^aeiou]y\z/)
-        return "#{word}es" if word.end_with?('s', 'x', 'z', 'ch', 'sh')
-
-        "#{word}s"
-      end
-
-      def report_sql(node, target, target_db, source_db)
-        add_offense(node, message: format(MSG_SQL, target:, target_db:, source_db:))
-      end
-
-      def sql_tables_in(node, from_clause: false)
-        text = (node.str_type? ? node.value : dstr_static_sql(node)).gsub(EXTRACT_PATTERN, '')
+      def scan_tables(raw_text, from_clause:)
+        text = strip_sql_literals(raw_text).gsub(EXTRACT_PATTERN, '')
         tables = text.scan(SQL_TABLE_PATTERN).flatten
         tables.concat(text.scan(FROM_LEADING_TABLE_PATTERN).flatten) if from_clause
         tables.uniq
       end
 
-      def dstr_static_sql(node)
-        node.children.map { |child| child.str_type? ? child.value : INTERPOLATED_PLACEHOLDER }.join
+      def strip_sql_literals(text)
+        text.gsub(QUOTED_LITERAL_PATTERN, "''")
+      end
+
+      def dstr_text(node)
+        node.children.map { |child| child.str_type? ? child.value : '__interp__' }.join
+      end
+
+      def dstr_sql_with_placeholders(node)
+        placeholders = {}
+        parts = node.children.each_with_index.map do |child, idx|
+          if child.str_type?
+            child.value
+          else
+            send_node = interpolated_table_name_send(child)
+            token = "#{INTERPOLATED_PREFIX}#{idx}__"
+            placeholders[token] = send_node if send_node
+            token
+          end
+        end
+        [parts.join, placeholders]
       end
 
       def interpolated_table_name_send(node)
@@ -234,18 +382,26 @@ module GLRubocop
         inner
       end
 
+      def report_sql(node, target, target_db, source_db)
+        add_offense(node, message: format(MSG_SQL, target:, target_db:, source_db:))
+      end
+
       def check_query_arguments(node)
-        source_db = db_group_for_expr(node.receiver)
+        source_db = source_db_for_call(node)
+        from_clause = node.method_name == :from
         node.arguments.each do |arg|
           if source_db
-            if SQL_QUERY_METHODS.include?(node.method_name)
-              check_sql_arg(arg, source_db, from_clause: node.method_name == :from)
-            end
+            check_sql_arg(arg, source_db, from_clause:) if sql_method?(node)
             check_mixed_arel_or_subquery(arg, source_db)
           else
+            check_sql_arg(arg, nil, from_clause:) if sql_method?(node) && node.receiver.nil?
             check_mixed_arel_tables(arg)
           end
         end
+      end
+
+      def sql_method?(node)
+        SQL_QUERY_METHODS.include?(node.method_name)
       end
 
       def check_mixed_arel_tables(node)
@@ -297,12 +453,12 @@ module GLRubocop
       end
 
       def materializing_send?(node)
-        node.send_type? && MATERIALIZING_METHODS.include?(node.method_name)
+        (node.send_type? || node.csend_type?) && MATERIALIZING_METHODS.include?(node.method_name)
       end
 
       def cross_db_ref(node, source_db)
         return lvar_cross_db_ref(node, source_db) if node.lvar_type?
-        return const_cross_db_ref(node, source_db) if node.send_type?
+        return send_cross_db_ref(node, source_db) if node.send_type? || node.csend_type?
 
         nil
       end
@@ -313,30 +469,67 @@ module GLRubocop
         [name, db] if db && db != source_db
       end
 
-      def const_cross_db_ref(node, source_db)
-        const_node = node.receiver
-        return nil unless const_node&.const_type?
+      def send_cross_db_ref(node, source_db)
+        return nil if node.receiver&.lvar_type?
+        return nil unless relation_or_arel_send?(node)
 
-        db = const_db_group(const_node)
-        [full_const_name(const_node), db] if db && db != source_db
+        db = relation_send_db_group(node)
+        return nil unless db && db != source_db
+
+        target = root_const_name(node) || node.method_name
+        [target, db]
       end
 
-      def db_group_for_expr(node)
+      def relation_or_arel_send?(node)
+        RELATION_METHODS.include?(node.method_name) ||
+          AREL_METHODS.include?(node.method_name) ||
+          non_primary_associations.key?(node.method_name.to_s)
+      end
+
+      def relation_db_group(node)
         return nil unless node.is_a?(Parser::AST::Node)
 
         if node.lvar_type?
           var_db_groups[node.children.first]
-        elsif node.const_type?
-          const_db_group(node)
-        elsif node.send_type?
-          db_group_for_send(node)
+        elsif node.send_type? || node.csend_type?
+          relation_send_db_group(node)
         end
       end
 
-      def db_group_for_send(node)
+      def relation_send_db_group(node)
+        return nil if MATERIALIZING_METHODS.include?(node.method_name)
+        return nil unless relation_or_arel_send?(node)
+
+        non_primary_associations[node.method_name.to_s] || chain_root_db_group(node.receiver)
+      end
+
+      def chain_root_db_group(node)
+        return nil unless node.is_a?(Parser::AST::Node)
+
+        case node.type
+        when :lvar then var_db_groups[node.children.first]
+        when :const then const_db_group(node)
+        when :send, :csend then send_chain_root_db_group(node)
+        end
+      end
+
+      def send_chain_root_db_group(node)
         return nil if MATERIALIZING_METHODS.include?(node.method_name)
 
-        non_primary_associations[node.method_name.to_s] || db_group_for_expr(node.receiver)
+        non_primary_associations[node.method_name.to_s] || chain_root_db_group(node.receiver)
+      end
+
+      def root_const_name(node)
+        current = node
+        current = current.receiver while current.respond_to?(:receiver) && current.receiver
+        full_const_name(current) if current&.const_type?
+      end
+
+      def enclosing_model_db(node)
+        class_node = node.each_ancestor(:class).first
+        return nil unless class_node
+
+        const_db_group(class_node.children[0]) || const_db_group(class_node.children[1])
       end
 
       def const_db_group(const_node)
@@ -381,16 +574,16 @@ module GLRubocop
         @var_db_groups ||= {}
       end
 
-      def shadowed_stack
-        @shadowed_stack ||= []
+      def block_scope_stack
+        @block_scope_stack ||= []
       end
 
       def model_db_groups
         GLRubocop::Helpers::ActiveRecordModelRegistry.database_groups_for(
           project_root: RuboCop::ConfigFinder.project_root,
           globs: model_globs,
-          non_primary_base_classes: cop_config.fetch('NonPrimaryBaseClasses', DEFAULT_BASE_CLASSES),
-          non_primary_models: cop_config.fetch('NonPrimaryModels', DEFAULT_MODELS)
+          non_primary_base_classes: cop_config.fetch('NonPrimaryBaseClasses', {}),
+          non_primary_models: cop_config.fetch('NonPrimaryModels', {})
         )
       end
 
@@ -400,14 +593,54 @@ module GLRubocop
 
       def non_primary_associations
         @non_primary_associations ||= invert_db_map(
-          cop_config.fetch('NonPrimaryAssociations', DEFAULT_ASSOCIATIONS)
+          cop_config.fetch('NonPrimaryAssociations', {})
         )
       end
 
       def non_primary_tables
         @non_primary_tables ||= invert_db_set_map(
-          cop_config.fetch('NonPrimaryTables', DEFAULT_TABLES)
+          cop_config.fetch('NonPrimaryTables', {})
         )
+      end
+
+      def table_ownership
+        @table_ownership ||= begin
+          ownership = configured_table_ownership
+          merge_inferred_model_tables!(ownership)
+          ownership
+        end
+      end
+
+      def configured_table_ownership
+        non_primary_tables.transform_values do |dbs|
+          dbs.include?(:datawarehouse) ? Set[:primary] | dbs : dbs.dup
+        end
+      end
+
+      def merge_inferred_model_tables!(ownership)
+        model_db_groups.each do |model_name, db|
+          table = model_to_table_name(model_name)
+          next if ownership.key?(table) && db == :primary
+
+          (ownership[table] ||= Set.new) << db
+        end
+      end
+
+      def model_to_table_name(model_name)
+        snake = model_name.split('::').last
+                          .gsub(/([A-Z\d]+)([A-Z][a-z])/, '\1_\2')
+                          .gsub(/([a-z\d])([A-Z])/, '\1_\2')
+                          .downcase
+        pluralize_table_segment(snake)
+      end
+
+      def pluralize_table_segment(word)
+        return "#{word[0..-4]}ses" if word.end_with?('sis')
+        return word if word.end_with?('s') && !word.end_with?('ss', 'us')
+        return "#{word[0..-2]}ies" if word.match?(/[^aeiou]y\z/)
+        return "#{word}es" if word.end_with?('s', 'x', 'z', 'ch', 'sh')
+
+        "#{word}s"
       end
 
       def invert_db_map(mapping)
