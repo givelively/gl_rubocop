@@ -120,6 +120,8 @@ RSpec.describe GLRubocop::GLCops::NoCrossDatabaseQueries do
       expect_no_offenses(<<~RUBY)
         class TrackedWorkflow
           scope :with_events, -> { joins(:workflow_events) }
+          scope :chained_events, -> { where(active: true).joins(:workflow_events) }
+          scope :explicit_self_events, -> { self.joins(:workflow_events) }
         end
       RUBY
     end
@@ -256,6 +258,56 @@ RSpec.describe GLRubocop::GLCops::NoCrossDatabaseQueries do
       expect_offense(<<~RUBY)
         Campaign.where(id: SalesforceSync.where(success: true).select(:salesforce_syncable_id))
                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ GLCops/NoCrossDatabaseQueries: Do not mix `SalesforceSync` (versions) into a primary query. Fetch IDs separately with pluck before querying.
+      RUBY
+    end
+
+    it 'flags cross-database subqueries in rewhere' do
+      expect_offense(<<~RUBY)
+        Campaign.rewhere(id: SalesforceSync.select(:salesforce_syncable_id))
+                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ GLCops/NoCrossDatabaseQueries: Do not mix `SalesforceSync` (versions) into a primary query. Fetch IDs separately with pluck before querying.
+      RUBY
+    end
+
+    it 'flags named scopes on non-primary models in where, merge, and local variables' do
+      expect_offense(<<~RUBY)
+        def run
+          Campaign.where(id: SalesforceSync.successful)
+                             ^^^^^^^^^^^^^^^^^^^^^^^^^ GLCops/NoCrossDatabaseQueries: Do not mix `SalesforceSync` (versions) into a primary query. Fetch IDs separately with pluck before querying.
+          s = SalesforceSync.successful
+          Campaign.where(id: s)
+                             ^ GLCops/NoCrossDatabaseQueries: Do not mix `s` (versions) into a primary query. Fetch IDs separately with pluck before querying.
+          Campaign.joins(:campaigns).merge(SalesforceSync.successful)
+                                           ^^^^^^^^^^^^^^^^^^^^^^^^^ GLCops/NoCrossDatabaseQueries: Do not mix `SalesforceSync` (versions) into a primary query. Fetch IDs separately with pluck before querying.
+        end
+      RUBY
+    end
+
+    it 'flags receiverless and self relation subqueries inside model classes' do
+      expect_offense(<<~RUBY)
+        class Campaign
+          def self.bad_subquery
+            ids = select(:id)
+            SalesforceSync.where(id: ids)
+                                     ^^^ GLCops/NoCrossDatabaseQueries: Do not mix `ids` (primary) into a versions query. Fetch IDs separately with pluck before querying.
+            SalesforceSync.where(id: self.select(:id))
+                                     ^^^^^^^^^^^^^^^^ GLCops/NoCrossDatabaseQueries: Do not mix `select` (primary) into a versions query. Fetch IDs separately with pluck before querying.
+          end
+        end
+      RUBY
+    end
+
+    it 'keeps outer local reassignments across blocks and checks call args before shadowing' do
+      expect_offense(<<~RUBY)
+        def run
+          relation = Campaign.all
+          1.times { relation = SalesforceSync.all }
+          Campaign.where(id: relation)
+                             ^^^^^^^^ GLCops/NoCrossDatabaseQueries: Do not mix `relation` (versions) into a primary query. Fetch IDs separately with pluck before querying.
+
+          x = SalesforceSync.all
+          Campaign.where(id: x).scoping { |x| x }
+                             ^ GLCops/NoCrossDatabaseQueries: Do not mix `x` (versions) into a primary query. Fetch IDs separately with pluck before querying.
+        end
       RUBY
     end
 

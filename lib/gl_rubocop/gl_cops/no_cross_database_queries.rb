@@ -29,15 +29,17 @@ module GLRubocop
       JOIN_METHODS = %i[joins left_joins left_outer_joins eager_load references].freeze
       SQL_JOIN_METHODS = %i[joins left_joins left_outer_joins from].freeze
       SQL_QUERY_METHODS = %i[
-        where not select reselect order reorder group having from find_by_sql
+        where not rewhere select reselect order reorder group having from find_by_sql
       ].freeze
       INCLUDES_CONFLICT_METHODS = %i[
-        where not select reselect order reorder group having
+        where not rewhere select reselect order reorder group having
       ].freeze
       QUERY_METHODS = %i[
-        where not or and merge joins left_joins left_outer_joins
+        where not rewhere or and merge joins left_joins left_outer_joins
         from order reorder group having select reselect find_by_sql
       ].freeze
+      SUBQUERY_VALUE_METHODS = %i[where not rewhere].freeze
+      RELATION_COMBINATOR_METHODS = %i[merge or and].freeze
       RELATION_METHODS = %i[
         all where not rewhere select reselect from joins left_joins left_outer_joins
         eager_load includes preload references order reorder group having limit offset
@@ -79,56 +81,78 @@ module GLRubocop
       def on_lvasgn(node)
         var_name, value = *node
         record_block_assignment(var_name)
-        db = relation_db_group(value)
+        db = relation_db_group(value, allow_scope_call: true)
         db ? var_db_groups[var_name] = db : var_db_groups.delete(var_name)
       end
 
       def on_block(node)
-        push_block_scope(block_param_names(node.arguments))
+        schedule_block_scope(node, block_param_names(node.arguments))
       end
 
-      def on_numblock(_node)
+      def on_numblock(node)
         params = (1..9).map { |i| :"_#{i}" } << :it
-        push_block_scope(params)
+        schedule_block_scope(node, params)
       end
 
-      def on_itblock(_node)
-        push_block_scope([:it])
+      def on_itblock(node)
+        schedule_block_scope(node, [:it])
       end
+
+      def after_send(node)
+        params = pending_block_scopes.delete(node)
+        push_block_scope(params) if params
+      end
+      alias_method :after_csend, :after_send
 
       def after_block(_node)
-        saved = block_scope_stack.pop || {}
-        saved.each do |var, prev|
+        scope = block_scope_stack.pop
+        return unless scope
+
+        scope[:saved].each do |var, prev|
           prev.equal?(UNSET) ? var_db_groups.delete(var) : var_db_groups[var] = prev
         end
+        scope[:new_lvars].each { |var| defined_lvars.delete(var) }
       end
       alias_method :after_numblock, :after_block
       alias_method :after_itblock, :after_block
 
       def on_def(_node)
         var_db_groups.clear
+        defined_lvars.clear
         block_scope_stack.clear
+        pending_block_scopes.clear
       end
       alias_method :on_defs, :on_def
 
       private
 
+      def schedule_block_scope(node, params)
+        send_node = node.send_node
+        if send_node&.send_type? || send_node&.csend_type?
+          pending_block_scopes[send_node] = params
+        else
+          push_block_scope(params)
+        end
+      end
+
       def push_block_scope(params)
         saved = {}
+        param_map = {}
         params.each do |param|
-          next unless var_db_groups.key?(param)
-
-          saved[param] = var_db_groups[param]
+          saved[param] = var_db_groups.key?(param) ? var_db_groups[param] : UNSET
           var_db_groups.delete(param)
+          param_map[param] = true
         end
-        block_scope_stack << saved
+        block_scope_stack << { saved:, params: param_map, new_lvars: [] }
       end
 
       def record_block_assignment(var_name)
-        return if block_scope_stack.empty? || block_scope_stack.last.key?(var_name)
-
-        block_scope_stack.last[var_name] =
-          var_db_groups.key?(var_name) ? var_db_groups[var_name] : UNSET
+        scope = block_scope_stack.last
+        unless !scope || scope[:params].key?(var_name) || defined_lvars.key?(var_name)
+          scope[:saved][var_name] = UNSET unless scope[:saved].key?(var_name)
+          scope[:new_lvars] << var_name
+        end
+        defined_lvars[var_name] = true
       end
 
       def block_param_names(args_node)
@@ -392,11 +416,23 @@ module GLRubocop
         node.arguments.each do |arg|
           if source_db
             check_sql_arg(arg, source_db, from_clause:) if sql_method?(node)
-            check_mixed_arel_or_subquery(arg, source_db)
+            check_query_arg_relations(node, arg, source_db)
           else
             check_sql_arg(arg, nil, from_clause:) if sql_method?(node) && node.receiver.nil?
             check_mixed_arel_tables(arg)
           end
+        end
+      end
+
+      def check_query_arg_relations(node, arg, source_db)
+        if SUBQUERY_VALUE_METHODS.include?(node.method_name) && arg.hash_type?
+          arg.pairs.each do |pair|
+            check_mixed_arel_or_subquery(pair.value, source_db, allow_scope_call: true)
+          end
+        elsif RELATION_COMBINATOR_METHODS.include?(node.method_name)
+          check_mixed_arel_or_subquery(arg, source_db, allow_scope_call: true)
+        else
+          check_mixed_arel_or_subquery(arg, source_db)
         end
       end
 
@@ -439,11 +475,11 @@ module GLRubocop
         const_db_group(node.receiver) || :primary
       end
 
-      def check_mixed_arel_or_subquery(node, source_db)
+      def check_mixed_arel_or_subquery(node, source_db, allow_scope_call: false)
         return unless node.is_a?(Parser::AST::Node)
         return if materializing_send?(node)
 
-        if (match = cross_db_ref(node, source_db))
+        if (match = cross_db_ref(node, source_db, allow_scope_call:))
           target, target_db = match
           add_offense(node, message: format(MSG_AREL, target:, target_db:, source_db:))
           return
@@ -456,9 +492,11 @@ module GLRubocop
         (node.send_type? || node.csend_type?) && MATERIALIZING_METHODS.include?(node.method_name)
       end
 
-      def cross_db_ref(node, source_db)
+      def cross_db_ref(node, source_db, allow_scope_call: false)
         return lvar_cross_db_ref(node, source_db) if node.lvar_type?
-        return send_cross_db_ref(node, source_db) if node.send_type? || node.csend_type?
+        if node.send_type? || node.csend_type?
+          return send_cross_db_ref(node, source_db, allow_scope_call:)
+        end
 
         nil
       end
@@ -469,11 +507,10 @@ module GLRubocop
         [name, db] if db && db != source_db
       end
 
-      def send_cross_db_ref(node, source_db)
+      def send_cross_db_ref(node, source_db, allow_scope_call: false)
         return nil if node.receiver&.lvar_type?
-        return nil unless relation_or_arel_send?(node)
 
-        db = relation_send_db_group(node)
+        db = relation_send_db_group(node, allow_scope_call:)
         return nil unless db && db != source_db
 
         target = root_const_name(node) || node.method_name
@@ -486,21 +523,38 @@ module GLRubocop
           non_primary_associations.key?(node.method_name.to_s)
       end
 
-      def relation_db_group(node)
+      def relation_db_group(node, allow_scope_call: false)
         return nil unless node.is_a?(Parser::AST::Node)
 
         if node.lvar_type?
           var_db_groups[node.children.first]
         elsif node.send_type? || node.csend_type?
-          relation_send_db_group(node)
+          relation_send_db_group(node, allow_scope_call:)
         end
       end
 
-      def relation_send_db_group(node)
+      def relation_send_db_group(node, allow_scope_call: false)
         return nil if MATERIALIZING_METHODS.include?(node.method_name)
-        return nil unless relation_or_arel_send?(node)
 
-        non_primary_associations[node.method_name.to_s] || chain_root_db_group(node.receiver)
+        if relation_or_arel_send?(node)
+          return non_primary_associations[node.method_name.to_s] ||
+                 receiver_or_enclosing_db(node)
+        end
+
+        return nil unless allow_scope_call
+
+        scoped_relation_send_db_group(node)
+      end
+
+      def scoped_relation_send_db_group(node)
+        return nil if node.method_name == :[] || node.method_name.to_s.end_with?('?')
+        return nil unless root_const_name(node)
+
+        chain_root_db_group(node.receiver)
+      end
+
+      def receiver_or_enclosing_db(node)
+        node.receiver ? chain_root_db_group(node.receiver) : enclosing_model_db(node)
       end
 
       def chain_root_db_group(node)
@@ -509,6 +563,7 @@ module GLRubocop
         case node.type
         when :lvar then var_db_groups[node.children.first]
         when :const then const_db_group(node)
+        when :self then enclosing_model_db(node)
         when :send, :csend then send_chain_root_db_group(node)
         end
       end
@@ -516,7 +571,7 @@ module GLRubocop
       def send_chain_root_db_group(node)
         return nil if MATERIALIZING_METHODS.include?(node.method_name)
 
-        non_primary_associations[node.method_name.to_s] || chain_root_db_group(node.receiver)
+        non_primary_associations[node.method_name.to_s] || receiver_or_enclosing_db(node)
       end
 
       def root_const_name(node)
@@ -574,8 +629,16 @@ module GLRubocop
         @var_db_groups ||= {}
       end
 
+      def defined_lvars
+        @defined_lvars ||= {}
+      end
+
       def block_scope_stack
         @block_scope_stack ||= []
+      end
+
+      def pending_block_scopes
+        @pending_block_scopes ||= {}.compare_by_identity
       end
 
       def model_db_groups

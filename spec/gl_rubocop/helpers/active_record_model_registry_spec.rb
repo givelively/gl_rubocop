@@ -166,5 +166,19 @@ RSpec.describe GLRubocop::Helpers::ActiveRecordModelRegistry do
         'Datawarehouse::RootChild' => :primary
       )
     end
+
+    it 'qualifies relative inheritance against unscanned explicit NonPrimaryBaseClasses' do
+      write_model('app/models/analytics/custom_record.rb', <<~RUBY)
+        module Analytics
+          class CustomRecord < UnscannedBaseRecord; end
+        end
+      RUBY
+
+      groups = described_class.database_groups_for(
+        project_root:,
+        non_primary_base_classes: { 'datawarehouse' => %w[Analytics::UnscannedBaseRecord] }
+      )
+      expect(groups['Analytics::CustomRecord']).to eq(:datawarehouse)
+    end
   end
 end

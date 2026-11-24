@@ -170,17 +170,17 @@ module GLRubocop
         parent = info[:parent]
         return nil unless parent
 
-        resolved_parent = resolve_const(parent, info[:namespace], parents,
+        resolved_parent = resolve_const(parent, info[:namespace], parents, explicit_db,
                                         anchored: info[:parent_anchored])
         seen[name] = resolve_db_group(resolved_parent, parents, explicit_db, seen)
       end
 
-      def resolve_const(name, namespace, parents, anchored: false)
+      def resolve_const(name, namespace, parents, explicit_db, anchored: false)
         return name if anchored
 
         namespace.size.downto(0) do |i|
           candidate = (namespace[0...i] + [name]).join('::')
-          return candidate if parents.key?(candidate)
+          return candidate if parents.key?(candidate) || explicit_db.key?(candidate)
         end
         name
       end
